@@ -12,7 +12,7 @@ export class AssetManager {
     };
 
     queueDownload(path: string) {
-        console.log("Queueing " + path);
+        console.log("Queueing: " + path);
         this.downloadQueue.push(path);
     };
 
@@ -24,24 +24,24 @@ export class AssetManager {
      * Downloads all stored assets
      * @param callback Called when all assets are downloaded
      */
-    downloadAll(callback: Function) {
-        if (this.downloadQueue.length === 0) setTimeout(callback, 10);
-        for (let i = 0; i < this.downloadQueue.length; i++) {
+    downloadAll(callback: (errorCount: number, successCount: number) => void) {
+        if (this.downloadQueue.length === 0) setTimeout(callback, 10, this.errorCount, this.successCount);
+
+        for (const path in this.downloadQueue) {
             const img: HTMLImageElement = new Image();
 
-            const path = this.downloadQueue[i];
             console.log(path);
 
             img.addEventListener("load", () => {
-                console.log("Loaded " + img.src);
+                console.log("Loaded: " + img.src);
                 this.successCount++;
-                if (this.isDone()) callback();
+                if (this.isDone()) callback(this.errorCount, this.successCount);
             });
 
             img.addEventListener("error", () => {
-                console.log("Error loading " + img.src);
+                console.error("Error loading: " + img.src);
                 this.errorCount++;
-                if (this.isDone()) callback();
+                if (this.isDone()) callback(this.errorCount, this.successCount);
             });
 
             img.src = path;
