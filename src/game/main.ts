@@ -1,6 +1,7 @@
 import { AssetManager } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
+import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 
 /**
@@ -22,7 +23,8 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    gameEngine.addEntity(new Player(), DrawLayer.MAX)
+    gameEngine.addEntity(new Player(), DrawLayer.HIGHEST)
+    gameEngine.addEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1));
 
     try {
         gameEngine.start();

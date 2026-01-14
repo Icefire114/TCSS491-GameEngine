@@ -156,6 +156,8 @@ export class GameEngine {
         const spare = (1000 / this.TARGET_FPS) - this.clockTick;
         if (spare > 0) {
             sleep(spare);
+        } else {
+            console.warn("Frame took over the alloted budget!!")
         }
         this.update();
         this.draw();
