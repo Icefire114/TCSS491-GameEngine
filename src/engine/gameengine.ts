@@ -5,7 +5,16 @@ import { AssetManager, ImagePath } from "./assetmanager.js";
 import { sleep } from "./util.js";
 
 export class GameEngine {
+    /**
+     * The single instance of the game engine.
+     */
+    public static g_INSTANCE: GameEngine;
+
     private readonly TARGET_FPS: number = 120;
+    /**
+     * The gravitational constant in meters per second squared.
+     */
+    readonly G = 9.80665;
 
     private ctx: CanvasRenderingContext2D | null;
     private entities: [Entity, DrawLayer][];
@@ -20,8 +29,22 @@ export class GameEngine {
     private clockTick: number;
     private assetManager: AssetManager;
 
+    private m_terrainData: { y: number[]; } | null = null;
+    public get terrainData(): { y: number[]; } | null {
+        return this.m_terrainData;
+    }
+    public set terrainData(value: { y: number[]; } | null) {
+        this.m_terrainData = value;
+    }
+
+    viewportX: number = 0;
+    viewportY: number = 0;
+    zoom: number = 1;
 
     constructor(assetManager: AssetManager, options?: { debugging: boolean; }) {
+        if (!GameEngine.g_INSTANCE != undefined) {
+            throw new Error("GameEngine has already been initialized!");
+        }
         // What you will use to draw
         // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
         this.ctx = null;
@@ -48,6 +71,7 @@ export class GameEngine {
         const canvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
         const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
         this.init(ctx);
+        GameEngine.g_INSTANCE = this;
     };
 
     getSprite(path: ImagePath): HTMLImageElement {
@@ -137,9 +161,10 @@ export class GameEngine {
     };
 
     update() {
-        for (const ent of this.entities) {
-            if (!ent[0].removeFromWorld) {
-                ent[0].update(this.keys, this.clockTick);
+        for (const entPair of this.entities) {
+            const e: Entity = entPair[0];
+            if (!e.removeFromWorld) {
+                e.update(this.keys, this.clockTick);
             }
         }
 
@@ -165,4 +190,7 @@ export class GameEngine {
         requestAnimationFrame(() => this.loop());
     };
 
+    getEntityByTag(tag: string): Entity | undefined {
+        return this.entities.find(ent => ent[0].tag === tag)?.[0];
+    };
 };
