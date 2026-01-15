@@ -16,7 +16,7 @@
   "scripts": {
     "test": "echo \"Real devs test in prod\" && exit 1",
     "build:dev": "tsc",
-    "build:prod": "esbuild --bundle src/engine/main.ts --outfile=./build/bundle.js --minify",
+    "build:prod": "esbuild --minify --bundle src/game/main.ts --outfile=./build/bundle.js",
     "watch": "tsc --watch",
     "clean": "rm -rf build",
     "dev": "concurrently \"npm run watch\" \"http-server -p 8080\""

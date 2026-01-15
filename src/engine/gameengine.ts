@@ -1,5 +1,6 @@
 // This game shell was happily modified from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
-import { DrawLayer, Entity } from "./types.js";
+import { DrawLayer } from "./types.js";
+import { Entity } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
 import { sleep } from "./util.js";
@@ -42,7 +43,7 @@ export class GameEngine {
     zoom: number = 1;
 
     constructor(assetManager: AssetManager, options?: { debugging: boolean; }) {
-        if (!GameEngine.g_INSTANCE != undefined) {
+        if (GameEngine.g_INSTANCE != undefined) {
             throw new Error("GameEngine has already been initialized!");
         }
         // What you will use to draw
@@ -192,5 +193,12 @@ export class GameEngine {
 
     getEntityByTag(tag: string): Entity | undefined {
         return this.entities.find(ent => ent[0].tag === tag)?.[0];
+    };
+
+    /**
+     * @returns A list of all entities with physics.
+     */
+    getEntitiesWithPhysics(): Entity[] {
+        return this.entities.filter(ent => ent[0].physicsCollider !== null).map(ent => ent[0]);
     };
 };

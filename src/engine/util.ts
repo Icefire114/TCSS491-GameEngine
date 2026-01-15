@@ -17,3 +17,16 @@ export async function sleep(ms: number): Promise<void> {
 export function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
 }
+
+/**
+ * Basically just rust's Option.unwrap().
+ * @param v The value to unwrap.
+ * @returns `v` if it is a value
+ * @throws An error if `v` is null or undefined
+ */
+export function unwrap<T>(v: T | undefined | null): T {
+    if (v === undefined || v === null) {
+        throw new Error("unwrap was called on a null or undefined value!");
+    }
+    return v;
+}
