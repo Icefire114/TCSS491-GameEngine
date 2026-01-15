@@ -44,21 +44,45 @@ export class Player implements Entity {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        if (keys["a"]) {
-            this.xV += clamp(-200 * deltaTime, -100, 100)
-            this.yV += 10 * deltaTime
-        }
+        const onGround = this.yV === 0; // fix later
+
+        // -- Base movement: simulating sliding down a mountain --
+        const slideForce = 10; // Constant downward and rightward force
+        this.xV += slideForce * deltaTime;
+
+        // -- Player input --
+
+        // D key: Speed up
         if (keys["d"]) {
-            this.xV += clamp(200 * deltaTime, -100, 100)
-            this.yV += 10 * deltaTime
+            this.xV += 250 * deltaTime;
         }
 
-        this.yV += clamp((GameEngine.g_INSTANCE.G ** 2) * deltaTime, -100, 100)
+        // A key: Brake
+        if (keys["a"]) {
+            this.xV = Math.max(1, this.xV - 200 * deltaTime); // Reduce x velocity, but not below 1
+            this.yV = Math.max(1, this.yV - 200 * deltaTime); // Reduce y velocity, but not below 1
+        }
 
-        this.X = clamp(this.X + (this.xV * deltaTime), 0, Infinity)
-        this.Y += this.yV * deltaTime
+        // W or Space key: Jump
+        if ((keys["w"] || keys[" "]) && onGround) {
+            this.yV = -15; // Apply an upward force for jumping
+        }
 
-        // Colision with the terrain.
+
+        // -- Physics simulation --
+
+        // Gravity
+        this.yV += GameEngine.g_INSTANCE.G * deltaTime;
+
+        // Friction
+        const friction = 0.01;
+        this.xV *= (1 - friction);
+
+        // Apply velocity to position
+        this.X += this.xV * deltaTime;
+        this.Y += this.yV * deltaTime;
+
+        // -- Collision with terrain --
         const mountain = unwrap(GameEngine.g_INSTANCE.getEntityByTag("mountain"));
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
