@@ -20,13 +20,12 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - name: Build
+      - name: Build & collect files
         run: |
           npm ci
           npm run build:prod
-
-      - name: Copy index.html
-        run: cp index.html build/index.html
+          cp index.html build/
+          cp build/bundle.js build/bundle.js
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4.0.0
