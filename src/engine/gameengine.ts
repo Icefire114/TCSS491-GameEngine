@@ -19,6 +19,7 @@ export class GameEngine {
 
     private ctx: CanvasRenderingContext2D | null;
     private entities: [Entity, DrawLayer][];
+    private uniqueEntities: Record<string, [Entity, DrawLayer]> = {};
     private click: { x: number, y: number } | null;
     private mouse: { x: number, y: number } | null;
     private wheel: { x: number, y: number } | null;
@@ -146,6 +147,20 @@ export class GameEngine {
         this.entities.push([entity, drawPriority]);
     };
 
+    /**
+    * Registers a unique entity to be drawn and updated when the engine ticks, 
+    * these entities will be tracked separately and only one single instance 
+    * of these entities should ever exist.
+    *
+    * @param entity The entity to add.
+    * @param drawPriority The priority in which entites should be drawn, 
+    * lower numbers = drawn earlier, bigger numbers = drawn later.
+    */
+    addUniqueEntity(entity: Entity, drawPriority: DrawLayer) {
+        this.addEntity(entity, drawPriority);
+        this.uniqueEntities[entity.tag] = [entity, drawPriority];
+    };
+
     draw() {
         if (!this.ctx) {
             throw new Error("Lost canvas context!");
@@ -170,7 +185,7 @@ export class GameEngine {
         }
 
         // Update camera to follow player.
-        const player = this.getEntityByTag("player");
+        const player = this.getUniqueEntityByTag("player");
         if (player && this.ctx) {
             // Horizontal following
             const player_screen_pecentage_x = 0.15;
@@ -209,14 +224,26 @@ export class GameEngine {
      * @param tag The tag of the entity to find
      * @returns The entity with the given tag or undefined if no such entity could be found.
      */
-    getEntityByTag(tag: string): Entity | undefined {
-        return this.entities.find(ent => ent[0].tag === tag)?.[0];
+    getEntitiesByTag(tag: string): Entity[] | undefined {
+        return this.entities
+            .filter(ent => ent[0].tag === tag)
+            .map(ent => ent[0]);
+    };
+
+    /**
+     * @param tag The tag of the entity to find
+     * @returns The entity with the given tag or undefined if no such entity could be found.
+     */
+    getUniqueEntityByTag(tag: string): Entity | undefined {
+        return this.uniqueEntities[tag]?.[0];
     };
 
     /**
      * @returns A list of all entities with physics.
      */
     getEntitiesWithPhysics(): Entity[] {
-        return this.entities.filter(ent => ent[0].physicsCollider !== null).map(ent => ent[0]);
+        return this.entities
+            .filter(ent => ent[0].physicsCollider !== null)
+            .map(ent => ent[0]);
     };
 };

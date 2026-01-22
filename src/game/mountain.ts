@@ -11,10 +11,10 @@ export class Mountain implements Entity {
 
     constructor() {
         // Load the default level into the engine
-        fetch('res/levels/main.json').then(response => response.json()).then(data => {
+        fetch('res/levels/testing.json').then(response => response.json()).then(data => {
             GameEngine.g_INSTANCE.terrainData = data;
             this.physicsCollider = new MountainCollider(data.y);
-            unwrap(GameEngine.g_INSTANCE.getEntityByTag("player")).position.y = data.y[0] + 20;
+            unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
         });
     }
 
