@@ -19,6 +19,10 @@ export type Entity = {
     velocity: Vec2;
 
     physicsCollider: Collider | null;
+
+    /**
+     * The fallback sprite for the entity if it's not animatable.
+     */
     sprite: ImagePath | null;
 
     removeFromWorld: boolean;

@@ -1,6 +1,7 @@
 import { AssetManager } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
+import { BasicZombie } from "./BasicZombie.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 
@@ -13,6 +14,10 @@ const gameEngine = new GameEngine(ASSET_MANAGER);
 ASSET_MANAGER.queueDownload("res/img/player.png");
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -27,6 +32,9 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 function main() {
     gameEngine.addUniqueEntity(new Player(), DrawLayer.HIGHEST)
     gameEngine.addUniqueEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1));
+
+    gameEngine.addEntity(new BasicZombie(), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new BasicZombie({ x: 10, y: -10 }), DrawLayer.of(DrawLayer.HIGHEST - 2));
 
     try {
         gameEngine.start();

@@ -76,7 +76,9 @@ export class Player implements Entity {
         const onGround = this.velocity.y === 0; // TODO: fix later
 
         // -- Base movement: simulating sliding down a mountain --
-        const slideForce = 5; // Constant  rightward force
+        // I like having this around 5, but for testing i have it at 0
+        const slideForce = 0; // Constant rightward force
+        
         this.velocity.x += slideForce * deltaTime;
 
         // -- Player input --
