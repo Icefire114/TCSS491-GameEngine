@@ -65,9 +65,6 @@ export class ThrowerZombie implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        if (!keys["a"] && !keys["s"] && !keys["w"] && !keys["d"] && !keys[" "]) {
-            this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-        }
-
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
     }
 }
