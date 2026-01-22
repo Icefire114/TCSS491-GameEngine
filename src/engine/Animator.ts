@@ -22,7 +22,7 @@ export type SpriteSheetInfo = {
 };
 
 export class Animator {
-    private readonly ANIMATION_FPS = 10;
+    private readonly ANIMATION_FPS = 6;
 
     private currentState: AnimationState = AnimationState.IDLE;
     private frameCounter: number = 0;
