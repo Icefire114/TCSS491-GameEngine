@@ -24,8 +24,8 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    gameEngine.addEntity(new Player(), DrawLayer.HIGHEST)
-    gameEngine.addEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1));
+    gameEngine.addUniqueEntity(new Player(), DrawLayer.HIGHEST)
+    gameEngine.addUniqueEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1));
 
     try {
         gameEngine.start();

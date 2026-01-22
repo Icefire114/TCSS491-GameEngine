@@ -19,7 +19,7 @@ export class Player implements Entity {
     tag: string = "player";
 
     constructor() {
-        this.id = this.tag + "#" + new Crypto().randomUUID() as EntityID;
+        this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {

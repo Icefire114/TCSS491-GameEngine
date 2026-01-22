@@ -11,7 +11,7 @@ export class Mountain implements Entity {
     physicsCollider: MountainCollider | null = null;
 
     constructor() {
-        this.id = this.tag + "#" + new Crypto().randomUUID() as EntityID;
+        this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
         // Load the default level into the engine
         fetch('res/levels/testing.json').then(response => response.json()).then(data => {
             GameEngine.g_INSTANCE.terrainData = data;
