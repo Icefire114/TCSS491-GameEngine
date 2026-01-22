@@ -31,7 +31,7 @@ export class Player implements Entity {
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const sprite = game.getSprite(this.sprite);
 
-        const player_width_in_world_units = 4;
+        const player_width_in_world_units = 5;
 
         const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
@@ -55,7 +55,7 @@ export class Player implements Entity {
     drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const sprite = game.getSprite(this.snowBoardSprite);
 
-        const player_width_in_world_units = 4;
+        const player_width_in_world_units = 5;
         const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const w = player_width_in_world_units * meter_in_pixels;
         const h = sprite.height * (w / sprite.width);
@@ -66,7 +66,7 @@ export class Player implements Entity {
         ctx.drawImage(
             sprite,
             screenX - w / 2,
-            screenY - h + 8,
+            screenY - h + 9,
             w,
             h
         )
