@@ -4,6 +4,7 @@ import { DrawLayer } from "../engine/types.js";
 import { BasicZombie } from "./BasicZombie.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
+import { ThrowerZombie } from "./ThrowerZombie.js";
 
 /**
  * This is the main file for the game, and it should be considered the entry point for the game.
@@ -18,6 +19,10 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -35,6 +40,9 @@ function main() {
 
     gameEngine.addEntity(new BasicZombie(), DrawLayer.of(DrawLayer.HIGHEST - 2));
     gameEngine.addEntity(new BasicZombie({ x: 10, y: -10 }), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new BasicZombie({ x: 20, y: -10 }), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.of(DrawLayer.HIGHEST - 2));
 
     try {
         gameEngine.start();

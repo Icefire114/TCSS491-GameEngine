@@ -11,11 +11,14 @@ export class GameEngine {
     public static g_INSTANCE: GameEngine;
     public static readonly WORLD_UNITS_IN_VIEWPORT = 100;
 
-    private readonly TARGET_FPS: number = 120;
+    private static readonly TARGET_FPS: number = 120;
     /**
      * The gravitational constant in meters per second squared.
      */
     readonly G = 9.80665;
+
+    private static readonly FIXED_DT = 1 / GameEngine.TARGET_FPS;
+    private accumulator = 0;
 
     private ctx: CanvasRenderingContext2D | null;
     private entities: [Entity, DrawLayer][];
@@ -176,11 +179,10 @@ export class GameEngine {
         }
     };
 
-    update() {
-        for (const entPair of this.entities) {
-            const e: Entity = entPair[0];
-            if (!e.removeFromWorld) {
-                e.update(this.keys, this.clockTick);
+    update(dt: number) {
+        for (const [entity] of this.entities) {
+            if (!entity.removeFromWorld) {
+                entity.update(this.keys, dt);
             }
         }
 
@@ -207,19 +209,19 @@ export class GameEngine {
     };
 
     loop() {
-        this.clockTick = this.timer.tick();
+        let frameTime = this.timer.tick();
+        frameTime = Math.min(frameTime, 0.25); // prevent spiral of death
 
-        const spare = (1000 / this.TARGET_FPS) - this.clockTick;
-        if (spare > 0) {
-            sleep(spare);
-        } else {
-            console.warn("Frame took over the alloted budget!!")
+        this.accumulator += frameTime;
+
+        while (this.accumulator >= GameEngine.FIXED_DT) {
+            this.update(GameEngine.FIXED_DT);
+            this.accumulator -= GameEngine.FIXED_DT;
         }
-        this.update();
-        this.draw();
 
+        this.draw();
         requestAnimationFrame(() => this.loop());
-    };
+    }
 
     /**
      * @param tag The tag of the entity to find
