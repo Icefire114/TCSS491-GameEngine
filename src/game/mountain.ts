@@ -1,15 +1,17 @@
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { MountainCollider } from "../engine/physics/MountainCollider.js";
-import { Entity } from "../engine/Entity.js";
+import { Entity, EntityID } from "../engine/Entity.js";
 import { clamp, unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
 
 export class Mountain implements Entity {
+    tag: string = "mountain";
+    id: EntityID;
     physicsCollider: MountainCollider | null = null;
-    tag = "mountain";
 
     constructor() {
+        this.id = this.tag + "#" + new Crypto().randomUUID() as EntityID;
         // Load the default level into the engine
         fetch('res/levels/testing.json').then(response => response.json()).then(data => {
             GameEngine.g_INSTANCE.terrainData = data;

@@ -1,7 +1,7 @@
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Entity } from "../engine/Entity.js";
+import { Entity, EntityID } from "../engine/Entity.js";
 import { unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
 
@@ -10,12 +10,17 @@ import { Vec2 } from "../engine/types.js";
  * @description The main player class.
  */
 export class Player implements Entity {
+    id: EntityID;
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(1, 2);
     sprite: ImagePath = new ImagePath("res/img/player.png");
     removeFromWorld: boolean = false;
     tag: string = "player";
+
+    constructor() {
+        this.id = this.tag + "#" + new Crypto().randomUUID() as EntityID;
+    }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const sprite = game.getSprite(this.sprite);
@@ -41,7 +46,7 @@ export class Player implements Entity {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        const onGround = this.velocity.y === 0; // fix later
+        const onGround = this.velocity.y === 0; // TODO: fix later
 
         // -- Base movement: simulating sliding down a mountain --
         const slideForce = 10; // Constant downward and rightward force
@@ -57,7 +62,7 @@ export class Player implements Entity {
         // A key: Brake
         if (keys["a"]) {
             this.velocity.x = Math.max(1, this.velocity.x - 200 * deltaTime); // Reduce x velocity, but not below 1
-            this.velocity.y = Math.max(1, this.velocity.y - 200 * deltaTime); // Reduce y velocity, but not below 1
+            // this.velocity.y = Math.max(1, this.velocity.y - 200 * deltaTime); // Reduce y velocity, but not below 1
         }
 
         // W or Space key: Jump
@@ -80,7 +85,7 @@ export class Player implements Entity {
         this.position.y += this.velocity.y * deltaTime;
 
         // -- Collision with terrain --
-        const mountain = unwrap(GameEngine.g_INSTANCE.getEntityByTag("mountain"));
+        const mountain = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain"));
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
                 // TODO: Make the position jump to the nearest surface, or the amount moved should be 

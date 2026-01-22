@@ -1,5 +1,5 @@
 import { DrawLayer } from "./types.js";
-import { Entity } from "./Entity.js";
+import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
 import { sleep } from "./util.js";
@@ -200,6 +200,7 @@ export class GameEngine {
 
         for (let i = this.entities.length - 1; i >= 0; --i) {
             if (this.entities[i][0].removeFromWorld) {
+                delete this.uniqueEntities[this.entities[i][0].tag];
                 this.entities.splice(i, 1);
             }
         }
@@ -224,7 +225,7 @@ export class GameEngine {
      * @param tag The tag of the entity to find
      * @returns The entity with the given tag or undefined if no such entity could be found.
      */
-    getEntitiesByTag(tag: string): Entity[] | undefined {
+    getEntitiesByTag(tag: string): Entity[] {
         return this.entities
             .filter(ent => ent[0].tag === tag)
             .map(ent => ent[0]);
@@ -237,6 +238,14 @@ export class GameEngine {
     getUniqueEntityByTag(tag: string): Entity | undefined {
         return this.uniqueEntities[tag]?.[0];
     };
+
+    /**
+     * @param id The unique ID of the entity to get
+     * @returns The entity with the given ID or undefined if no such entity could be found.
+     */
+    getEntityByID(id: EntityID): Entity | undefined {
+        return this.entities.find(ent => ent[0].id === id)?.[0];
+    }
 
     /**
      * @returns A list of all entities with physics.

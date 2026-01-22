@@ -4,9 +4,15 @@ import { Collider } from "./physics/Collider.js";
 import { Vec2 } from "./types.js";
 
 /**
+ * Should be just `{entityTAG}#{UUID}`.
+ */
+export type EntityID = `${string}#${string}-${string}-${string}-${string}-${string}`;
+
+/**
  * This is the parent type for all entities, and they should all extend this type.
  */
 export type Entity = {
+    readonly id: EntityID;
     readonly tag: string;
 
     position: Vec2;
