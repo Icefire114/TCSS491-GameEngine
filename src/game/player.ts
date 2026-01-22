@@ -10,17 +10,23 @@ import { Vec2 } from "../engine/types.js";
  * @description The main player class.
  */
 export class Player implements Entity {
+    tag: string = "player";
     id: EntityID;
+
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
-    physicsCollider = new BoxCollider(1, 2);
-    sprite: ImagePath = new ImagePath("res/img/player.png");
+    physicsCollider = new BoxCollider(2, 4);
+    sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
-    tag: string = "player";
+
+    snowBoardSprite: ImagePath = new ImagePath("res/img/snowboard.png");
 
     constructor() {
         this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
     }
+
+
+    // TODO(pg): When we are going down a slope, we shhould rotate both player and snowboard to be perpendicular to the slope
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const sprite = game.getSprite(this.sprite);
@@ -43,13 +49,34 @@ export class Player implements Entity {
             w,
             h
         );
+        this.drawSnowboard(ctx, game);
+    }
+
+    drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        const sprite = game.getSprite(this.snowBoardSprite);
+
+        const player_width_in_world_units = 4;
+        const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const w = player_width_in_world_units * meter_in_pixels;
+        const h = sprite.height * (w / sprite.width);
+        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
+        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
+
+        ctx.drawImage(
+            sprite,
+            screenX - w / 2,
+            screenY - h + 8,
+            w,
+            h
+        )
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
         const onGround = this.velocity.y === 0; // TODO: fix later
 
         // -- Base movement: simulating sliding down a mountain --
-        const slideForce = 10; // Constant downward and rightward force
+        const slideForce = 5; // Constant  rightward force
         this.velocity.x += slideForce * deltaTime;
 
         // -- Player input --
