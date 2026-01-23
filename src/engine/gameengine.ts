@@ -2,7 +2,7 @@ import { DrawLayer } from "./types.js";
 import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
-import { sleep } from "./util.js";
+import { sleep, unwrap } from "./util.js";
 
 export class GameEngine {
     /**
@@ -79,8 +79,13 @@ export class GameEngine {
         GameEngine.g_INSTANCE = this;
     };
 
+    /**
+     * @param path The path to the image.
+     * @returns An image from the given path.
+     * @throws If the given `path` is not in the image cache.
+     */
     getSprite(path: ImagePath): HTMLImageElement {
-        return this.assetManager.getImage(path);
+        return unwrap(this.assetManager.getImage(path));
     }
 
 

@@ -51,7 +51,7 @@ export class AssetManager {
         }
     };
 
-    getImage(path: ImagePath): HTMLImageElement {
+    getImage(path: ImagePath): HTMLImageElement | undefined {
         return this.m_cache[path.asRaw()];
     };
 };

@@ -4,6 +4,7 @@ import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
+import { Item } from "./Item.js";
 
 /**
  * @author PG
@@ -20,6 +21,11 @@ export class Player implements Entity {
     removeFromWorld: boolean = false;
 
     snowBoardSprite: ImagePath = new ImagePath("res/img/snowboard.png");
+
+    /**
+     * The items the player has picked up.
+     */
+    items: Item[] = [];
 
     constructor() {
         this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
@@ -78,7 +84,7 @@ export class Player implements Entity {
         // -- Base movement: simulating sliding down a mountain --
         // I like having this around 5, but for testing i have it at 0
         const slideForce = 0; // Constant rightward force
-        
+
         this.velocity.x += slideForce * deltaTime;
 
         // -- Player input --
@@ -90,7 +96,9 @@ export class Player implements Entity {
 
         // A key: Brake
         if (keys["a"]) {
-            this.velocity.x = Math.max(1, this.velocity.x - 200 * deltaTime); // Reduce x velocity, but not below 1
+            this.velocity.x -= 250 * deltaTime;
+
+            // this.velocity.x = Math.max(1, this.velocity.x - 200 * deltaTime); // Reduce x velocity, but not below 1
             // this.velocity.y = Math.max(1, this.velocity.y - 200 * deltaTime); // Reduce y velocity, but not below 1
         }
 
