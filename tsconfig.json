@@ -9,13 +9,17 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
-    "lib": ["ES2020", "DOM"],
-    "allowImportingTsExtensions": false
-  },
-    "include": [
-        "./src/**/*"
+    "lib": [
+      "ES2020",
+      "DOM"
     ],
-    "exclude": [
-        "node_modules"
-    ]
+    "allowImportingTsExtensions": false,
+    "sourceMap": true,
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
 }

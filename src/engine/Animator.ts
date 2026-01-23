@@ -25,7 +25,6 @@ export class Animator {
     private readonly ANIMATION_FPS = 6;
 
     private currentState: AnimationState = AnimationState.IDLE;
-    private frameCounter: number = 0;
     private elapsed = 0; // seconds
     private secondsPerFrame = 1 / this.ANIMATION_FPS;
 
@@ -48,12 +47,12 @@ export class Animator {
         };
 
     constructor(spriteSheets: [SpriteSheetInfo, AnimationState][]) {
-        for (const a of spriteSheets) {
-            this.spriteSheet[a[1]] = {
-                sprite: unwrap(GameEngine.g_INSTANCE.getSprite(a[0].sprite)),
-                frameHeight: a[0].frameHeight,
-                frameCount: a[0].frameCount,
-                frameWidth: a[0].frameWidth,
+        for (const spriteSheet of spriteSheets) {
+            this.spriteSheet[spriteSheet[1]] = {
+                sprite: unwrap(GameEngine.g_INSTANCE.getSprite(spriteSheet[0].sprite)),
+                frameHeight: spriteSheet[0].frameHeight,
+                frameCount: spriteSheet[0].frameCount,
+                frameWidth: spriteSheet[0].frameWidth,
             }
         }
     }
