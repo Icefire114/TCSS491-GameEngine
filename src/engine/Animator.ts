@@ -78,16 +78,7 @@ export class Animator {
         const frameIdx = Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
         const game = GameEngine.g_INSTANCE;
 
-        const player_width_in_world_units = 10;
-
         const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-
-        const w = player_width_in_world_units * meter_in_pixels;
-        const h = currentAnim.sprite.height * (w / currentAnim.sprite.width);
-
-        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const screenX = (pos.x - game.viewportX) * scale / game.zoom;
-        const screenY = (pos.y - game.viewportY) * scale / game.zoom;
 
         ctx.drawImage(
             currentAnim.sprite,
@@ -95,8 +86,8 @@ export class Animator {
             0, // srcImgY
             currentAnim.frameWidth, // srcImgW
             currentAnim.frameHeight, // srcImgH
-            screenX - w / 2,
-            screenY - h,
+            (pos.x - game.viewportX) * meter_in_pixels / game.zoom,
+            (pos.y - game.viewportY) * meter_in_pixels / game.zoom,
             currentAnim.frameWidth,
             currentAnim.frameHeight
         );

@@ -1,4 +1,5 @@
-import { AssetManager } from "../engine/assetmanager.js";
+import { AnimationState, Animator } from "../engine/Animator.js";
+import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
 import { BasicZombie } from "./BasicZombie.js";
@@ -52,7 +53,24 @@ function main() {
     gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.ZOMBIE);
     gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.ZOMBIE);
 
-    gameEngine.addEntity(new ItemEntity(new InstantHealthItem(), { x: 60, y: -10 }), DrawLayer.ITEM);
+    gameEngine.addEntity(
+        new ItemEntity(
+            new InstantHealthItem(),
+            new Animator(
+                [
+                    [
+                        {
+                            frameCount: 4,
+                            frameHeight: 40,
+                            frameWidth: 42,
+                            sprite: new ImagePath("res/img/items/instant_health_pickup.png")
+                        },
+                        AnimationState.IDLE
+                    ]
+                ]
+            ),
+            { x: 60, y: -5 })
+        , DrawLayer.ITEM);
 
     try {
         gameEngine.start();

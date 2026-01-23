@@ -1,3 +1,4 @@
+import { AnimationState, Animator } from "../../engine/Animator.js";
 import { ImagePath } from "../../engine/assetmanager.js";
 import { Entity } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
@@ -15,16 +16,18 @@ export class ItemEntity implements Entity {
     physicsCollider: Collider = new BoxCollider(2, 2);
     sprite: ImagePath;
     removeFromWorld: boolean = false;
+    animation: Animator;
 
     /**
      * The item this entity represents.
      */
     item: Item;
 
-    constructor(item: Item, position?: Vec2) {
+    constructor(item: Item, animator: Animator, position?: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.item = item;
         this.sprite = item.sprite;
+        this.animation = animator;
         if (position) {
             this.position = position;
         }
@@ -32,21 +35,23 @@ export class ItemEntity implements Entity {
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        const sprite = game.getSprite(this.sprite);
+        this.animation.drawCurrentAnimFrameAtPos(ctx, this.position);
 
-        const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        // TODO: This is some simpler draw code!
+        // const sprite = game.getSprite(this.sprite);
 
-        ctx.drawImage(
-            sprite,
-            (this.position.x - game.viewportX) * meter_in_pixels / game.zoom,
-            (this.position.y - game.viewportY) * meter_in_pixels / game.zoom,
-            sprite.width,
-            sprite.height
-        );
+        // const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+
+        // ctx.drawImage(
+        //     sprite,
+        //     (this.position.x - game.viewportX) * meter_in_pixels / game.zoom,
+        //     (this.position.y - game.viewportY) * meter_in_pixels / game.zoom,
+        //     sprite.width,
+        //     sprite.height
+        // );
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-
+        this.animation.updateAnimState(AnimationState.IDLE, deltaTime);
     }
-
 }
