@@ -28,7 +28,7 @@ export class Player implements Entity {
     items: Item[] = [];
 
     constructor() {
-        this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 
 

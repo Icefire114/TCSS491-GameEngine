@@ -63,7 +63,7 @@ export class ThrowerZombie implements Entity {
     ]);
 
     constructor(pos?: Vec2) {
-        this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
         if (pos) {
             this.position = pos;
         }
