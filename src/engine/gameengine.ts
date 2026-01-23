@@ -85,7 +85,7 @@ export class GameEngine {
      * @throws If the given `path` is not in the image cache.
      */
     getSprite(path: ImagePath): HTMLImageElement {
-        return unwrap(this.assetManager.getImage(path));
+        return unwrap(this.assetManager.getImage(path), `Failed to get sprite for ${path}!`);
     }
 
 
