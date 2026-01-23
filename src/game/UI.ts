@@ -31,6 +31,7 @@ export class UILayer implements Entity {
             const w = sprite.width;
             const h = sprite.height;
             // TODO: Draw the items along the bottom of the screen
+            //       and buffs along the top.
         }
     }
 
