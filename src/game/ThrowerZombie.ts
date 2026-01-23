@@ -50,6 +50,15 @@ export class ThrowerZombie implements Entity {
                 frameCount: 6
             },
             AnimationState.JUMP
+        ],
+        [
+            {
+                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Dead.png"),
+                frameHeight: 96,
+                frameWidth: 96,
+                frameCount: 5
+            },
+            AnimationState.DEATH
         ]
     ]);
 

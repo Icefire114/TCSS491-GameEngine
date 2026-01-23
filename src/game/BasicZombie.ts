@@ -50,6 +50,15 @@ export class BasicZombie implements Entity {
                 frameCount: 6
             },
             AnimationState.JUMP
+        ],
+        [
+            {
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Dead.png"),
+                frameHeight: 96,
+                frameWidth: 96,
+                frameCount: 5
+            },
+            AnimationState.DEATH
         ]
     ]);
 

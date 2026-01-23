@@ -19,10 +19,12 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
