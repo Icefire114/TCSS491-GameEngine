@@ -11,8 +11,12 @@ export type Item = {
     /**
      * These should be unique per item.
      */
-    id: string,
+    tag: string,
     sprite: ImagePath,
 
-    onUse(): void;
+    /**
+     * Called when the item is picked up in the case of a buff, 
+     * or when the item is used in the case of a gun.
+     */
+    onActivate(): void;
 }

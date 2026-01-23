@@ -2,6 +2,8 @@ import { AssetManager } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
 import { BasicZombie } from "./BasicZombie.js";
+import { InstantHealthItem } from "./Items/InstantHealth.js";
+import { ItemEntity } from "./Items/ItemEntity.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
@@ -27,6 +29,8 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 
+ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
+
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
         console.error(`Error loading assets ${errorCount} of them failed to load!`);
@@ -47,6 +51,8 @@ function main() {
     gameEngine.addEntity(new BasicZombie({ x: 20, y: -10 }), DrawLayer.ZOMBIE);
     gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.ZOMBIE);
     gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.ZOMBIE);
+
+    gameEngine.addEntity(new ItemEntity(new InstantHealthItem(), { x: 60, y: -10 }), DrawLayer.ITEM);
 
     try {
         gameEngine.start();
