@@ -7,6 +7,10 @@ import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
 import { Item } from "./Item.js";
 
+/**
+ * @author PG
+ * @description Represents an item that can be picked up by the player and is existing in the game world.
+ */
 export class ItemEntity implements Entity {
     id: `${string}#${string}-${string}-${string}-${string}-${string}`;
     tag: string = "ItemEntity";
