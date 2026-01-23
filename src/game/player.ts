@@ -4,7 +4,7 @@ import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
-import { Item } from "./Item.js";
+import { Item } from "./Items/Item.js";
 
 /**
  * @author PG
