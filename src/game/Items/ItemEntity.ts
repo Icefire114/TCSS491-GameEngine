@@ -58,6 +58,7 @@ export class ItemEntity implements Entity, Collidable {
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
         // TODO: Check for collision with the player and if one is found,
         //       then call the item's pickup method and remove this entity from the game
+        // NOTE: This is handled in the player's update method, no need to do anything here.
         this.animation.updateAnimState(AnimationState.IDLE, deltaTime);
     }
 }
