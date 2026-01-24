@@ -3,7 +3,7 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { Entity } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
-import { Collider } from "../../engine/physics/Collider.js";
+import { Collidable, Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
 import { Item } from "./Item.js";
 
@@ -11,12 +11,12 @@ import { Item } from "./Item.js";
  * @author PG
  * @description Represents an item that can be picked up by the player and is existing in the game world.
  */
-export class ItemEntity implements Entity {
+export class ItemEntity implements Entity, Collidable {
     id: `${string}#${string}-${string}-${string}-${string}-${string}`;
     tag: string = "ItemEntity";
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
-    // TODO: Collision with items should not be considered when doing physics collisions, just item pickups.
+    // TODO: Collider size should be determined by the size of the rendered sprite!
     physicsCollider: Collider = new BoxCollider(2, 2);
     sprite: ImagePath;
     removeFromWorld: boolean = false;

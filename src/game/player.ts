@@ -5,12 +5,14 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
 import { Item } from "./Items/Item.js";
+import { ItemEntity } from "./Items/ItemEntity.js";
+import { Collidable } from "../engine/physics/Collider.js";
 
 /**
  * @author PG
  * @description The main player class.
  */
-export class Player implements Entity {
+export class Player implements Entity, Collidable {
     tag: string = "player";
     id: EntityID;
 
@@ -129,6 +131,14 @@ export class Player implements Entity {
                 // proportional to the distance we are below the terrain
                 this.position.y -= this.physicsCollider.height;
                 this.velocity.y = 0;
+            }
+        }
+
+        // Item pickup checks:
+        const items: ItemEntity[] = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
+        for (const item of items) {
+            if (this.physicsCollider.collides(this, item)) {
+                console.log(`We hit item ${item.item.tag}`);
             }
         }
     }
