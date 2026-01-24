@@ -5,6 +5,7 @@ import { DrawLayer } from "../engine/types.js";
 import { BasicZombie } from "./BasicZombie.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
+import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
@@ -31,6 +32,7 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
+ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -43,36 +45,57 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    gameEngine.addUniqueEntity(new Player(), DrawLayer.HIGHEST);
-    gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
-    gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
-
-    gameEngine.addEntity(new BasicZombie({ x: 50, y: -10 }), DrawLayer.ZOMBIE);
-    gameEngine.addEntity(new BasicZombie({ x: 10, y: -10 }), DrawLayer.ZOMBIE);
-    gameEngine.addEntity(new BasicZombie({ x: 20, y: -10 }), DrawLayer.ZOMBIE);
-    gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.ZOMBIE);
-    gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.ZOMBIE);
-
-    gameEngine.addEntity(
-        new ItemEntity(
-            new InstantHealthItem(),
-            new Animator(
-                [
-                    [
-                        {
-                            frameCount: 4,
-                            frameHeight: 40,
-                            frameWidth: 42,
-                            sprite: new ImagePath("res/img/items/instant_health_pickup.png")
-                        },
-                        AnimationState.IDLE
-                    ]
-                ]
-            ),
-            { x: 60, y: -5 })
-        , DrawLayer.ITEM);
-
     try {
+        gameEngine.addUniqueEntity(new Player(), DrawLayer.HIGHEST);
+        gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
+        gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
+
+        gameEngine.addEntity(new BasicZombie({ x: 50, y: -10 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 10, y: -10 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 20, y: -10 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.ZOMBIE);
+
+        gameEngine.addEntity(
+            new ItemEntity(
+                new InstantHealthItem(),
+                new Animator(
+                    [
+                        [
+                            {
+                                frameCount: 4,
+                                frameHeight: 40,
+                                frameWidth: 42,
+                                sprite: new ImagePath("res/img/items/instant_health_pickup.png")
+                            },
+                            AnimationState.IDLE
+                        ]
+                    ],
+                    { x: 5, y: 5 }
+                ),
+                { x: 60, y: -5 })
+            , DrawLayer.ITEM);
+        gameEngine.addEntity(
+            new ItemEntity(
+                new ShieldRestorePickupItem(),
+                new Animator(
+                    [
+                        [
+                            {
+                                frameCount: 10,
+                                frameHeight: 64,
+                                frameWidth: 54,
+                                sprite: new ImagePath("res/img/items/shield_pickup.png")
+                            },
+                            AnimationState.IDLE
+                        ]
+                    ],
+                    { x: 5, y: 5 }
+                ),
+                { x: 70, y: -5 }
+            ),
+            DrawLayer.ITEM
+        )
         gameEngine.start();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);

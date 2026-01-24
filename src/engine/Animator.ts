@@ -27,6 +27,7 @@ export class Animator {
     private currentState: AnimationState = AnimationState.IDLE;
     private elapsed = 0; // seconds
     private secondsPerFrame = 1 / this.ANIMATION_FPS;
+    private forceScaleToSize: Vec2 | undefined;
 
     private spriteSheet: Record<AnimationState,
         {
@@ -46,7 +47,13 @@ export class Animator {
             [AnimationState.DEATH]: null
         };
 
-    constructor(spriteSheets: [SpriteSheetInfo, AnimationState][]) {
+    /**
+     * @param spriteSheets The spite sheets and the animation state that they correspond to.
+     * @param forceScaleToSize If provided, then the resulting animation will be scaled to that size 
+     * (useful for items where sprites are not the same size).
+     */
+    constructor(spriteSheets: [SpriteSheetInfo, AnimationState][], forceScaleToSize?: Vec2) {
+        this.forceScaleToSize = forceScaleToSize;
         for (const spriteSheet of spriteSheets) {
             this.spriteSheet[spriteSheet[1]] = {
                 sprite: unwrap(GameEngine.g_INSTANCE.getSprite(spriteSheet[0].sprite)),
@@ -75,21 +82,32 @@ export class Animator {
             );
         }
 
-        const frameIdx = Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
+
+        const frameIdx =
+            Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
         const game = GameEngine.g_INSTANCE;
 
-        const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+
+        // Target dimensions in screen pixels
+        const targetW = this.forceScaleToSize
+            ? this.forceScaleToSize.x * meterInPixels / game.zoom
+            : currentAnim.frameWidth;
+
+        const targetH = this.forceScaleToSize
+            ? this.forceScaleToSize.y * meterInPixels / game.zoom
+            : currentAnim.frameHeight;
 
         ctx.drawImage(
             currentAnim.sprite,
-            frameIdx * currentAnim.frameWidth, // srcImgX
-            0, // srcImgY
-            currentAnim.frameWidth, // srcImgW
-            currentAnim.frameHeight, // srcImgH
-            (pos.x - game.viewportX) * meter_in_pixels / game.zoom,
-            (pos.y - game.viewportY) * meter_in_pixels / game.zoom,
-            currentAnim.frameWidth,
-            currentAnim.frameHeight
+            frameIdx * currentAnim.frameWidth, // srcX
+            0, // srcY
+            currentAnim.frameWidth, // srcW
+            currentAnim.frameHeight, // srcH
+            (pos.x - game.viewportX) * meterInPixels / game.zoom, // dstX
+            (pos.y - game.viewportY) * meterInPixels / game.zoom, // dstY
+            targetW, // dstW
+            targetH  // dstH
         );
     }
 }
