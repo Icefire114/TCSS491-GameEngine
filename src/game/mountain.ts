@@ -24,6 +24,13 @@ export class Mountain implements Entity {
     private isRavineSequence: boolean = false;
     private ravineStep: number = 0; 
     private ravineBaseY: number = 0; 
+    private ravineWidth = 0;
+    private minRavineWidth: number = 10;
+    private maxRavineWidth: number = 25;
+    private slopeBeforeRavine: number = 0;
+    private lastRavineEndX: number = 0;
+    private ravineCooldown = 150;
+    private ravineStartShowing = 150;
 
     constructor() {
         // Load the default level into the engine
@@ -205,9 +212,18 @@ export class Mountain implements Entity {
             return;
         }
 
+        const currentX = this.lastAnchor.x;
+
+        // Spawn ravine only if it past the spawn point area
+        const pastSpawnPoint = currentX > this.ravineStartShowing;
+        // Try to spawn a ravine only if the cool down is gone
+        const coolDown = currentX > (this.lastRavineEndX + this.ravineCooldown);
+
+
         // Probablity of a ravine spawns or not, if not, then do normal 
-        if (Math.random() < 0.1) {
+        if (pastSpawnPoint && coolDown && Math.random() < 0.1) {
             this.startRavineSequence();
+            console.log("RAVINE SPAWN")
         } else {
             this.generateNormalAnchor();
         }
@@ -226,11 +242,15 @@ export class Mountain implements Entity {
 
         // Logic what anchor y direction should go, up or down, and how much so
         const movementChoice = Math.random() < 0.5 ? "Up" : "Down"; 
+        let changeOfY = 0;
         if (movementChoice == "Up") {
-            anchorY -= this.randomIntFromInterval(3, 7);
+            changeOfY -= this.randomIntFromInterval(3, 7);
         } else {
-             anchorY += this.randomIntFromInterval(3, 30);
+             changeOfY += this.randomIntFromInterval(3, 30);
         }
+
+        anchorY += changeOfY;
+        this.slopeBeforeRavine = changeOfY;
 
         // Creating the new anchor along with that camera angle for that specific x position
         // Then adding it our point array and updating our lastAnchor points too
@@ -246,6 +266,7 @@ export class Mountain implements Entity {
         this.isRavineSequence = true;
         this.ravineStep = 0;
         this.ravineBaseY = this.lastAnchor.y; 
+        this.ravineWidth = this.randomIntFromInterval(this.minRavineWidth, this.maxRavineWidth); 
         this.generateRavineAnchor();
     }
 
@@ -263,30 +284,31 @@ export class Mountain implements Entity {
         // Ravine sequence where it dips, then gap, then rise back up
         switch (this.ravineStep) {
             case 0: // The ravine entrance
-                x += 12.5; 
-                y += 50;
+                x += 5; 
+                y += 0;
                 ghostCamera += 5; 
                 break;
             case 1: // The ravine drop
-                x += 12.5;
-                y += 1000; 
-                ghostCamera += 5; 
+                x += 3;
+                y += 5000; 
+                ghostCamera += this.ravineWidth / 2; 
                 break;
             case 2: // The ravine gap
-                x += 20;   
+                x += this.ravineWidth;   
                 y += 0;
-                ghostCamera += 10; 
+                ghostCamera += this.ravineWidth / 2; 
                 break;
             case 3: // Rising up from the ravine
-                x += 12.5;
-                y -= 1000; 
-                ghostCamera += 5; 
+                x += 1;
+                y = this.ravineBaseY; 
+                ghostCamera += 0; 
                 break;
             case 4: // Continuing as normal
-                x += 12.5;
-                y = this.ravineBaseY + 25; 
+                x += 10;
+                y = this.ravineBaseY + this.slopeBeforeRavine; 
                 ghostCamera = y;               
                 this.isRavineSequence = false; 
+                this.lastRavineEndX = x;
                 break;
         }
 
