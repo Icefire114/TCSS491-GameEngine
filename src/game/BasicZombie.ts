@@ -11,6 +11,7 @@ export class BasicZombie implements Entity {
 
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
+    // TODO: Sprite render size should be determined by the size of the collider, or the other way around!
     physicsCollider = new BoxCollider(2, 4);
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;

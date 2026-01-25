@@ -18,6 +18,7 @@ export type Entity = {
     position: Vec2;
     velocity: Vec2;
 
+    // TODO: Sprite render size should be determined by the size of the collider, or the other way around!
     physicsCollider: Collider | null;
 
     /**

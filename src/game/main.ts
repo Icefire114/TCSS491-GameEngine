@@ -73,7 +73,7 @@ function main() {
                             AnimationState.IDLE
                         ]
                     ],
-                    { x: 5, y: 5 }
+                    { x: 3, y: 3 }
                 ),
                 { x: 60, y: -5 })
             , DrawLayer.ITEM);
@@ -92,7 +92,7 @@ function main() {
                             AnimationState.IDLE
                         ]
                     ],
-                    { x: 5, y: 5 }
+                    { x: 3, y: 3 }
                 ),
                 { x: 70, y: -5 }
             ),

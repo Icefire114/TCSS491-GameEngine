@@ -1,4 +1,4 @@
-import { ImagePath } from "../../engine/assetmanager";
+import { ImagePath } from "../../engine/assetmanager.js";
 
 export enum ItemType {
     GUN,

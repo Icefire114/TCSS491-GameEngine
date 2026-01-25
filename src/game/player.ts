@@ -7,6 +7,7 @@ import { Vec2 } from "../engine/types.js";
 import { Item } from "./Items/Item.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
+import { Mountain } from "./mountain.js";
 
 /**
  * @author PG
@@ -124,7 +125,7 @@ export class Player implements Entity, Collidable {
         this.position.y += this.velocity.y * deltaTime;
 
         // -- Collision with terrain --
-        const mountain = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain"));
+        const mountain: Mountain = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain")) as Mountain;
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
                 // TODO: Make the position jump to the nearest surface, or the amount moved should be 
