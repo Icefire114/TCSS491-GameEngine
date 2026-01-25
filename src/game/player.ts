@@ -69,8 +69,8 @@ export class Player implements Entity, Collidable {
 
         ctx.drawImage(
             sprite,
-            screenX - w / 2,
-            screenY - h - 9,
+            screenX - w / 4,
+            screenY - h + 10,
             w,
             h
         )

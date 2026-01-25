@@ -17,7 +17,7 @@ export class ItemEntity implements Entity, Collidable {
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     // TODO: Sprite render size should be determined by the size of the collider, or the other way around!
-    physicsCollider: Collider = new BoxCollider(2, 2);
+    physicsCollider: BoxCollider = new BoxCollider(2, 2);
     sprite: ImagePath;
     removeFromWorld: boolean = false;
     animation: Animator;
