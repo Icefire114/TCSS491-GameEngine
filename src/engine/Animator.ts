@@ -20,6 +20,9 @@ export type SpriteSheetInfo = {
     frameWidth: number;
     frameHeight: number;
     frameCount: number;
+
+    // Offset to help the sprite sheet be centered due to transparency on the spritesheet
+    offestX?: number;
 };
 
 export class Animator {
@@ -35,7 +38,8 @@ export class Animator {
             sprite: HTMLImageElement,
             frameWidth: number,
             frameHeight: number,
-            frameCount: number
+            frameCount: number,
+            offsetX: number,
         } | null
     > = {
             [AnimationState.IDLE]: null,
@@ -62,6 +66,7 @@ export class Animator {
                 frameHeight: spriteSheet[0].frameHeight,
                 frameCount: spriteSheet[0].frameCount,
                 frameWidth: spriteSheet[0].frameWidth,
+                offsetX: spriteSheet[0].offestX ?? 0,
             }
         }
     }
@@ -107,7 +112,7 @@ export class Animator {
 
         // Bottom-left world-space -> top-left screen-space
         const screenX =
-            ((pos.x - game.viewportX) * meterInPixels) / game.zoom;
+            ((pos.x - game.viewportX + currentAnim.offsetX) * meterInPixels) / game.zoom;
 
         const screenY =
             ((pos.y - game.viewportY) * meterInPixels) / game.zoom

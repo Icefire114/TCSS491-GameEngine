@@ -21,7 +21,8 @@ export class ThrowerZombie implements Entity {
                 sprite: new ImagePath("res/img/zombies/Thrower Zombie/Idle.png"),
                 frameHeight: 96,
                 frameWidth: 96,
-                frameCount: 5
+                frameCount: 5,
+                offestX: -3.4
             },
             AnimationState.IDLE
         ],

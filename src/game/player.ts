@@ -33,6 +33,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 7,
                     frameHeight: 128,
                     frameWidth: 128,
+                    offestX: -5
                 },
                 AnimationState.IDLE
             ]
