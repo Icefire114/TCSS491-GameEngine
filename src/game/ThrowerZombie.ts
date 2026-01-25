@@ -44,12 +44,21 @@ export class ThrowerZombie implements Entity {
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Jump.png"),
+                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Jump_R.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 6
             },
-            AnimationState.JUMP
+            AnimationState.JUMP_R
+        ],
+        [
+            {
+                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Jump_L.png"),
+                frameHeight: 96,
+                frameWidth: 96,
+                frameCount: 6
+            },
+            AnimationState.JUMP_L
         ],
         [
             {
