@@ -77,39 +77,52 @@ export class Animator {
 
     drawCurrentAnimFrameAtPos(ctx: CanvasRenderingContext2D, pos: Vec2): void {
         const currentAnim = this.spriteSheet[this.currentState];
-
         if (!currentAnim) {
             throw new Error(
                 `SpriteSheet for animation state ${this.currentState} is null`
             );
         }
 
-
         const frameIdx =
             Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
+
         const game = GameEngine.g_INSTANCE;
 
-        const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        // World units -> screen pixels
+        const meterInPixels =
+            ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
-        // Target dimensions in screen pixels
-        const targetW = this.forceScaleToSize
-            ? this.forceScaleToSize.x * meterInPixels / game.zoom
-            : currentAnim.frameWidth;
+        // World-space sprite size (in meters)
+        const worldW = this.forceScaleToSize
+            ? this.forceScaleToSize.x
+            : currentAnim.frameWidth / meterInPixels;
 
-        const targetH = this.forceScaleToSize
-            ? this.forceScaleToSize.y * meterInPixels / game.zoom
-            : currentAnim.frameHeight;
+        const worldH = this.forceScaleToSize
+            ? this.forceScaleToSize.y
+            : currentAnim.frameHeight / meterInPixels;
+
+        // Screen-space sprite size (in pixels), with zoom
+        const screenW = (worldW * meterInPixels) / game.zoom;
+        const screenH = (worldH * meterInPixels) / game.zoom;
+
+        // Bottom-left world-space -> top-left screen-space
+        const screenX =
+            ((pos.x - game.viewportX) * meterInPixels) / game.zoom;
+
+        const screenY =
+            ((pos.y - game.viewportY) * meterInPixels) / game.zoom
+            - screenH; // shift up because canvas Y grows downward
 
         ctx.drawImage(
             currentAnim.sprite,
             frameIdx * currentAnim.frameWidth, // srcX
-            0, // srcY
-            currentAnim.frameWidth, // srcW
-            currentAnim.frameHeight, // srcH
-            (pos.x - game.viewportX) * meterInPixels / game.zoom, // dstX
-            (pos.y - game.viewportY) * meterInPixels / game.zoom, // dstY
-            targetW, // dstW
-            targetH  // dstH
+            0,                                 // srcY
+            currentAnim.frameWidth,            // srcW
+            currentAnim.frameHeight,           // srcH
+            screenX,                           // dstX (left)
+            screenY,                           // dstY (top)
+            screenW,                           // dstW
+            screenH                            // dstH
         );
     }
 }

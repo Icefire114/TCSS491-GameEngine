@@ -1,3 +1,8 @@
+
+/**
+ * Global config object with feature flags.
+ */
 export const G_CONFIG = {
+    // If true, draw the mountain based on the terrain data loaded from json files.
     DRAW_OLD_MOUNTAIN: true
 }

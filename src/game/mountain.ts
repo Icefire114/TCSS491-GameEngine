@@ -80,8 +80,6 @@ export class Mountain implements Entity {
             this.points.shift();
         }
 
-
-
         if (G_CONFIG.DRAW_OLD_MOUNTAIN) {
             this.drawFromTerrainData(ctx, game);
         } else {
@@ -339,7 +337,6 @@ export class Mountain implements Entity {
 
 
     // # Old Way: Drawing the moutain by using the Json Points
-
     drawFromTerrainData(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         if (game.terrainData == null) {
             console.error("Mountain terrain data not yet loaded!");
