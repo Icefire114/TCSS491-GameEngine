@@ -3,6 +3,8 @@ import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
 import { sleep, unwrap } from "./util.js";
+import { G_CONFIG } from "../game/CONSTANTS.js";
+import { BoxCollider } from "./physics/BoxCollider.js";
 
 export class GameEngine {
     /**
@@ -181,6 +183,39 @@ export class GameEngine {
         this.entities.sort((a, b) => a[1] - b[1])
         for (const ent of this.entities) {
             ent[0].draw(this.ctx, this);
+        }
+
+        if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
+            const meterInPixels = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            for (const ent of this.entities) {
+                if (ent[0].physicsCollider !== null && ent[0].physicsCollider instanceof BoxCollider) {
+                    const collider = ent[0].physicsCollider;
+
+                    const screenX =
+                        ((ent[0].position.x - this.viewportX) * meterInPixels) / this.zoom;
+
+                    // Bottom-left -> top-left for canvas
+                    const screenY =
+                        ((ent[0].position.y - this.viewportY) * meterInPixels) / this.zoom
+                        - (collider.height * meterInPixels) / this.zoom;
+
+                    const screenW =
+                        (collider.width * meterInPixels) / this.zoom;
+
+                    const screenH =
+                        (collider.height * meterInPixels) / this.zoom;
+
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = "red";
+                    this.ctx.strokeRect(
+                        screenX,
+                        screenY,
+                        screenW,
+                        screenH
+                    );
+                    this.ctx.closePath();
+                }
+            }
         }
     };
 
