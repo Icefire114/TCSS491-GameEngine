@@ -17,7 +17,7 @@ export class Background implements Entity {
 
     removeFromWorld: boolean = false;
     tag: string = "background";
-    
+
     playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].position;
     widthInWorldUnits: number;
     gameLayers: BackgroundLayer[] = [];
@@ -32,7 +32,7 @@ export class Background implements Entity {
         console.log(startX, startY);
     }
 
-    init():void {
+    init(): void {
         const layer1 = new BackgroundLayer("res/img/Plan 4.png", 0.0008);
         const layer2 = new BackgroundLayer("res/img/Plan 2.png", 0.002);
         const layer3 = new BackgroundLayer("res/img/cloud.png", 0.008, 20, 80, 9400, false);

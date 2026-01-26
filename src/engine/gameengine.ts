@@ -178,9 +178,9 @@ export class GameEngine {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-        // Sort the entities by their draw priority, lower numbers = drawn earlier, bigger numbers = drawn later.
+        // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
         // And then draw them, no garuntee of order when their draw priority is the same.
-        this.entities.sort((a, b) => a[1] - b[1])
+        this.entities.sort((a, b) => b[1] - a[1])
         for (const ent of this.entities) {
             ent[0].draw(this.ctx, this);
         }

@@ -17,14 +17,22 @@ export class BackgroundLayer implements Entity {
     tag: string = "backgroundlayer";
     id: EntityID;
 
-    parallaxSpeed: number; 
+    parallaxSpeed: number;
     worldWidth = 99;
     position2: Vec2 = new Vec2();
     playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].position;
     widthInWorldUnits: number;
     followPlayer: boolean;
 
-    constructor(spritePath: string, parallaxSpeed: number = 0.5, widthInWorldUnits: number = 100, startX: number = 35, startY: number = 9450, followPlayer: boolean = true) {
+    constructor(
+        spritePath: string,
+        parallaxSpeed: number = 0.5,
+        widthInWorldUnits: number = 100,
+        startX: number = 35,
+        startY: number = 9450,
+        followPlayer: boolean = true
+    ) {
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.sprite = new ImagePath(spritePath);
         this.position.x = startX;
         this.position.y = startY;
@@ -33,7 +41,6 @@ export class BackgroundLayer implements Entity {
         this.position2.y = startY;
         this.widthInWorldUnits = widthInWorldUnits;
         this.followPlayer = followPlayer;
-        this.id = `${this.tag}#${crypto.randomUUID()}`;
         console.log(startX, startY);
     }
 
@@ -78,14 +85,13 @@ export class BackgroundLayer implements Entity {
         if (this.position.x + this.worldWidth < this.playerPosition.x + 35) {
             this.position.x = this.position2.x + this.worldWidth;
             //console.log("resetting position 1");
-            
+
         } else {
             this.position.x -= this.velocity.x * this.parallaxSpeed;
         }
         if (this.position2.x + this.worldWidth < this.playerPosition.x + 35) {
             this.position2.x = this.position.x + this.worldWidth;
             //console.log("resetting position 2");
-        
         } else {
             this.position2.x -= this.velocity.x * this.parallaxSpeed;
         }

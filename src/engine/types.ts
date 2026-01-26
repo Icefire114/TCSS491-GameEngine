@@ -3,10 +3,11 @@ export namespace DrawLayer {
     export const HIGHEST: DrawLayer = 1000000 as DrawLayer;
     export const UI_LAYER: DrawLayer = HIGHEST as DrawLayer;
 
-    export const PLAYER: DrawLayer = HIGHEST - 1 as DrawLayer;
-    export const MOUNTAIN_TERRAIN: DrawLayer = PLAYER - 1 as DrawLayer;
+    export const BACKGROUND: DrawLayer = HIGHEST - 1 as DrawLayer;
+    export const MOUNTAIN_TERRAIN: DrawLayer = BACKGROUND - 1 as DrawLayer;
     export const ZOMBIE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
     export const ITEM: DrawLayer = ZOMBIE - 1 as DrawLayer;
+    export const PLAYER: DrawLayer = ITEM - 1 as DrawLayer;
 
     export const DEFAULT: DrawLayer = 0 as DrawLayer;
     export const LOWEST: DrawLayer = -1000000 as DrawLayer;
