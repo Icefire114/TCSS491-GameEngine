@@ -8,6 +8,7 @@ import { Item } from "./Items/Item.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
+import { AnimationState, Animator } from "../engine/Animator.js";
 
 /**
  * @author PG
@@ -24,6 +25,20 @@ export class Player implements Entity, Collidable {
     removeFromWorld: boolean = false;
 
     snowBoardSprite: ImagePath = new ImagePath("res/img/snowboard.png");
+    animator: Animator = new Animator(
+        [
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Idle.png"),
+                    frameCount: 7,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                    offestX: -5
+                },
+                AnimationState.IDLE
+            ]
+        ]
+    );
 
     /**
      * The items the player has picked up.
@@ -38,27 +53,8 @@ export class Player implements Entity, Collidable {
     // TODO(pg): When we are going down a slope, we shhould rotate both player and snowboard to be perpendicular to the slope
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        const sprite = game.getSprite(this.sprite);
-
-        const player_width_in_world_units = 5;
-
-        const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-
-        const w = player_width_in_world_units * meter_in_pixels;
-        const h = sprite.height * (w / sprite.width);
-
-        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
-        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
-
-        ctx.drawImage(
-            sprite,
-            screenX - w / 2,
-            screenY - h,
-            w,
-            h
-        );
         this.drawSnowboard(ctx, game);
+        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
     }
 
     drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -74,14 +70,15 @@ export class Player implements Entity, Collidable {
 
         ctx.drawImage(
             sprite,
-            screenX - w / 2,
-            screenY - h + 9,
+            screenX - w / 4,
+            screenY - h + 10,
             w,
             h
         )
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
         const onGround = this.velocity.y === 0; // TODO: fix later
 
         // -- Base movement: simulating sliding down a mountain --
@@ -94,12 +91,12 @@ export class Player implements Entity, Collidable {
 
         // D key: Speed up
         if (keys["d"]) {
-            this.velocity.x += 250 * deltaTime;
+            this.velocity.x += 150 * deltaTime;
         }
 
         // A key: Brake
         if (keys["a"]) {
-            this.velocity.x -= 250 * deltaTime;
+            this.velocity.x -= 150 * deltaTime;
 
             // this.velocity.x = Math.max(1, this.velocity.x - 200 * deltaTime); // Reduce x velocity, but not below 1
             // this.velocity.y = Math.max(1, this.velocity.y - 200 * deltaTime); // Reduce y velocity, but not below 1

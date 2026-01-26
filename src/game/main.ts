@@ -44,6 +44,9 @@ ASSET_MANAGER.queueDownload("res/img/sun.png");
 ASSET_MANAGER.queueDownload("res/img/cloud.png");
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
+
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
+
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
@@ -77,11 +80,11 @@ function main() {
         gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 
-        gameEngine.addEntity(new BasicZombie({ x: 50, y: -10 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 10, y: -10 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 20, y: -10 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ThrowerZombie({ x: 30, y: -10 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ThrowerZombie({ x: 40, y: -10 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
 
         gameEngine.addEntity(
             new ItemEntity(
@@ -93,6 +96,7 @@ function main() {
                                 frameCount: 4,
                                 frameHeight: 40,
                                 frameWidth: 42,
+                                offestX: -0.5,
                                 sprite: new ImagePath("res/img/items/instant_health_pickup.png")
                             },
                             AnimationState.IDLE
@@ -100,7 +104,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                { x: 60, y: -5 })
+                { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
             new ItemEntity(
@@ -112,6 +116,7 @@ function main() {
                                 frameCount: 10,
                                 frameHeight: 64,
                                 frameWidth: 54,
+                                offestX: -0.5,
                                 sprite: new ImagePath("res/img/items/shield_pickup.png")
                             },
                             AnimationState.IDLE
@@ -119,7 +124,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                { x: 70, y: -5 }
+                { x: 70, y: 0 }
             ),
             DrawLayer.ITEM
         )

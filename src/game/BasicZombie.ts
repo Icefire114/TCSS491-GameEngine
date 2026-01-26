@@ -21,7 +21,8 @@ export class BasicZombie implements Entity {
                 sprite: new ImagePath("res/img/zombies/Wild Zombie/Idle.png"),
                 frameHeight: 96,
                 frameWidth: 96,
-                frameCount: 9
+                frameCount: 9,
+                offestX: -3.7
             },
             AnimationState.IDLE
         ],
