@@ -1,6 +1,6 @@
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
-import { Entity } from "../engine/Entity.js";
+import { Entity, EntityID } from "../engine/Entity.js";
 import { DrawLayer, Vec2 } from "../engine/types.js";
 import { BackgroundLayer } from "./backgroundLayer.js";
 
@@ -9,15 +9,16 @@ import { BackgroundLayer } from "./backgroundLayer.js";
  * @description The main background class.
  */
 export class Background implements Entity {
-    velocity: Vec2 = GameEngine.g_INSTANCE.getEntityByTag("player")!.velocity;
+    velocity: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].velocity;
     position: Vec2 = new Vec2();
     physicsCollider = null;
     sprite: ImagePath;
+    id: EntityID;
 
     removeFromWorld: boolean = false;
     tag: string = "background";
     
-    playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntityByTag("player")!.position;
+    playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].position;
     widthInWorldUnits: number;
     gameLayers: BackgroundLayer[] = [];
 
@@ -27,6 +28,7 @@ export class Background implements Entity {
         this.position.y = startY;
         this.widthInWorldUnits = widthInWorldUnits;
         this.init();
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
         console.log(startX, startY);
     }
 

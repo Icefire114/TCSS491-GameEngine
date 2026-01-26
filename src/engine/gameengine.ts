@@ -1,8 +1,8 @@
 import { DrawLayer } from "./types.js";
-import { Entity } from "./Entity.js";
+import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
-import { sleep } from "./util.js";
+import { sleep, unwrap } from "./util.js";
 
 export class GameEngine {
     /**
@@ -11,14 +11,18 @@ export class GameEngine {
     public static g_INSTANCE: GameEngine;
     public static readonly WORLD_UNITS_IN_VIEWPORT = 100;
 
-    private readonly TARGET_FPS: number = 120;
+    private static readonly TARGET_FPS: number = 120;
     /**
      * The gravitational constant in meters per second squared.
      */
     readonly G = 9.80665;
 
+    private static readonly FIXED_DT = 1 / GameEngine.TARGET_FPS;
+    private accumulator = 0;
+
     private ctx: CanvasRenderingContext2D | null;
     private entities: [Entity, DrawLayer][];
+    private uniqueEntities: Record<string, [Entity, DrawLayer]> = {};
     private click: { x: number, y: number } | null;
     private mouse: { x: number, y: number } | null;
     private wheel: { x: number, y: number } | null;
@@ -75,8 +79,13 @@ export class GameEngine {
         GameEngine.g_INSTANCE = this;
     };
 
+    /**
+     * @param path The path to the image.
+     * @returns An image from the given path.
+     * @throws If the given `path` is not in the image cache.
+     */
     getSprite(path: ImagePath): HTMLImageElement {
-        return this.assetManager.getImage(path);
+        return unwrap(this.assetManager.getImage(path), `Failed to get sprite for ${path.asRaw()}!`);
     }
 
 
@@ -146,6 +155,20 @@ export class GameEngine {
         this.entities.push([entity, drawPriority]);
     };
 
+    /**
+    * Registers a unique entity to be drawn and updated when the engine ticks, 
+    * these entities will be tracked separately and only one single instance 
+    * of these entities should ever exist.
+    *
+    * @param entity The entity to add.
+    * @param drawPriority The priority in which entites should be drawn, 
+    * lower numbers = drawn earlier, bigger numbers = drawn later.
+    */
+    addUniqueEntity(entity: Entity, drawPriority: DrawLayer) {
+        this.addEntity(entity, drawPriority);
+        this.uniqueEntities[entity.tag] = [entity, drawPriority];
+    };
+
     draw() {
         if (!this.ctx) {
             throw new Error("Lost canvas context!");
@@ -161,16 +184,15 @@ export class GameEngine {
         }
     };
 
-    update() {
-        for (const entPair of this.entities) {
-            const e: Entity = entPair[0];
-            if (!e.removeFromWorld) {
-                e.update(this.keys, this.clockTick);
+    update(dt: number) {
+        for (const [entity] of this.entities) {
+            if (!entity.removeFromWorld) {
+                entity.update(this.keys, dt);
             }
         }
 
         // Update camera to follow player.
-        const player = this.getEntityByTag("player");
+        const player = this.getUniqueEntityByTag("player");
         if (player && this.ctx) {
             // Horizontal following
             const player_screen_pecentage_x = 0.15;
@@ -185,38 +207,59 @@ export class GameEngine {
 
         for (let i = this.entities.length - 1; i >= 0; --i) {
             if (this.entities[i][0].removeFromWorld) {
+                delete this.uniqueEntities[this.entities[i][0].tag];
                 this.entities.splice(i, 1);
             }
         }
     };
 
     loop() {
-        this.clockTick = this.timer.tick();
+        let frameTime = this.timer.tick();
+        frameTime = Math.min(frameTime, 0.25); // prevent spiral of death
 
-        const spare = (1000 / this.TARGET_FPS) - this.clockTick;
-        if (spare > 0) {
-            sleep(spare);
-        } else {
-            console.warn("Frame took over the alloted budget!!")
+        this.accumulator += frameTime;
+
+        while (this.accumulator >= GameEngine.FIXED_DT) {
+            this.update(GameEngine.FIXED_DT);
+            this.accumulator -= GameEngine.FIXED_DT;
         }
-        this.update();
-        this.draw();
 
+        this.draw();
         requestAnimationFrame(() => this.loop());
+    }
+
+    /**
+     * @param tag The tag of the entity to find
+     * @returns The entity with the given tag or undefined if no such entity could be found.
+     */
+    getEntitiesByTag(tag: string): Entity[] {
+        return this.entities
+            .filter(ent => ent[0].tag === tag)
+            .map(ent => ent[0]);
     };
 
     /**
      * @param tag The tag of the entity to find
      * @returns The entity with the given tag or undefined if no such entity could be found.
      */
-    getEntityByTag(tag: string): Entity | undefined {
-        return this.entities.find(ent => ent[0].tag === tag)?.[0];
+    getUniqueEntityByTag(tag: string): Entity | undefined {
+        return this.uniqueEntities[tag]?.[0];
     };
+
+    /**
+     * @param id The unique ID of the entity to get
+     * @returns The entity with the given ID or undefined if no such entity could be found.
+     */
+    getEntityByID(id: EntityID): Entity | undefined {
+        return this.entities.find(ent => ent[0].id === id)?.[0];
+    }
 
     /**
      * @returns A list of all entities with physics.
      */
     getEntitiesWithPhysics(): Entity[] {
-        return this.entities.filter(ent => ent[0].physicsCollider !== null).map(ent => ent[0]);
+        return this.entities
+            .filter(ent => ent[0].physicsCollider !== null)
+            .map(ent => ent[0]);
     };
 };

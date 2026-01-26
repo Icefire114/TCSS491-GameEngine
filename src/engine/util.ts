@@ -21,12 +21,13 @@ export function clamp(value: number, min: number, max: number): number {
 /**
  * Basically just rust's Option.unwrap().
  * @param v The value to unwrap.
+ * @param msg Optional message to throw if the unwrap fails.
  * @returns `v` if it is a value
  * @throws An error if `v` is null or undefined
  */
-export function unwrap<T>(v: T | undefined | null): T {
+export function unwrap<T>(v: T | undefined | null, msg?: string): T {
     if (v === undefined || v === null) {
-        throw new Error("unwrap was called on a null or undefined value!");
+        throw new Error(`unwrap was called on a null or undefined value! ${msg}`);
     }
     return v;
 }

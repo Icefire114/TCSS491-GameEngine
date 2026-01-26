@@ -17,6 +17,11 @@ export class BoxCollider implements Collider {
     collides(thisEntity: Collidable, otherEntity: Collidable): boolean {
         if (otherEntity.physicsCollider instanceof MountainCollider) {
             return otherEntity.physicsCollider.collides(otherEntity, thisEntity);
+        } else if (otherEntity.physicsCollider instanceof BoxCollider) {
+            return (thisEntity.position.x + this.width > otherEntity.position.x &&
+                thisEntity.position.x < otherEntity.position.x + otherEntity.physicsCollider.width &&
+                thisEntity.position.y + this.height > otherEntity.position.y &&
+                thisEntity.position.y < otherEntity.position.y + otherEntity.physicsCollider.height);
         }
 
         return false;
