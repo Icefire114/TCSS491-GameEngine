@@ -1,8 +1,10 @@
 import { AssetManager } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
+import { Background } from "./background.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
+
 
 /**
  * This is the main file for the game, and it should be considered the entry point for the game.
@@ -11,6 +13,11 @@ import { Player } from "./player.js";
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine(ASSET_MANAGER);
 ASSET_MANAGER.queueDownload("res/img/player.png");
+ASSET_MANAGER.queueDownload("res/img/Plan 4.png");
+ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
+ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
+ASSET_MANAGER.queueDownload("res/img/sun.png");
+ASSET_MANAGER.queueDownload("res/img/cloud.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -24,7 +31,15 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 
 function main() {
     gameEngine.addEntity(new Player(), DrawLayer.HIGHEST)
-    gameEngine.addEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1));
+    gameEngine.addEntity(new Mountain(), DrawLayer.of(DrawLayer.HIGHEST - 1))
+    gameEngine.addEntity(new Background("res/img/cloud.png", 0.008, 20, 80, 9450), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new Background("res/img/cloud.png", 0.008, 20, 60, 9470), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new Background("res/img/cloud.png", 0.008, 20, 30, 9430), DrawLayer.of(DrawLayer.HIGHEST - 2));
+    gameEngine.addEntity(new Background("res/img/Plan 2.png", 0.002), DrawLayer.of(DrawLayer.HIGHEST - 3));
+    gameEngine.addEntity(new Background("res/img/Plan 4.png", 0.0008), DrawLayer.of(DrawLayer.HIGHEST - 4));
+    gameEngine.addEntity(new Background("res/img/sun.png", 0.000002, 100, 70, 9450), DrawLayer.of(DrawLayer.HIGHEST - 5));
+    gameEngine.addEntity(new Background("res/img/Plan 5.png", 0, 120), DrawLayer.of(DrawLayer.HIGHEST - 6));
+    
 
     try {
         gameEngine.start();
