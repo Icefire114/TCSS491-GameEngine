@@ -5,7 +5,8 @@ export namespace DrawLayer {
 
     export const BACKGROUND: DrawLayer = HIGHEST - 1 as DrawLayer;
     export const MOUNTAIN_TERRAIN: DrawLayer = BACKGROUND - 1 as DrawLayer;
-    export const ZOMBIE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
+    export const SPIKE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
+    export const ZOMBIE: DrawLayer = SPIKE - 1 as DrawLayer;
     export const ITEM: DrawLayer = ZOMBIE - 1 as DrawLayer;
     export const PLAYER: DrawLayer = ITEM - 1 as DrawLayer;
 

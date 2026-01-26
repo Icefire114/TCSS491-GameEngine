@@ -3,6 +3,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
+import { AnimationState, Animator } from "../engine/Animator.js";
 
 
 /**
@@ -12,36 +13,38 @@ import { Vec2 } from "../engine/types.js";
 export class Spike implements Entity {
     id: EntityID;
     readonly tag = "spike";
-    position: Vec2;
+    position: Vec2 = { x: 0, y: 0 };
     velocity: Vec2 = { x: 0, y: 0 };
 
-    physicsCollider: BoxCollider;
-    sprite: ImagePath;
+    physicsCollider: BoxCollider = new BoxCollider(2, 2);
+    sprite: ImagePath = new ImagePath("res/img/spike.png");
 
     removeFromWorld = false;
+    animator: Animator = new Animator([
+        [
+            {
+                sprite: new ImagePath("res/img/spike.png"),
+                frameHeight: 128,
+                frameWidth: 128,
+                frameCount: 1,
+            },
+            AnimationState.IDLE
+        ]
+    ],
+        { x: 2, y: 2 });
 
-    constructor(position: Vec2) {
+    constructor(position?: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.position = position;
-
-        this.sprite = new ImagePath("res/img/spike.png");
-
-        this.physicsCollider = new BoxCollider(32, 32); // just width and height
+        if (position) {
+            this.position = position;
+        }
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        // doesn't move
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        //draws spike image
-        const img = game.getSprite(this.sprite);
-        ctx.drawImage(
-            img,
-            this.position.x,
-            this.position.y,
-            32,
-            32
-        );
+        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position)
     }
 }

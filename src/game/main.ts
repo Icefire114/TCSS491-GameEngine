@@ -9,6 +9,7 @@ import { ItemEntity } from "./Items/ItemEntity.js";
 import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
+import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
 
@@ -21,6 +22,10 @@ const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine(ASSET_MANAGER);
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
+
+
+// === Zombie Assets ===
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
@@ -34,34 +39,19 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 
+// === Item Assets ===
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
 
+// === Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
 ASSET_MANAGER.queueDownload("res/img/Plan 4.png");
 ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
 ASSET_MANAGER.queueDownload("res/img/sun.png");
 ASSET_MANAGER.queueDownload("res/img/cloud.png");
-ASSET_MANAGER.queueDownload("res/img/player_new.png");
-ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 
-ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
-
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_R.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_L.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Dead.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_R.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_L.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
-
-ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
-ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
+// === World Object Assets ===
+ASSET_MANAGER.queueDownload("res/img/spike.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -85,6 +75,10 @@ function main() {
         gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
+        gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
+        gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
+
 
         gameEngine.addEntity(
             new ItemEntity(
