@@ -1,7 +1,8 @@
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Entity } from "../engine/Entity.js";
-import { Vec2 } from "../engine/types.js";
+import { DrawLayer, Vec2 } from "../engine/types.js";
+import { BackgroundLayer } from "./backgroundLayer.js";
 
 /**
  * @author JK
@@ -14,23 +15,31 @@ export class Background implements Entity {
     sprite: ImagePath;
 
     removeFromWorld: boolean = false;
-    tag: string = "mountain_background";
-
-    parallaxSpeed: number; 
-    worldWidth = 99;
-    position2: Vec2 = new Vec2();
+    tag: string = "background";
+    
     playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntityByTag("player")!.position;
     widthInWorldUnits: number;
+    gameLayers: BackgroundLayer[] = [];
 
-    constructor(spritePath: string, parallaxSpeed: number = 0.5, widthInWorldUnits: number = 100, startX: number = 35, startY: number = 9450) {
+    constructor(spritePath: string, widthInWorldUnits: number = 100, startX: number = 0, startY: number = 9450) {
         this.sprite = new ImagePath(spritePath);
         this.position.x = startX;
         this.position.y = startY;
-        this.parallaxSpeed = parallaxSpeed;
-        this.position2.x = startX + this.worldWidth;
-        this.position2.y = startY;
         this.widthInWorldUnits = widthInWorldUnits;
+        this.init();
         console.log(startX, startY);
+    }
+
+    init():void {
+        const layer1 = new BackgroundLayer("res/img/Plan 4.png", 0.0008);
+        const layer2 = new BackgroundLayer("res/img/Plan 2.png", 0.002);
+        const layer3 = new BackgroundLayer("res/img/cloud.png", 0.008, 20, 80, 9400, false);
+
+        this.gameLayers = [layer1, layer2, layer3];
+
+        // GameEngine.g_INSTANCE.addEntity(layer1, DrawLayer.of(DrawLayer.HIGHEST));
+        // GameEngine.g_INSTANCE.addEntity(layer2, DrawLayer.of(DrawLayer.HIGHEST - 1));
+        // GameEngine.g_INSTANCE.addEntity(layer3, DrawLayer.of(DrawLayer.HIGHEST - 2));
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -47,10 +56,6 @@ export class Background implements Entity {
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
 
-        const screenX2 = (this.position2.x - game.viewportX) * scale / game.zoom;
-        const screenY2 = (this.position2.y - game.viewportY) * scale / game.zoom;
-
-        // first slide
         ctx.drawImage(
             sprite,
             screenX - w / 2,
@@ -59,35 +64,17 @@ export class Background implements Entity {
             h
         );
 
-        // second slide
-        ctx.drawImage(
-            sprite,
-            screenX2 - w / 2,
-            screenY2 - h,
-            w,
-            h
-        );
+        this.gameLayers.forEach(layer => {
+            layer.draw(ctx, game);
+        });
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        // horizontal movement logic
-        if (this.position.x + this.worldWidth < this.playerPosition.x + 35) {
-            this.position.x = this.position2.x + this.worldWidth;
-            //console.log("resetting position 1");
-            
-        } else {
-            this.position.x -= this.velocity.x * this.parallaxSpeed;
-        }
-        if (this.position2.x + this.worldWidth < this.playerPosition.x + 35) {
-            this.position2.x = this.position.x + this.worldWidth;
-            //console.log("resetting position 2");
-        
-        } else {
-            this.position2.x -= this.velocity.x * this.parallaxSpeed;
-        }
+        this.gameLayers.forEach(layer => {
+            layer.update(keys, deltaTime);
+        });
 
-        // verticle movement logic 
-        this.position.y = this.playerPosition.y + 30;
-        this.position2.y = this.playerPosition.y + 30;
+        this.position.x = this.playerPosition.x + 10;
+        this.position.y = this.playerPosition.y + 40;
     }
 }
