@@ -6,7 +6,7 @@ import { Vec2 } from "../engine/types.js";
 import { Player } from "./player.js";
 
 export class UILayer implements Entity {
-    readonly id: `${string}#${string}-${string}-${string}-${string}-${string}`;
+    readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
 
     position: Vec2 = new Vec2();
@@ -17,7 +17,7 @@ export class UILayer implements Entity {
 
 
     constructor() {
-        this.id = (this.tag + "#" + crypto.randomUUID()) as EntityID;
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
