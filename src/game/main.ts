@@ -127,6 +127,5 @@ function main() {
         console.error(`Engine has encounted an uncaught error! ${e}`);
         alert(`Engine has encounted an uncaught error! ${e}`);
         throw e;
-        throw e;
     }
 }
