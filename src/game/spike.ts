@@ -1,7 +1,7 @@
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Entity } from "../engine/Entity.js";
+import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
 
 
@@ -10,16 +10,18 @@ import { Vec2 } from "../engine/types.js";
  * @description The main Spike class.
  */
 export class Spike implements Entity {
-    position: Vec2; 
+    id: EntityID;
+    readonly tag = "spike";
+    position: Vec2;
     velocity: Vec2 = { x: 0, y: 0 };
 
     physicsCollider: BoxCollider;
     sprite: ImagePath;
-    readonly tag = "spike";
 
     removeFromWorld = false;
 
     constructor(position: Vec2) {
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = position;
 
         this.sprite = new ImagePath("res/img/spike.png");
