@@ -2,6 +2,7 @@ import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
+import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
@@ -11,13 +12,36 @@ import { Player } from "./player.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
 
+
 /**
  * This is the main file for the game, and it should be considered the entry point for the game.
  */
 
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine(ASSET_MANAGER);
-ASSET_MANAGER.queueDownload("res/img/player.png");
+ASSET_MANAGER.queueDownload("res/img/player_new.png");
+ASSET_MANAGER.queueDownload("res/img/snowboard.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Dead.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_R.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_L.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
+
+ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
+ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
+
+ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
+ASSET_MANAGER.queueDownload("res/img/Plan 4.png");
+ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
+ASSET_MANAGER.queueDownload("res/img/sun.png");
+ASSET_MANAGER.queueDownload("res/img/cloud.png");
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Walk_R.png");
@@ -49,6 +73,7 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.HIGHEST);
+        gameEngine.addEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.of(DrawLayer.HIGHEST - 1));
         gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 
@@ -102,6 +127,7 @@ function main() {
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
         alert(`Engine has encounted an uncaught error! ${e}`);
+        throw e;
         throw e;
     }
 }
