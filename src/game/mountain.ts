@@ -19,7 +19,7 @@ export class Mountain implements Entity {
     removeFromWorld: boolean = false;
 
     // Anchor Points Setup
-    private points: MountainPoint[] = [];
+    public points: MountainPoint[] = [];
     private lastAnchor: MountainPoint;
 
     // Ravine use fields
@@ -37,11 +37,13 @@ export class Mountain implements Entity {
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         // Load the default level into the engine
-        fetch('res/levels/testing.json').then(response => response.json()).then(data => {
-            GameEngine.g_INSTANCE.terrainData = data;
-            this.physicsCollider = new MountainCollider(data.y);
-            unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
-        });
+        // fetch('res/levels/testing.json').then(response => response.json()).then(data => {
+        //     GameEngine.g_INSTANCE.terrainData = data;
+        //     this.physicsCollider = new MountainCollider(data.y);
+        //     unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
+        // });
+
+        this.physicsCollider = new MountainCollider(this.points);
 
         // Initialize the staring anchor
         const startY = 100;
