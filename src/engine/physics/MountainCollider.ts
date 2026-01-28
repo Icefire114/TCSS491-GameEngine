@@ -15,17 +15,36 @@ export class MountainCollider implements Collider {
     }
 
     collides(thisEntity: Collidable, otherEntity: Collidable): boolean {
-        // REMINDER: Safe Check when anchor points array is -1 or is the last point in the array
-
+        // Finding where the steering point that the player is on
         let steeringPointIndex = this.findAnchorPointPassedEntity(otherEntity);
 
+        // Safety check if such point exit
+        if (steeringPointIndex <= 0 || steeringPointIndex >= this.anchorPointsReference.length - 1) {
+            return false;
+        }
 
+        // Using that index in order to find the previous, steering, and forward point
         let steeringPoint = this.anchorPointsReference[steeringPointIndex];
         let startingPoint = this.anchorPointsReference[steeringPointIndex - 1];
         let endingPoint = this.anchorPointsReference[steeringPointIndex + 1];
 
+        // Base on the start, steering, and end points, we need to find the midpoint between 
         let midpointAB = this.calculatePointsMidpoint(startingPoint, steeringPoint);
         let midpointBC = this.calculatePointsMidpoint(steeringPoint, endingPoint);
+
+        
+        // Calcaulting the player pecent progress in realtive to the midpoints (percent) relative to the midpoints, not the anchor points
+        let entityPositionPercent = this.findingTheEntityPositionWithinTheCurve(otherEntity, midpointAB, midpointBC);
+
+         // Using that percent to find that Y position of the curve
+        let mountainGround = this.calculatingQuadraticBezier(entityPositionPercent, midpointAB, steeringPoint, midpointBC);
+
+        // Collision logic
+        if (otherEntity.position.y > mountainGround) {
+            otherEntity.position.y = mountainGround;
+            return true;
+        }
+
 
         return false;
    }
@@ -50,6 +69,31 @@ export class MountainCollider implements Collider {
 
         return {x: midPointX, y: midPointY};
     }
+
+     findingTheEntityPositionWithinTheCurve(otherEntity: Collidable, startingPoint: Vec2, endingPoint: Vec2): number {
+        // Getting the enetity x position 
+        let entityPositionX = otherEntity.position.x;
+        // Get the total width of the whole area we are tracking
+        let totalWidthOfArea = endingPoint.x - startingPoint.x;
+        
+        // Calculating where our entity is base on our total width
+        return (entityPositionX - startingPoint.x) / totalWidthOfArea;    
+    }
+
+    calculatingQuadraticBezier(entityPosition: number, midPointAB: Vec2, steeringPoint: MountainPoint, midPointBC: Vec2) {
+        /* QuadraticBezier Formula: 
+        B(t) = (1 - t)^2 * P0 + 
+               2(1 - t)t * P1 + 
+               t^2 * P2
+        */
+        let t = entityPosition;
+
+        // We got the point of the curve in relative to the player x
+        return (Math.pow(1 - t, 2) * midPointAB.y) + 
+               (2 * (1 - t) * t * steeringPoint.y) + 
+               (t * t * midPointBC.y);
+    }
+
 
     // /**
     //  * Checks if this collider collides with the other collider.
