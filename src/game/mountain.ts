@@ -34,6 +34,16 @@ export class Mountain implements Entity {
     private ravineCooldown = 150;
     private ravineStartShowing = 150;
 
+
+    // Flat plains logic
+    private flatSequenceOn: boolean = false;
+    private flatStep: number = 0;
+    private flatBaseY: number = 0;
+    private flatGenerationTick = 10;
+    private flatCooldown = 150;
+    private flatStartShowing = 150
+    private flatEndX: number = 0;
+    
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         // Load the default level into the engine
@@ -74,7 +84,7 @@ export class Mountain implements Entity {
 
         // Generating anchor points ahead of the player
         if (this.lastAnchor.x < viewport_right_world) {
-            while (this.lastAnchor.x < viewport_right_world + 1000) {
+            while (this.lastAnchor.x < viewport_right_world + 3000) {
                 this.generatingAnchor();
             }
         }
@@ -182,6 +192,12 @@ export class Mountain implements Entity {
             return;
         }
 
+        // Checking if were in a flat generation
+        if (this.flatSequenceOn) {
+            this.generateFlatAnchor();
+            return;
+        }
+
         const currentX = this.lastAnchor.x;
 
         // Spawn ravine only if it past the spawn point area
@@ -190,11 +206,18 @@ export class Mountain implements Entity {
         const coolDown = currentX > (this.lastRavineEndX + this.ravineCooldown);
 
 
+        // Spawn and cool down for flats
+        const pastSpawnPointForFlat = currentX > this.flatStartShowing;
+        const cooldownForFlat = currentX > (this.flatEndX + this.flatCooldown);
+
         // Probablity of a ravine spawns or not, if not, then do normal 
         if (pastSpawnPoint && coolDown && Math.random() < 0.1) {
             this.startRavineSequence();
             console.log("RAVINE SPAWN")
-        } else {
+        } else if (pastSpawnPointForFlat && cooldownForFlat && Math.random() < .15) {
+            this.startFlatSequence();
+            console.log("Im being generated?")
+        } else { 
             this.generateNormalAnchor();
         }
     }
@@ -286,6 +309,37 @@ export class Mountain implements Entity {
         this.points.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.ravineStep++;
+    }
+
+    /**
+     * Setup for starting a flat sequence
+     */
+    startFlatSequence() {
+        this.flatSequenceOn = true;
+        this.flatStep = 0;
+        this.flatBaseY = this.lastAnchor.y; 
+        console.log("Flat Generation is happening right now")
+    }
+
+    /**
+     * Generating a flat ground
+     */
+    generateFlatAnchor() {
+        let x = this.lastAnchor.x + 15; 
+        let y = this.flatBaseY;          
+
+        const newAnchor = { x: x, y: y, cameraTargetY: y };
+        this.points.push(newAnchor);
+        this.lastAnchor = newAnchor;
+
+        this.flatStep++;
+
+        // After 10 ticks, return to normal generation
+        if (this.flatStep >= this.flatGenerationTick) {
+            this.flatSequenceOn = false;
+            this.flatEndX = x;
+
+        }
     }
 
 
