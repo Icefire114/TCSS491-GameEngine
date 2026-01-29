@@ -51,13 +51,17 @@ export class MountainCollider implements Collider {
 
 
     findAnchorPointPassedEntity(otherEntity: Collidable): number {
-        let targetPoint = null;
-        for (let i = 0; i < this.anchorPointsReference.length; i++) {
-            if (this.anchorPointsReference[i].x > otherEntity.position.x) {
-                targetPoint = this.anchorPointsReference[i];
+        const x = otherEntity.position.x;
+        
+        for (let i = 1; i < this.anchorPointsReference.length - 1; i++) {
+            let midLeft = (this.anchorPointsReference[i].x + this.anchorPointsReference[i-1].x) / 2;
+            let midRight = (this.anchorPointsReference[i].x + this.anchorPointsReference[i+1].x) / 2;
+
+            if (x >= midLeft && x <= midRight) {
                 // Returning the index in the array where the sterring point is located at
-                return i;                
+                return i;
             }
+
         }
         // Represent it doesn't exit
         return -1;
