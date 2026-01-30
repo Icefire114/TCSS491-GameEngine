@@ -66,7 +66,7 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
-        gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
+        //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 

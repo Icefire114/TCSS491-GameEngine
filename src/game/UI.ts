@@ -33,6 +33,18 @@ export class UILayer implements Entity {
             // TODO: Draw the items along the bottom of the screen
             //       and buffs along the top.
         }
+
+        //draw player health on top right corner of the screen
+        ctx.fillStyle = "red";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Health: ${player.health}%`, ctx.canvas.width - 200, 40);
+        //console.log(`Player Health: ${player.health}`);
+
+        //draw player sheild below health
+        ctx.fillStyle = "blue";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Sheild: ${player.shield}%`, ctx.canvas.width - 200, 80);
+        //console.log(`Player Sheild: ${player.sheild}`);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {

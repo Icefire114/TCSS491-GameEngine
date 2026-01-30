@@ -40,6 +40,22 @@ export class Player implements Entity, Collidable {
         ]
     );
 
+    // players current health and sheild health
+    health: number = 0;
+    shield: number = 50;
+
+    // players max health (smash bros health system where 0% is max health)
+    maxHealth: number = 0;
+    maxSheild: number = 100;
+
+    // invulnerbale time frame after getting hit
+    iTime: number = 0; 
+    // seconds of immunity after getting hit
+    iDuration: number = 0.5; 
+
+    // god mode for testing
+    godMode: boolean = false;
+
     /**
      * The items the player has picked up.
      */
@@ -78,6 +94,10 @@ export class Player implements Entity, Collidable {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        //console.log(`Player position: (${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)})`);
+        console.log(`Player IWindow: ${this.iTime.toFixed(2)}`);
+        this.iTime -= deltaTime;
+
         this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
         const onGround = this.velocity.y === 0; // TODO: fix later
 
@@ -132,12 +152,60 @@ export class Player implements Entity, Collidable {
             }
         }
 
+        // -- Collision with items --
         // Item pickup checks:
         const items: ItemEntity[] = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
         for (const itemEnt of items) {
             if (this.physicsCollider.collides(this, itemEnt)) {
                 console.log(`We hit item ${itemEnt.item.tag}`);
+            
+                // remove item from world when picked up
+                itemEnt.removeFromWorld = true;
+
+                // call items pickup method
+                itemEnt.item.onActivate();
             }
         }
+
+        // -- Collision with spikes --
+        const spike: Entity[] | undefined = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
+        for (const spikeEntity of spike) {
+            if (this.physicsCollider.collides(this, spikeEntity)) {
+                console.log(`Player hit a spike!`);
+                this.damagePlayer(10); // damage health by 10% when hitting a spike
+                this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
+                this.velocity.y = -10; // bounce player up a bit on spike hit
+                console.log('Player hit a spike');
+            }
+        }
+        
+        // -- Collision with zombies --
+        const zombies: Entity[] | undefined = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
+        for (const zombie of zombies) {
+            if (this.physicsCollider.collides(this, zombie) && this.isInvulnerable()) {
+                this.damagePlayer(20); // damage health by 20% when hitting a zombie
+                this.iTime = this.iDuration; // start invulnerability time
+                console.log(`Player hit by a zombie`);
+            }
+        }
+
+    }
+
+    damagePlayer(damage: number):void {
+        if (!this.godMode) {
+            if (this.shield <= 0) { //damage sheild first
+                if (this.health + damage >= 100) {
+                    console.log(`Player has died!`);
+                    this.removeFromWorld = true; 
+                }
+                this.health += damage;
+            } else {
+                this.shield = Math.max(0, this.shield - damage);
+            }
+        }
+    }
+
+    isInvulnerable(): boolean {
+        return this.iTime <= 0;
     }
 }
