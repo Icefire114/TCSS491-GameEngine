@@ -39,6 +39,22 @@ export class Player implements Entity, Collidable {
         ]
     );
 
+    prevGroundSpeed: number = 0;
+
+    // Movement tuning constants
+    MIN_SPEED = 15;
+    MAX_SPEED = 350;
+    SLIDE_FORCE = 50;
+    ACCELERATION = 150;
+    BRAKE_FORCE = 200;
+    FRICTION = 0.01;
+    GROUND_STICK_FORCE = 500;
+
+    isInSafeZone(): boolean {
+        // TODO(pg): If in terrain flat zone, then its a safe zone.
+        return false;
+    }
+
     /**
      * The items the player has picked up.
      */
@@ -49,7 +65,92 @@ export class Player implements Entity, Collidable {
     }
 
 
-    // TODO(pg): When we are going down a slope, we shhould rotate both player and snowboard to be perpendicular to the slope
+    update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+        const onGround = this.velocity.y === 0; // TODO: fix later
+
+        // ---------- Ground-only momentum ----------
+        if (onGround) {
+            // Base downhill slide (only if not in a safe zone)
+            if (!this.isInSafeZone()) {
+                this.velocity.x += this.SLIDE_FORCE * deltaTime;
+            }
+
+            // D key: Speed up
+            if (keys["d"]) {
+                this.velocity.x += this.ACCELERATION * deltaTime;
+            }
+
+            // A key: Brake
+            if (keys["a"]) {
+                this.velocity.x -= this.BRAKE_FORCE * deltaTime;
+            }
+
+            // Stick to ground
+            this.velocity.y += this.GROUND_STICK_FORCE * deltaTime;
+
+            // Convert some gravity into forward motion (slope feel)
+            const GRAVITY_TO_FORWARD = 0.4;
+            this.velocity.x += GameEngine.g_INSTANCE.G * GRAVITY_TO_FORWARD * deltaTime;
+        } else {
+            // ---------- In air: no momentum gains ----------
+            // Optional small air drag to prevent creeping speed increases
+            const AIR_DRAG = 0.9995;
+            this.velocity.x *= AIR_DRAG;
+        }
+
+        // ---------- Jump (ground only) ----------
+        if ((keys["w"] || keys[" "]) && onGround) {
+            this.velocity.y = -15;
+        }
+
+        // ---------- Gravity ----------
+        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
+
+        // ---------- Ground friction only ----------
+        if (onGround) {
+            this.velocity.x *= (1 - this.FRICTION);
+        }
+
+        // ---------- Enforce right-only + min/max speed ----------
+        if (onGround) {
+            this.velocity.x = Math.max(this.MIN_SPEED, this.velocity.x);
+        } else {
+            // In air: never allow speed to increase
+            this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed ?? this.velocity.x);
+        }
+
+        this.velocity.x = Math.min(this.MAX_SPEED, this.velocity.x);
+
+        // Store last grounded speed
+        if (onGround) {
+            this.prevGroundSpeed = this.velocity.x;
+        }
+
+        // ---------- Integrate ----------
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
+
+        // ---------- Collision with terrain ----------
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        if (mountain && mountain.physicsCollider) {
+            if (this.physicsCollider.collides(this, mountain)) {
+                this.velocity.y = 0;
+            }
+        }
+
+        // ---------- Item pickup ----------
+        const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
+        for (const itemEnt of items) {
+            if (this.physicsCollider.collides(this, itemEnt)) {
+                console.log(`We hit item ${itemEnt.item.tag}`);
+            }
+        }
+    }
+
+
+    // TODO(pg): When we are going down a slope, we should rotate the snowboard to be perpendicular to the slope
+    //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         this.drawSnowboard(ctx, game);
@@ -74,69 +175,5 @@ export class Player implements Entity, Collidable {
             w,
             h
         )
-    }
-
-    update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-        const onGround = this.velocity.y === 0; // TODO: fix later
-
-        // -- Base movement: simulating sliding down a mountain --
-        // I like having this around 5, but for testing i have it at 0
-        const slideForce = 0; // Constant rightward force
-
-        this.velocity.x += slideForce * deltaTime;
-
-        // -- Player input --
-
-        // D key: Speed up
-        if (keys["d"]) {
-            this.velocity.x += 150 * deltaTime;
-        }
-
-        // A key: Brake
-        if (keys["a"]) {
-            this.velocity.x -= 150 * deltaTime;
-
-            // this.velocity.x = Math.max(1, this.velocity.x - 200 * deltaTime); // Reduce x velocity, but not below 1
-            // this.velocity.y = Math.max(1, this.velocity.y - 200 * deltaTime); // Reduce y velocity, but not below 1
-        }
-
-        // W or Space key: Jump
-        if ((keys["w"] || keys[" "]) && onGround) {
-            this.velocity.y = -15; // Apply an upward force for jumping
-        }
-
-
-        // -- Physics simulation --
-
-        // Gravity
-        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime;
-
-        // Friction
-        const friction = 0.01;
-        this.velocity.x *= (1 - friction);
-
-        // Apply velocity to position
-        this.position.x += this.velocity.x * deltaTime;
-        this.position.y += this.velocity.y * deltaTime;
-
-        // -- Collision with terrain --
-        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
-        if (mountain && mountain.physicsCollider) {
-            if (this.physicsCollider.collides(this, mountain)) {
-                // TODO: Make the position jump to the nearest surface, or the amount moved should be 
-                // proportional to the distance we are below the terrain
-                this.velocity.y = 0; 
-
-            }
-        }
-
-        // Item pickup checks:
-        const items: ItemEntity[] = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
-        for (const itemEnt of items) {
-            if (this.physicsCollider.collides(this, itemEnt)) {
-                console.log(`We hit item ${itemEnt.item.tag}`);
-            }
-        }
     }
 }

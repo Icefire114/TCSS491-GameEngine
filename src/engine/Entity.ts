@@ -28,5 +28,11 @@ export type Entity = {
 
     removeFromWorld: boolean;
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void;
+
+    /**
+     * Called once per fram per entity, used to update the entity's state.
+     * @param keys A map of key names to whether they're pressed or not.
+     * @param deltaTime The time in seconds since the last frame.
+     */
     update(keys: { [key: string]: boolean; }, deltaTime: number): void;
 };

@@ -174,9 +174,8 @@ export class Mountain implements Entity {
         }
     }
 
-    // IDK what this is used for? 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-
+        // Unused.
     }
 
     /**
