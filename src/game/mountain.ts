@@ -2,9 +2,7 @@ import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { MountainCollider } from "../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
-import { clamp, unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
-import { G_CONFIG } from "./CONSTANTS.js";
 
 // Object that holds the anchor point x, y and that camera angle 
 type MountainPoint = Vec2 & { cameraTargetY: number };

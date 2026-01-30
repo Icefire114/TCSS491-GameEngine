@@ -2,7 +2,7 @@ import { DrawLayer } from "./types.js";
 import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, ImagePath } from "./assetmanager.js";
-import { sleep, unwrap } from "./util.js";
+import { unwrap } from "./util.js";
 import { G_CONFIG } from "../game/CONSTANTS.js";
 import { BoxCollider } from "./physics/BoxCollider.js";
 
