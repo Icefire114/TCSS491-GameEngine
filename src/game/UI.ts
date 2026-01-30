@@ -35,16 +35,22 @@ export class UILayer implements Entity {
         }
 
         //draw player health on top right corner of the screen
-        ctx.fillStyle = "red";
+        if (player.health < 100) {
+            ctx.fillStyle = "green";
+        } else if (player.health < 200) {
+            ctx.fillStyle = "orange";
+        } else {
+            ctx.fillStyle = "red";
+        }
         ctx.font = "30px Arial";
         ctx.fillText(`Health: ${player.health}%`, ctx.canvas.width - 200, 40);
         //console.log(`Player Health: ${player.health}`);
 
-        //draw player sheild below health
+        //draw player shield below health
         ctx.fillStyle = "blue";
         ctx.font = "30px Arial";
-        ctx.fillText(`Sheild: ${player.shield}%`, ctx.canvas.width - 200, 80);
-        //console.log(`Player Sheild: ${player.sheild}`);
+        ctx.fillText(`Shield: ${player.shield}%`, ctx.canvas.width - 200, 80);
+        //console.log(`Player Shield: ${player.shield}`);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
