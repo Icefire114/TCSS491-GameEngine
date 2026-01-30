@@ -76,4 +76,12 @@ export class ItemEntity implements Entity, Collidable {
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
     }
+
+    /**
+     * Called when the player picks up the item.
+     * @returns The item that was picked up/ this entity represents.
+     */
+    pickup(): Item {
+        return this.item;
+    }
 }

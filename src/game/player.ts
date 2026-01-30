@@ -49,6 +49,7 @@ export class Player implements Entity, Collidable {
     BRAKE_FORCE = 200;
     FRICTION = 0.01;
     GROUND_STICK_FORCE = 500;
+    JUMP_FORCE = -30;
 
     isInSafeZone(): boolean {
         // TODO(pg): If in terrain flat zone, then its a safe zone.
@@ -101,7 +102,7 @@ export class Player implements Entity, Collidable {
 
         // ---------- Jump (ground only) ----------
         if ((keys["w"] || keys[" "]) && onGround) {
-            this.velocity.y = -15;
+            this.velocity.y = this.JUMP_FORCE;
         }
 
         // ---------- Gravity ----------
@@ -144,6 +145,8 @@ export class Player implements Entity, Collidable {
         for (const itemEnt of items) {
             if (this.physicsCollider.collides(this, itemEnt)) {
                 console.log(`We hit item ${itemEnt.item.tag}`);
+                this.items.push(itemEnt.pickup());
+                itemEnt.removeFromWorld = true;
             }
         }
     }
