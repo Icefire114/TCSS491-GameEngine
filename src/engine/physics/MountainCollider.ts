@@ -75,13 +75,17 @@ export class MountainCollider implements Collider {
     }
 
     findingTheEntityPositionWithinTheCurve(otherEntity: Collidable, startingPoint: Vec2, endingPoint: Vec2): number {
-        // Getting the enetity x position 
-        let entityPositionX = otherEntity.position.x;
-        // Get the total width of the whole area we are tracking
-        let totalWidthOfArea = endingPoint.x - startingPoint.x;
+        if (otherEntity.physicsCollider instanceof BoxCollider) {
+            // Getting the enetity x position
+            let entityPositionX = otherEntity.position.x + otherEntity.physicsCollider.width / 2;
+            // Get the total width of the whole area we are tracking
+            let totalWidthOfArea = endingPoint.x - startingPoint.x;
+            // Calculating where our entity is base on our total width
+            return (entityPositionX - startingPoint.x) / totalWidthOfArea;
+        } else {
+            throw new Error("Non BoxColliders are not supported with the mountain collider yet!");
+        }
 
-        // Calculating where our entity is base on our total width
-        return (entityPositionX - startingPoint.x) / totalWidthOfArea;
     }
 
     calculatingQuadraticBezier(entityPosition: number, midPointAB: Vec2, steeringPoint: MountainPoint, midPointBC: Vec2) {
