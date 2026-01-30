@@ -5,6 +5,7 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Collidable, Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
+import { Mountain } from "../mountain.js";
 import { Item } from "./Item.js";
 
 /**
@@ -55,10 +56,25 @@ export class ItemEntity implements Entity, Collidable {
         // );
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        // TODO: Check for collision with the player and if one is found,
-        //       then call the item's pickup method and remove this entity from the game
-        // NOTE: This is handled in the player's update method, no need to do anything here.
+    update(_: { [key: string]: boolean; }, deltaTime: number): void {
+        // NOTE: Item pickup is handled in the player's update method, no need to do anything here except physics
         this.animation.updateAnimState(AnimationState.IDLE, deltaTime);
+
+
+        // ---------- Gravity ----------
+        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime;
+
+        // ---------- Collision with terrain ----------
+        const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        if (mountain && mountain.physicsCollider) {
+            if (this.physicsCollider.collides(this, mountain)) {
+                this.velocity.y = 0;
+            }
+        }
+
+
+        // ---------- Integrate ----------
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
     }
 }

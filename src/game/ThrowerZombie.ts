@@ -4,6 +4,7 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Vec2 } from "../engine/types.js";
+import { Mountain } from "./mountain.js";
 
 export class ThrowerZombie implements Entity {
     tag: string = "ThrowerZombie";
@@ -86,5 +87,22 @@ export class ThrowerZombie implements Entity {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
         this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+
+
+        // ---------- Gravity ----------
+        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime;
+
+        // ---------- Collision with terrain ----------
+        const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        if (mountain && mountain.physicsCollider) {
+            if (this.physicsCollider.collides(this, mountain)) {
+                this.velocity.y = 0;
+            }
+        }
+
+
+        // ---------- Integrate ----------
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
     }
 }
