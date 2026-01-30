@@ -14,7 +14,7 @@ import { Item } from "./Item.js";
  */
 export class ItemEntity implements Entity, Collidable {
     id: EntityID;
-    tag: string = "ItemEntity";
+    tag: string;
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     physicsCollider: BoxCollider = new BoxCollider(2, 2);
@@ -28,6 +28,7 @@ export class ItemEntity implements Entity, Collidable {
     item: Item;
 
     constructor(item: Item, animator: Animator, position?: Vec2) {
+        this.tag = `ItemEntity__${item.tag}`;
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.item = item;
         this.sprite = item.sprite;
