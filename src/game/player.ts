@@ -122,13 +122,13 @@ export class Player implements Entity, Collidable {
         this.position.y += this.velocity.y * deltaTime;
 
         // -- Collision with terrain --
-        const mountain: Mountain = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain")) as Mountain;
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
                 // TODO: Make the position jump to the nearest surface, or the amount moved should be 
                 // proportional to the distance we are below the terrain
-                this.position.y -= this.physicsCollider.height;
-                this.velocity.y = 0;
+                this.velocity.y = 0; 
+
             }
         }
 

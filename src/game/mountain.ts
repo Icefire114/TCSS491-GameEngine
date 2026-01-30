@@ -34,20 +34,35 @@ export class Mountain implements Entity {
     private ravineCooldown = 150;
     private ravineStartShowing = 150;
 
+
+    // Flat plains logic
+    private flatSequenceOn: boolean = false;
+    private flatStep: number = 0;
+    private flatBaseY: number = 0;
+    private flatGenerationTick = 10;
+    private flatCooldown = 150;
+    private flatStartShowing = 150
+    private flatEndX: number = 0;
+    
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         // Load the default level into the engine
-        fetch('res/levels/testing.json').then(response => response.json()).then(data => {
-            GameEngine.g_INSTANCE.terrainData = data;
-            this.physicsCollider = new MountainCollider(data.y);
-            unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
-        });
+        // fetch('res/levels/testing.json').then(response => response.json()).then(data => {
+        //     GameEngine.g_INSTANCE.terrainData = data;
+        //     this.physicsCollider = new MountainCollider(data.y);
+        //     unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
+        // });
+
+        this.physicsCollider = new MountainCollider(this.points);
 
         // Initialize the staring anchor
-        const startY = 100;
+        const startY = 0;
         const startingPoint = { x: -50, y: startY, cameraTargetY: startY };
         this.points.push(startingPoint);
         this.lastAnchor = startingPoint;
+
+        // Setting the collider to have the live points array
+        this.physicsCollider = new MountainCollider(this.points);
     }
 
 
@@ -69,7 +84,7 @@ export class Mountain implements Entity {
 
         // Generating anchor points ahead of the player
         if (this.lastAnchor.x < viewport_right_world) {
-            while (this.lastAnchor.x < viewport_right_world + 1000) {
+            while (this.lastAnchor.x < viewport_right_world + 3000) {
                 this.generatingAnchor();
             }
         }
@@ -80,72 +95,25 @@ export class Mountain implements Entity {
             this.points.shift();
         }
 
-        if (G_CONFIG.DRAW_OLD_MOUNTAIN) {
-            this.drawFromTerrainData(ctx, game);
-        } else {
-            // TEMP CODE: Force Viewport to follow Moutain
-            this.cameraFollowMoutain(game);
+        // Drawing the moutain 
+        this.drawMoutain(ctx, game, scale);
 
-            // Uncomment to see anchor dots
-            // this.drawPoints(ctx, game, scale);
-
-            // Drawing the moutain 
-            this.drawMoutain(ctx, game, scale);
-        }
+        // Uncomment to see anchor dots
+        //this.drawPoints(ctx, game, scale); 
     }
 
-    /**
-     * A TEMP METHOD (Will delete later)
-     * Used to force the camera to follow the moutain so I know the moutain generation is working
-     * 
-     * @param game is the game engine. 
-     */
-    cameraFollowMoutain(game: GameEngine) {
-        // Camera following the moutain logic 
-
-        // Finding a point in the array where such x value is greater than the x value of the view port
-        const point2Index = this.points.findIndex(p => p.x > game.viewportX);
-
-        // Finding the 2 points 
-        const point1 = this.points[point2Index - 1];
-        const point2 = this.points[point2Index];
-
-        if (point1 && point2) {
-            // Checking Points and Camera Position
-            console.log("Point x Value: " + point1.x);
-            console.log("Point y value:" + point2.x)
-            console.log("Viewport x value: " + game.viewportX);
-
-            const totalDistance = point2.x - point1.x;
-            const currentDistance = game.viewportX - point1.x;
-            const percentage = currentDistance / totalDistance;
-
-            // Calculating the camera position Y using linear interpolation between 2 points 
-            let exactHeight = point1.cameraTargetY + (point2.cameraTargetY - point1.cameraTargetY) * percentage;
-
-            // Setting the camera 40 pixels above the moutain
-            game.viewportY = exactHeight - 40;
-        } else if (this.points.length > 0) {
-            game.viewportY = this.points[0].cameraTargetY - 40;
-        }
-    }
-
-    /**
-     * Drawing the moutain\
-     * 
-     * @param ctx is the context of the canvas
-     * @param game is the game engine. 
-     */
     drawMoutain(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number) {
+        if (this.points.length < 2) return;
+
         ctx.beginPath();
 
-        // Conver out world anchor points -> screen points, and then set our ctx to that point
-        if (this.points.length > 0) {
-            const startX = (this.points[0].x - game.viewportX) * scale;
-            const startY = (this.points[0].y - game.viewportY) * scale;
-            ctx.moveTo(startX, startY);
-        }
-
+        // This will closed propelry when filling 
+        const startX = (this.points[0].x - game.viewportX) * scale;
+        const startY = (this.points[0].y - game.viewportY) * scale;
+        
+        // Were drawing from the very bottom of the canvas at the start X
+        ctx.moveTo(startX, ctx.canvas.height); 
+        ctx.lineTo(startX, startY);
 
         for (let i = 0; i < this.points.length - 1; i++) {
             const currentPoint = this.points[i];
@@ -165,6 +133,13 @@ export class Mountain implements Entity {
             ctx.quadraticCurveTo(currentPointX, currentPointY, midX, midY);
         }
 
+        // Closeign the shape at the bottom-right
+        const lastPoint = this.points[this.points.length - 1];
+        const lastX = (lastPoint.x - game.viewportX) * scale;
+        
+        ctx.lineTo(lastX, ctx.canvas.height);
+        ctx.lineTo(startX, ctx.canvas.height); 
+        
         // Drawing the moutain
         ctx.lineTo(ctx.canvas.width, ctx.canvas.height);
         ctx.lineTo(0, ctx.canvas.height);
@@ -217,6 +192,12 @@ export class Mountain implements Entity {
             return;
         }
 
+        // Checking if were in a flat generation
+        if (this.flatSequenceOn) {
+            this.generateFlatAnchor();
+            return;
+        }
+
         const currentX = this.lastAnchor.x;
 
         // Spawn ravine only if it past the spawn point area
@@ -225,11 +206,18 @@ export class Mountain implements Entity {
         const coolDown = currentX > (this.lastRavineEndX + this.ravineCooldown);
 
 
+        // Spawn and cool down for flats
+        const pastSpawnPointForFlat = currentX > this.flatStartShowing;
+        const cooldownForFlat = currentX > (this.flatEndX + this.flatCooldown);
+
         // Probablity of a ravine spawns or not, if not, then do normal 
         if (pastSpawnPoint && coolDown && Math.random() < 0.1) {
             this.startRavineSequence();
             console.log("RAVINE SPAWN")
-        } else {
+        } else if (pastSpawnPointForFlat && cooldownForFlat && Math.random() < .15) {
+            this.startFlatSequence();
+            console.log("Im being generated?")
+        } else { 
             this.generateNormalAnchor();
         }
     }
@@ -323,6 +311,37 @@ export class Mountain implements Entity {
         this.ravineStep++;
     }
 
+    /**
+     * Setup for starting a flat sequence
+     */
+    startFlatSequence() {
+        this.flatSequenceOn = true;
+        this.flatStep = 0;
+        this.flatBaseY = this.lastAnchor.y; 
+        console.log("Flat Generation is happening right now")
+    }
+
+    /**
+     * Generating a flat ground
+     */
+    generateFlatAnchor() {
+        let x = this.lastAnchor.x + 15; 
+        let y = this.flatBaseY;          
+
+        const newAnchor = { x: x, y: y, cameraTargetY: y };
+        this.points.push(newAnchor);
+        this.lastAnchor = newAnchor;
+
+        this.flatStep++;
+
+        // After 10 ticks, return to normal generation
+        if (this.flatStep >= this.flatGenerationTick) {
+            this.flatSequenceOn = false;
+            this.flatEndX = x;
+
+        }
+    }
+
 
     /**
      * Random generate a number between a min and max
@@ -337,39 +356,39 @@ export class Mountain implements Entity {
 
 
     // # Old Way: Drawing the moutain by using the Json Points
-    drawFromTerrainData(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        if (game.terrainData == null) {
-            console.error("Mountain terrain data not yet loaded!");
-            return;
-        }
-        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+    // drawFromTerrainData(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+    //     if (game.terrainData == null) {
+    //         console.error("Mountain terrain data not yet loaded!");
+    //         return;
+    //     }
+    //     const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
-        // Render nodes that are within the viewport
-        const viewport_left_world = game.viewportX;
-        const viewport_right_world = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT / game.zoom;
+    //     // Render nodes that are within the viewport
+    //     const viewport_left_world = game.viewportX;
+    //     const viewport_right_world = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT / game.zoom;
 
-        const lower = clamp(Math.floor(viewport_left_world), 0, game.terrainData.y.length);
-        const upper = clamp(Math.ceil(viewport_right_world), 0, game.terrainData.y.length);
+    //     const lower = clamp(Math.floor(viewport_left_world), 0, game.terrainData.y.length);
+    //     const upper = clamp(Math.ceil(viewport_right_world), 0, game.terrainData.y.length);
 
-        ctx.beginPath();
+    //     ctx.beginPath();
 
-        // Move to the first point
-        const startNodeX = lower;
-        const startNodeY = game.terrainData.y[startNodeX];
-        const screenStartX = (startNodeX - game.viewportX) * scale / game.zoom;
-        const screenStartY = (startNodeY - game.viewportY) * scale / game.zoom;
-        ctx.moveTo(screenStartX, screenStartY);
+    //     // Move to the first point
+    //     const startNodeX = lower;
+    //     const startNodeY = game.terrainData.y[startNodeX];
+    //     const screenStartX = (startNodeX - game.viewportX) * scale / game.zoom;
+    //     const screenStartY = (startNodeY - game.viewportY) * scale / game.zoom;
+    //     ctx.moveTo(screenStartX, screenStartY);
 
-        // Draw lines to subsequent points
-        for (let i = lower + 1; i < upper; i++) {
-            const nodeY = game.terrainData.y[i];
-            const screenX = (i - game.viewportX) * scale / game.zoom;
-            const screenY = (nodeY - game.viewportY) * scale / game.zoom;
-            ctx.lineTo(screenX, screenY);
-        }
+    //     // Draw lines to subsequent points
+    //     for (let i = lower + 1; i < upper; i++) {
+    //         const nodeY = game.terrainData.y[i];
+    //         const screenX = (i - game.viewportX) * scale / game.zoom;
+    //         const screenY = (nodeY - game.viewportY) * scale / game.zoom;
+    //         ctx.lineTo(screenX, screenY);
+    //     }
 
-        ctx.strokeStyle = "#313131"
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    }
+    //     ctx.strokeStyle = "#313131"
+    //     ctx.lineWidth = 2;
+    //     ctx.stroke();
+    // }
 }
