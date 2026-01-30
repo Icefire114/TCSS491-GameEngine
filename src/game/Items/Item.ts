@@ -4,6 +4,7 @@ export enum ItemType {
     GUN,
     PERM_BUFF,
     TEMP_BUFF,
+    INSTANT_APPLY,
 }
 
 export type Item = {

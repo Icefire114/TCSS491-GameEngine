@@ -4,6 +4,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
+import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
@@ -42,6 +43,7 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 // === Item Assets ===
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
+ASSET_MANAGER.queueDownload("res/img/items/infection_immunity.png");
 
 // === Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
@@ -78,6 +80,24 @@ function main() {
         gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
+        gameEngine.addEntity(new ItemEntity(
+            new InfectionImmunityItem(),
+            new Animator([
+                [
+                    {
+                        frameCount: 15,
+                        frameHeight: 51,
+                        frameWidth: 39,
+                        offestX: -0.5,
+                        sprite: new ImagePath("res/img/items/infection_immunity.png")
+                    },
+                    AnimationState.IDLE
+                ]
+            ],
+                { x: 3, y: 3 }
+            ),
+            { x: 90, y: 0 })
+            , DrawLayer.ITEM);
 
 
         gameEngine.addEntity(
