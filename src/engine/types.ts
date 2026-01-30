@@ -1,7 +1,6 @@
 export type DrawLayer = number & { __brand: "DrawLayer" };
 export namespace DrawLayer {
     export const HIGHEST: DrawLayer = 1000000 as DrawLayer;
-    export const UI_LAYER: DrawLayer = HIGHEST as DrawLayer;
 
     export const BACKGROUND: DrawLayer = HIGHEST - 1 as DrawLayer;
     export const MOUNTAIN_TERRAIN: DrawLayer = BACKGROUND - 1 as DrawLayer;
@@ -11,7 +10,9 @@ export namespace DrawLayer {
     export const PLAYER: DrawLayer = ITEM - 1 as DrawLayer;
 
     export const DEFAULT: DrawLayer = 0 as DrawLayer;
+    
     export const LOWEST: DrawLayer = -1000000 as DrawLayer;
+    export const UI_LAYER: DrawLayer = LOWEST as DrawLayer;
 
     /**
      * @param value The integer value to create a draw layer of.
