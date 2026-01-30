@@ -144,7 +144,7 @@ export class Player implements Entity, Collidable {
         const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
         for (const itemEnt of items) {
             if (this.physicsCollider.collides(this, itemEnt)) {
-                console.log(`We hit item ${itemEnt.item.tag}`);
+                console.log(`We hit item ${itemEnt.id}`);
                 this.items.push(itemEnt.pickup());
                 itemEnt.removeFromWorld = true;
             }
