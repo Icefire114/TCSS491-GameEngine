@@ -43,7 +43,7 @@ export class Mountain implements Entity {
     private flatCooldown = 150;
     private flatStartShowing = 150
     private flatEndX: number = 0;
-    
+
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         // Load the default level into the engine
@@ -52,8 +52,6 @@ export class Mountain implements Entity {
         //     this.physicsCollider = new MountainCollider(data.y);
         //     unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
         // });
-
-        this.physicsCollider = new MountainCollider(this.points);
 
         // Initialize the staring anchor
         const startY = 0;
@@ -110,9 +108,9 @@ export class Mountain implements Entity {
         // This will closed propelry when filling 
         const startX = (this.points[0].x - game.viewportX) * scale;
         const startY = (this.points[0].y - game.viewportY) * scale;
-        
+
         // Were drawing from the very bottom of the canvas at the start X
-        ctx.moveTo(startX, ctx.canvas.height); 
+        ctx.moveTo(startX, ctx.canvas.height);
         ctx.lineTo(startX, startY);
 
         for (let i = 0; i < this.points.length - 1; i++) {
@@ -136,10 +134,10 @@ export class Mountain implements Entity {
         // Closeign the shape at the bottom-right
         const lastPoint = this.points[this.points.length - 1];
         const lastX = (lastPoint.x - game.viewportX) * scale;
-        
+
         ctx.lineTo(lastX, ctx.canvas.height);
-        ctx.lineTo(startX, ctx.canvas.height); 
-        
+        ctx.lineTo(startX, ctx.canvas.height);
+
         // Drawing the moutain
         ctx.lineTo(ctx.canvas.width, ctx.canvas.height);
         ctx.lineTo(0, ctx.canvas.height);
@@ -217,7 +215,7 @@ export class Mountain implements Entity {
         } else if (pastSpawnPointForFlat && cooldownForFlat && Math.random() < .15) {
             this.startFlatSequence();
             console.log("Im being generated?")
-        } else { 
+        } else {
             this.generateNormalAnchor();
         }
     }
@@ -317,7 +315,7 @@ export class Mountain implements Entity {
     startFlatSequence() {
         this.flatSequenceOn = true;
         this.flatStep = 0;
-        this.flatBaseY = this.lastAnchor.y; 
+        this.flatBaseY = this.lastAnchor.y;
         console.log("Flat Generation is happening right now")
     }
 
@@ -325,8 +323,8 @@ export class Mountain implements Entity {
      * Generating a flat ground
      */
     generateFlatAnchor() {
-        let x = this.lastAnchor.x + 15; 
-        let y = this.flatBaseY;          
+        let x = this.lastAnchor.x + 15;
+        let y = this.flatBaseY;
 
         const newAnchor = { x: x, y: y, cameraTargetY: y };
         this.points.push(newAnchor);
@@ -353,42 +351,4 @@ export class Mountain implements Entity {
     randomIntFromInterval(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
-
-
-    // # Old Way: Drawing the moutain by using the Json Points
-    // drawFromTerrainData(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-    //     if (game.terrainData == null) {
-    //         console.error("Mountain terrain data not yet loaded!");
-    //         return;
-    //     }
-    //     const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-
-    //     // Render nodes that are within the viewport
-    //     const viewport_left_world = game.viewportX;
-    //     const viewport_right_world = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT / game.zoom;
-
-    //     const lower = clamp(Math.floor(viewport_left_world), 0, game.terrainData.y.length);
-    //     const upper = clamp(Math.ceil(viewport_right_world), 0, game.terrainData.y.length);
-
-    //     ctx.beginPath();
-
-    //     // Move to the first point
-    //     const startNodeX = lower;
-    //     const startNodeY = game.terrainData.y[startNodeX];
-    //     const screenStartX = (startNodeX - game.viewportX) * scale / game.zoom;
-    //     const screenStartY = (startNodeY - game.viewportY) * scale / game.zoom;
-    //     ctx.moveTo(screenStartX, screenStartY);
-
-    //     // Draw lines to subsequent points
-    //     for (let i = lower + 1; i < upper; i++) {
-    //         const nodeY = game.terrainData.y[i];
-    //         const screenX = (i - game.viewportX) * scale / game.zoom;
-    //         const screenY = (nodeY - game.viewportY) * scale / game.zoom;
-    //         ctx.lineTo(screenX, screenY);
-    //     }
-
-    //     ctx.strokeStyle = "#313131"
-    //     ctx.lineWidth = 2;
-    //     ctx.stroke();
-    // }
 }
