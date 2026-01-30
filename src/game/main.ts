@@ -44,6 +44,7 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity.png");
+ASSET_MANAGER.queueDownload("res/img/items/infection_immunity_UI.png");
 
 // === Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/Plan 2.png");

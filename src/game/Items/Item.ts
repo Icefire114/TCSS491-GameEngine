@@ -21,3 +21,15 @@ export type Item = {
      */
     onActivate(): void;
 }
+
+export type TempBuff = {
+    /**
+     * The duration of the buff in seconds.
+     */
+    startingDuration: number;
+
+    /**
+     * The amount of time remaining on the buff.
+     */
+    currentDuration: number;
+}

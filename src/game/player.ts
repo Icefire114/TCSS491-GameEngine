@@ -3,7 +3,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
-import { Item } from "./Items/Item.js";
+import { Item, ItemType, TempBuff } from "./Items/Item.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
@@ -67,6 +67,18 @@ export class Player implements Entity, Collidable {
 
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        for (const item of
+            this.items.filter(
+                (item) => item.type === ItemType.TEMP_BUFF
+            ) as (Item & TempBuff)[]
+        ) {
+            item.currentDuration = item.currentDuration - deltaTime;
+            if (item.currentDuration <= 0) {
+                this.items.splice(this.items.indexOf(item), 1);
+            }
+        }
+
+
         this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
         const onGround = this.velocity.y === 0; // TODO: fix later
 
