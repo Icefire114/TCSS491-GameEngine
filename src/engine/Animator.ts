@@ -88,8 +88,12 @@ export class Animator {
             );
         }
 
-        const frameIdx =
+        let frameIdx =
             Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
+        // If we are in death animation, then we do not want to replay the animation.
+        if (this.currentState === AnimationState.DEATH && Math.floor(this.elapsed / this.secondsPerFrame) >= currentAnim.frameCount) {
+            frameIdx = currentAnim.frameCount - 1;
+        }
 
         const game = GameEngine.g_INSTANCE;
 
