@@ -10,7 +10,7 @@ export namespace DrawLayer {
     export const PLAYER: DrawLayer = ITEM - 1 as DrawLayer;
 
     export const DEFAULT: DrawLayer = 0 as DrawLayer;
-    
+
     export const LOWEST: DrawLayer = -1000000 as DrawLayer;
     export const UI_LAYER: DrawLayer = LOWEST as DrawLayer;
 
@@ -40,4 +40,24 @@ export namespace ResourcePath {
 export class Vec2 {
     x: number = 0;
     y: number = 0;
+}
+
+export namespace Vec2 {
+    /**
+     * @param v1 Vector 1
+     * @param v2 Vector 2
+     * @returns The dot product of `v1` and `v2`
+     */
+    export function dot(v1: Vec2, v2: Vec2): number {
+        return v1.x * v2.x + v1.y * v2.y;
+    }
+
+    /**
+     * @param v1 Vector 1
+     * @param v2 Vector 2
+     * @returns The cross product of `v1` and `v2`
+     */
+    export function cross(v1: Vec2, v2: Vec2): number {
+        return v1.x * v2.y - v1.y * v2.x;
+    }
 }
