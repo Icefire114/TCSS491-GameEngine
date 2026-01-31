@@ -45,7 +45,7 @@ export class Player implements Entity, Collidable {
     MIN_SPEED = 15;
     MAX_SPEED = 350;
     SLIDE_FORCE = 50;
-    ACCELERATION = 150;
+    ACCELERATION = 60;
     BRAKE_FORCE = 200;
     FRICTION = 0.01;
     GROUND_STICK_FORCE = 500;
@@ -80,7 +80,7 @@ export class Player implements Entity, Collidable {
 
 
         this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-        const onGround = this.velocity.y === 0; // TODO: fix later
+        const onGround = this.velocity.y === 0; // TODO: fix later, dist between player and ground < some threshold?
 
         // ---------- Ground-only momentum ----------
         if (onGround) {
