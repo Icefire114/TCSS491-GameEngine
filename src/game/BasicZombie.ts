@@ -22,7 +22,6 @@ export class BasicZombie implements Entity {
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 9,
-                offestX: -3.7
             },
             AnimationState.IDLE
         ],

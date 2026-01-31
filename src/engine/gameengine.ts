@@ -210,12 +210,11 @@ export class GameEngine {
                     const collider = ent[0].physicsCollider;
 
                     const screenX =
-                        ((ent[0].position.x - this.viewportX) * meterInPixels) / this.zoom;
+                        ((ent[0].position.x - collider.width / 2 - this.viewportX) * meterInPixels) / this.zoom;
 
-                    // Bottom-left -> top-left for canvas
+                    // Bottom-center -> top-left for canvas
                     const screenY =
-                        ((ent[0].position.y - this.viewportY) * meterInPixels) / this.zoom
-                        - (collider.height * meterInPixels) / this.zoom;
+                        ((ent[0].position.y - collider.height - this.viewportY) * meterInPixels) / this.zoom;
 
                     const screenW =
                         (collider.width * meterInPixels) / this.zoom;

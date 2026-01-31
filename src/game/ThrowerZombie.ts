@@ -22,7 +22,6 @@ export class ThrowerZombie implements Entity {
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 5,
-                offestX: -3.4
             },
             AnimationState.IDLE
         ],

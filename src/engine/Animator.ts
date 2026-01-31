@@ -114,13 +114,12 @@ export class Animator {
         const screenW = (worldW * meterInPixels) / game.zoom;
         const screenH = (worldH * meterInPixels) / game.zoom;
 
-        // Bottom-left world-space -> top-left screen-space
+        // Bottom-center world-space -> top-left screen-space
         const screenX =
-            ((pos.x - game.viewportX + currentAnim.offsetX) * meterInPixels) / game.zoom;
+            ((pos.x - (worldW / 2) - game.viewportX + currentAnim.offsetX) * meterInPixels) / game.zoom;
 
         const screenY =
-            ((pos.y - game.viewportY) * meterInPixels) / game.zoom
-            - screenH; // shift up because canvas Y grows downward
+            ((pos.y - worldH - game.viewportY) * meterInPixels) / game.zoom;
 
         ctx.drawImage(
             currentAnim.sprite,

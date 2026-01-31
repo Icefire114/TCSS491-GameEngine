@@ -93,7 +93,6 @@ function main() {
                         frameCount: 15,
                         frameHeight: 51,
                         frameWidth: 39,
-                        offestX: -0.5,
                         sprite: new ImagePath("res/img/items/infection_immunity.png")
                     },
                     AnimationState.IDLE
@@ -115,7 +114,6 @@ function main() {
                                 frameCount: 4,
                                 frameHeight: 40,
                                 frameWidth: 42,
-                                offestX: -0.5,
                                 sprite: new ImagePath("res/img/items/instant_health_pickup.png")
                             },
                             AnimationState.IDLE
@@ -135,7 +133,6 @@ function main() {
                                 frameCount: 10,
                                 frameHeight: 64,
                                 frameWidth: 54,
-                                offestX: -0.5,
                                 sprite: new ImagePath("res/img/items/shield_pickup.png")
                             },
                             AnimationState.IDLE

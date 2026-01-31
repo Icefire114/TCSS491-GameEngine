@@ -33,7 +33,6 @@ export class Player implements Entity, Collidable {
                     frameCount: 7,
                     frameHeight: 128,
                     frameWidth: 128,
-                    offestX: -5
                 },
                 AnimationState.IDLE
             ],
@@ -43,7 +42,6 @@ export class Player implements Entity, Collidable {
                     frameCount: 4,
                     frameHeight: 128,
                     frameWidth: 128,
-                    offestX: -6
                 },
                 AnimationState.DEATH
             ]
@@ -254,7 +252,7 @@ export class Player implements Entity, Collidable {
 
         ctx.drawImage(
             sprite,
-            screenX - w / 4,
+            screenX - w / 2,
             screenY - h + 10,
             w,
             h

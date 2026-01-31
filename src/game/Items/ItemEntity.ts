@@ -17,7 +17,7 @@ export class ItemEntity implements Entity, Collidable {
     tag: string = "ItemEntity";
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
-    physicsCollider: BoxCollider = new BoxCollider(2, 2);
+    physicsCollider: BoxCollider = new BoxCollider(3, 3);
     sprite: ImagePath;
     removeFromWorld: boolean = false;
     animation: Animator;
@@ -39,20 +39,8 @@ export class ItemEntity implements Entity, Collidable {
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        this.animation.drawCurrentAnimFrameAtPos(ctx, this.position);
-
-        // TODO: This is some simpler draw code!
-        // const sprite = game.getSprite(this.sprite);
-
-        // const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-
-        // ctx.drawImage(
-        //     sprite,
-        //     (this.position.x - game.viewportX) * meter_in_pixels / game.zoom,
-        //     (this.position.y - game.viewportY) * meter_in_pixels / game.zoom,
-        //     sprite.width,
-        //     sprite.height
-        // );
+        const positionWithBBOffset = new Vec2(this.position.x , this.position.y);
+        this.animation.drawCurrentAnimFrameAtPos(ctx, positionWithBBOffset);
     }
 
     update(_: { [key: string]: boolean; }, deltaTime: number): void {

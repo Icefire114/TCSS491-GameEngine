@@ -18,10 +18,15 @@ export class BoxCollider implements Collider {
         if (otherEntity.physicsCollider instanceof MountainCollider) {
             return otherEntity.physicsCollider.collides(otherEntity, thisEntity);
         } else if (otherEntity.physicsCollider instanceof BoxCollider) {
-            return (thisEntity.position.x + this.width > otherEntity.position.x &&
-                thisEntity.position.x < otherEntity.position.x + otherEntity.physicsCollider.width &&
-                thisEntity.position.y + this.height > otherEntity.position.y &&
-                thisEntity.position.y < otherEntity.position.y + otherEntity.physicsCollider.height);
+            const thisLeft = thisEntity.position.x - this.width / 2;
+            const thisTop = thisEntity.position.y - this.height;
+            const otherLeft = otherEntity.position.x - otherEntity.physicsCollider.width / 2;
+            const otherTop = otherEntity.position.y - otherEntity.physicsCollider.height;
+
+            return (thisLeft + this.width > otherLeft &&
+                thisLeft < otherLeft + otherEntity.physicsCollider.width &&
+                thisTop + this.height > otherTop &&
+                thisTop < otherTop + otherEntity.physicsCollider.height);
         }
 
         return false;
