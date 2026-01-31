@@ -3,6 +3,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { MountainCollider } from "../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 
 // Object that holds the anchor point x, y and that camera angle 
 type MountainPoint = Vec2 & { cameraTargetY: number };
@@ -95,7 +96,9 @@ export class Mountain implements Entity {
         this.drawMoutain(ctx, game, scale);
 
         // Uncomment to see anchor dots
-        //this.drawPoints(ctx, game, scale); 
+        if (G_CONFIG.DRAW_TERRAIN_ANCHOR_POINTS) {
+            this.drawPoints(ctx, game, scale);
+        }
     }
 
     drawMoutain(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number) {
@@ -300,7 +303,7 @@ export class Mountain implements Entity {
                 break;
         }
 
-        const newAnchor = { x: x, y: y, cameraTargetY: ghostCamera };
+        const newAnchor: MountainPoint = { x, y, cameraTargetY: ghostCamera };
         this.points.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.ravineStep++;
