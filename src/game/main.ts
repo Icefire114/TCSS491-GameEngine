@@ -24,6 +24,7 @@ const gameEngine = new GameEngine(ASSET_MANAGER);
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Dead.png");
 
 
 // === Zombie Assets ===
