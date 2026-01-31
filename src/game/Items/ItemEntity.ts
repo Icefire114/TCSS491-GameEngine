@@ -78,8 +78,10 @@ export class ItemEntity implements Entity, Collidable {
     }
 
     /**
-     * Called when the player picks up the item.
-     * @returns The item that was picked up/ this entity represents.
+     * Called when the player picks up the item, it will apply the item's 
+     * effect by calling its `onActivate` method.
+     * @returns The item that was picked up/ this entity represents, 
+     * so the player can optionally add it to their inventory.
      */
     pickup(): Item {
         if (this.item.type !== ItemType.GUN) {
