@@ -62,7 +62,7 @@ export class Player implements Entity, Collidable {
 
     // players max health (smash bros health system where 0% is max health)
     maxHealth: number = 0;
-    maxSheild: number = 100;
+    maxShield: number = 100;
 
     // invulnerbale time frame after getting hit
     iTime: number = 0;
