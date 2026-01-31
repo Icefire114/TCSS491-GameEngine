@@ -56,6 +56,24 @@ export class Player implements Entity, Collidable {
         return false;
     }
 
+    // players current health and sheild health
+    health: number = 0;
+    shield: number = 100;
+
+    // players max health (smash bros health system where 0% is max health)
+    maxHealth: number = 0;
+    maxSheild: number = 100;
+
+    // invulnerbale time frame after getting hit
+    iTime: number = 0;
+    // time of immunity after getting hit
+    iDuration: number = 0.5;
+
+    hitMultiplier: number = 1;
+
+    // god mode for testing
+    godMode: boolean = false;
+
     /**
      * The items the player has picked up.
      */
@@ -67,6 +85,14 @@ export class Player implements Entity, Collidable {
 
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        //console.log(`Player position: (${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)})`);
+        //console.log(`Player IWindow: ${this.iTime.toFixed(2)}`);
+        console.log(`deltaTime: ${deltaTime / 10}`);
+        this.iTime -= deltaTime;
+
+        if (!this.isInvulnerable())
+            this.hitMultiplier = this.hitMultiplier < 1 ? 1 : this.hitMultiplier - deltaTime / 10; // hit multiplier decays over time, min is 1
+
         for (const item of
             this.items.filter(
                 (item) => item.type === ItemType.TEMP_BUFF
@@ -152,13 +178,36 @@ export class Player implements Entity, Collidable {
             }
         }
 
-        // ---------- Item pickup ----------
+        // -- Collision with items --
         const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
         for (const itemEnt of items) {
             if (this.physicsCollider.collides(this, itemEnt)) {
                 console.log(`We hit item ${itemEnt.id}`);
                 this.items.push(itemEnt.pickup());
                 itemEnt.removeFromWorld = true;
+            }
+        }
+
+        // -- Collision with spikes --
+        const spike: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
+        for (const spikeEntity of spike) {
+            if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
+                console.log(`Player hit a spike!`);
+                this.damagePlayer(5);
+                this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
+                this.velocity.y = -10; // bounce player up a bit on spike hit
+                this.iTime = this.iDuration; // start invulnerability time
+                console.log('Player hit a spike');
+            }
+        }
+
+        // -- Collision with zombies --
+        const zombies: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
+        for (const zombie of zombies) {
+            if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
+                this.damagePlayer(10);
+                this.iTime = this.iDuration; // start invulnerability time
+                console.log(`Player hit by a zombie`);
             }
         }
     }
@@ -190,5 +239,35 @@ export class Player implements Entity, Collidable {
             w,
             h
         )
+    }
+
+    damagePlayer(damage: number): void {
+        if (!this.godMode) {
+            // increase damage based on current health
+            // Note: scaled damage is only applied to health, not shield
+            const scalingFactor = 1 + (this.health / 100);
+            const ScaledDamage = Math.round(damage * scalingFactor);
+            this.hitMultiplier += 0.1; // increase hit multiplier on each hit
+
+            if (this.shield <= 0) { //damage shield first
+                this.health += ScaledDamage;
+                var death = Math.random() * this.health;
+                console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
+                death *= this.hitMultiplier;
+                console.log(`Adjusted death chance: ${death.toFixed(2)}`);
+
+                if (death >= 150) { // chance of death increases with health%
+                    console.log(`Player has died!`);
+                    this.removeFromWorld = true;
+                }
+
+            } else {
+                this.shield = Math.max(0, this.shield - damage);
+            }
+        }
+    }
+
+    isInvulnerable(): boolean {
+        return this.iTime >= 0;
     }
 }

@@ -53,6 +53,9 @@ ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
 ASSET_MANAGER.queueDownload("res/img/sun.png");
 ASSET_MANAGER.queueDownload("res/img/cloud.png");
 
+// === Music Assets ===
+ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
+
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 
@@ -69,7 +72,7 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
-        gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
+        //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 
