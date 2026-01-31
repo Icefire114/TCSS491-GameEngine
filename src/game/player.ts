@@ -185,7 +185,6 @@ export class Player implements Entity, Collidable {
                 console.log(`We hit item ${itemEnt.id}`);
                 const item = itemEnt.pickup();
                 this.items.push(item);
-                item.onActivate();
                 itemEnt.removeFromWorld = true;
             }
         }
