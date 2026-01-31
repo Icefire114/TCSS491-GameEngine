@@ -42,7 +42,7 @@ export class Player implements Entity, Collidable {
 
     // players current health and sheild health
     health: number = 0;
-    shield: number = 0;
+    shield: number = 100;
 
     // players max health (smash bros health system where 0% is max health)
     maxHealth: number = 0;
@@ -210,7 +210,7 @@ export class Player implements Entity, Collidable {
                 this.health += ScaledDamage;
                 var death = Math.random() * this.health;
                 console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
-                death *= this.hitMultiplier; // increase chance of death based on hit multiplier
+                death *= this.hitMultiplier; 
                 console.log(`Adjusted death chance: ${death.toFixed(2)}`);
 
                 if (death >= 150) { // chance of death increases with health%

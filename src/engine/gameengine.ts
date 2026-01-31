@@ -1,7 +1,7 @@
 import { DrawLayer } from "./types.js";
 import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
-import { AssetManager, ImagePath } from "./assetmanager.js";
+import { AssetManager, AudioPath, ImagePath } from "./assetmanager.js";
 import { sleep, unwrap } from "./util.js";
 import { G_CONFIG } from "../game/CONSTANTS.js";
 import { BoxCollider } from "./physics/BoxCollider.js";
@@ -21,6 +21,7 @@ export class GameEngine {
 
     private static readonly FIXED_DT = 1 / GameEngine.TARGET_FPS;
     private accumulator = 0;
+    private audioUnlock = false;
 
     private ctx: CanvasRenderingContext2D | null;
     private entities: [Entity, DrawLayer][];
@@ -90,6 +91,10 @@ export class GameEngine {
         return unwrap(this.assetManager.getImage(path), `Failed to get sprite for ${path.asRaw()}!`);
     }
 
+    getAudio(path: AudioPath): HTMLAudioElement {
+        return unwrap(this.assetManager.getAudio(path), `Failed to get audio for ${path.asRaw()}!`);
+    }
+
 
     init(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
@@ -112,6 +117,14 @@ export class GameEngine {
             y: e.clientY - (this.ctx?.canvas.getBoundingClientRect().top as number)
         });
 
+        // Unlock audio on first user interaction because browsers block audio until user interacts with the page
+        const unlockAudio = () => {
+            if (this.audioUnlock) return;
+            this.audioUnlock = true;
+            this.startMusic();
+            console.log("Audio unlocked!");
+        };
+
         this.ctx.canvas.addEventListener("mousemove", e => {
             if (this.options.debugging) {
                 console.log("MOUSE_MOVE", getXandY(e));
@@ -124,6 +137,7 @@ export class GameEngine {
                 console.log("CLICK", getXandY(e));
             }
             this.click = getXandY(e);
+            unlockAudio();
         });
 
         this.ctx.canvas.addEventListener("wheel", e => {
@@ -142,7 +156,11 @@ export class GameEngine {
             this.rightclick = getXandY(e);
         });
 
-        this.ctx.canvas.addEventListener("keydown", event => this.keys[event.key] = true);
+        this.ctx.canvas.addEventListener("keydown", event => {
+            this.keys[event.key] = true
+            unlockAudio();
+        });
+        
         this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
     };
 
@@ -296,5 +314,13 @@ export class GameEngine {
         return this.entities
             .filter(ent => ent[0].physicsCollider !== null)
             .map(ent => ent[0]);
+    };
+
+    startMusic(): void {
+        const audioPath = new AudioPath("res/aud/game_music.ogg");
+        const audio = this.getAudio(audioPath);
+        audio.play();
+        audio.loop = true;
+        audio.volume = 0.2;
     };
 };

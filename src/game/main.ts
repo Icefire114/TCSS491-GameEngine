@@ -50,6 +50,9 @@ ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
 ASSET_MANAGER.queueDownload("res/img/sun.png");
 ASSET_MANAGER.queueDownload("res/img/cloud.png");
 
+// === Music Assets ===
+ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
+
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 
