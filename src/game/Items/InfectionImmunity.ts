@@ -12,6 +12,5 @@ export class InfectionImmunityItem implements Item, TempBuff {
     currentDuration: number = this.startingDuration;
 
     onActivate(): void {
-        throw new Error("Method not implemented.");
     }
 }

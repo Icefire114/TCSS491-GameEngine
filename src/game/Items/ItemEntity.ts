@@ -6,7 +6,7 @@ import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Collidable } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
 import { Mountain } from "../mountain.js";
-import { Item } from "./Item.js";
+import { Item, ItemType } from "./Item.js";
 
 /**
  * @author PG
@@ -82,6 +82,9 @@ export class ItemEntity implements Entity, Collidable {
      * @returns The item that was picked up/ this entity represents.
      */
     pickup(): Item {
+        if (this.item.type !== ItemType.GUN) {
+            this.item.onActivate();
+        }
         return this.item;
     }
 }
