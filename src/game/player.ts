@@ -19,7 +19,7 @@ export class Player implements Entity, Collidable {
 
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
-    physicsCollider = new BoxCollider(2, 4);
+    physicsCollider = new BoxCollider(2.5, 6.5);
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
     dead: boolean = false;
@@ -33,6 +33,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 7,
                     frameHeight: 128,
                     frameWidth: 128,
+                    offestX: 0.25
                 },
                 AnimationState.IDLE
             ],
