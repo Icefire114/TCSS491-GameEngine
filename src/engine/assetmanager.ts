@@ -31,9 +31,6 @@ export class AssetManager {
 
         for (const path of this.m_downloadQueue) {
             const img: HTMLImageElement = new Image();
-
-            console.log(path);
-
             img.addEventListener("load", () => {
                 console.log("Loaded: " + img.src);
                 this.m_successCount++;
