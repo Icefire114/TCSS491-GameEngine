@@ -85,6 +85,12 @@ export class UILayer implements Entity {
         ctx.font = "30px Arial";
         ctx.fillText(`Shield: ${player.shield}%`, ctx.canvas.width - 200, 80);
         //console.log(`Player Shield: ${player.shield}`);
+
+        // draw ammo count below shield
+        ctx.fillStyle = "black";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Ammo: ${player.ammo}/${player.maxAmmo}`, ctx.canvas.width - 200, 120);
+        //console.log(`Player Ammo: ${player.ammo}`);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {

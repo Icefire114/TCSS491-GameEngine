@@ -4,6 +4,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
+import { GunItem } from "./Items/gun.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
@@ -25,6 +26,7 @@ ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Dead.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Shot_2.png");
 
 
 // === Zombie Assets ===
@@ -48,6 +50,10 @@ ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity_UI.png");
+ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
+
+// === Bullet Assets ===
+ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
 
 // === Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
@@ -102,6 +108,7 @@ function main() {
             ],
                 { x: 3, y: 3 }
             ),
+            2, 2,
             { x: 90, y: 0 })
             , DrawLayer.ITEM);
 
@@ -123,6 +130,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
+                2, 2,
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
@@ -142,7 +150,31 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
+                2, 2,
                 { x: 70, y: 0 }
+            ),
+            DrawLayer.ITEM
+        )
+        gameEngine.addEntity(
+            new ItemEntity(
+                new GunItem(),
+                new Animator(
+                    [
+                        [
+                            {
+                                frameCount: 7,
+                                frameHeight: 24,
+                                frameWidth: 43,
+                                offestX: 0.1,
+                                sprite: new ImagePath("res/img/items/rifle.png")
+                            },
+                            AnimationState.IDLE
+                        ]
+                    ],
+                    { x: 6, y: 3 }
+                ),
+                6, 3,
+                { x: 13, y: 0 }
             ),
             DrawLayer.ITEM
         )
