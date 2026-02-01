@@ -191,7 +191,7 @@ export class Mountain implements Entity {
         }
 
         // Checking if were in a flat generation
-        if (this.flatSequenceOn) {
+        if (this.flatSequenceOn || G_CONFIG.TERRAIN_GENERATION_FORCE_FLAT) {
             this.generateFlatAnchor();
             return;
         }
