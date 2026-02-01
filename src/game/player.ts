@@ -156,7 +156,7 @@ export class Player implements Entity, Collidable {
                     this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
 
                     this.ammo -= 1;
-                    this.endTime = 240; // duration of attack animation in ms
+                    this.endTime = 666.667; // duration of attack animation in ms
                     this.inAnimation = true;
                     this.timer = Date.now();
 
