@@ -5,6 +5,7 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { AnimationState, Animator } from "../engine/Animator.js";
+import { Mountain } from "./mountain.js";
 
 /**
  * @author JK
@@ -70,6 +71,15 @@ export class Bullet implements Entity, Collidable {
 
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+
+        // ---------- Collision with terrain ----------
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        if (mountain && mountain.physicsCollider) {
+            if (this.physicsCollider.collides(this, mountain)) {
+                this.removeFromWorld = true;
+            }
+        }
+
         // Move the bullet
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
