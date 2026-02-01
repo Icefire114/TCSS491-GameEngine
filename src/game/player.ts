@@ -8,6 +8,7 @@ import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
 import { AnimationState, Animator } from "../engine/Animator.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 
 /**
  * @author PG
@@ -258,7 +259,7 @@ export class Player implements Entity, Collidable {
     }
 
     damagePlayer(damage: number): void {
-        if (!this.godMode) {
+        if (!this.godMode && !G_CONFIG.GOD_MODE) {
             // increase damage based on current health
             // Note: scaled damage is only applied to health, not shield
             const scalingFactor = 1 + (this.health / 100);
