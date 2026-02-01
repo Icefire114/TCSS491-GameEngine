@@ -32,12 +32,14 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Dead.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Attack_1.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
+
 
 // === Item Assets ===
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
