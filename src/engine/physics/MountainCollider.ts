@@ -76,7 +76,7 @@ export class MountainCollider implements Collider {
     findingTheEntityPositionWithinTheCurve(otherEntity: Collidable, startingPoint: Vec2, endingPoint: Vec2): number {
         if (otherEntity.physicsCollider instanceof BoxCollider) {
             // Getting the enetity x position
-            let entityPositionX = otherEntity.position.x + otherEntity.physicsCollider.width / 2;
+            let entityPositionX = otherEntity.position.x;
             // Get the total width of the whole area we are tracking
             let totalWidthOfArea = endingPoint.x - startingPoint.x;
             // Calculating where our entity is base on our total width
