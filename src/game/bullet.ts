@@ -46,7 +46,7 @@ export class Bullet implements Entity, Collidable {
 
         // direction
         const dir = new Vec2(endX - startX, endY - startY);
-        
+
         // normalize
         // normalize (guard against zero length)
         const length = Math.hypot(dir.x, dir.y);
@@ -68,8 +68,6 @@ export class Bullet implements Entity, Collidable {
         console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
     }
 
-  
-
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
         // Move the bullet
@@ -81,6 +79,4 @@ export class Bullet implements Entity, Collidable {
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
     }
-
-    
 }

@@ -45,7 +45,6 @@ export class Player implements Entity, Collidable {
                     frameCount: 4,
                     frameHeight: 128,
                     frameWidth: 128,
-                    offestX: -5
                 },
                 AnimationState.ATTACK
             ],
@@ -134,11 +133,8 @@ export class Player implements Entity, Collidable {
         }
 
         this.animationLock();
-        console.log(`deltaTime: ${deltaTime / 10}`);
         if (!this.dead) {
-
             this.iTime -= deltaTime;
-
 
             if (!this.isInvulnerable())
                 this.hitMultiplier = this.hitMultiplier < 1 ? 1 : this.hitMultiplier - deltaTime / 10; // hit multiplier decays over time, min is 1
@@ -155,12 +151,11 @@ export class Player implements Entity, Collidable {
             }
 
             if (!this.inAnimation) {
-                this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-
                 // -- Shooting guns --
                 if (keys["Mouse0"] && this.ammo > 0) {
-                    this.ammo -= 1;
                     this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
+
+                    this.ammo -= 1;
                     this.endTime = 240; // duration of attack animation in ms
                     this.inAnimation = true;
                     this.timer = Date.now();
@@ -174,8 +169,10 @@ export class Player implements Entity, Collidable {
 
                     // create bullet
                     const bullet = new Bullet(this.position.x, this.position.y, targetX, targetY);
-                    GameEngine.g_INSTANCE.addEntity(bullet, 3 as DrawLayer);
+                    GameEngine.g_INSTANCE.addEntity(bullet, DrawLayer.of(3));
                     //console.log(`ammo: ${this.ammo}`);
+                } else {
+                    this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
                 }
             }
 
