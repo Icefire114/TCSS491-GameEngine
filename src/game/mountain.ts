@@ -351,4 +351,34 @@ export class Mountain implements Entity {
     randomIntFromInterval(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
+
+    getHeightAt(x: number): number {
+        for (let i = 0; i < this.points.length - 1; i++) {
+            const p0 = this.points[i];
+            const p1 = this.points[i + 1];
+
+            if (x >= p0.x && x <= p1.x) {
+                const t = (x - p0.x) / (p1.x - p0.x);
+                return p0.y + t * (p1.y - p0.y);
+            }
+        }
+        return 0;
+    }
+
+    getSlopeAt(x: number, epsilon = 0.1): number {
+        const y1 = this.getHeightAt(x - epsilon);
+        const y2 = this.getHeightAt(x + epsilon);
+        return (y2 - y1) / (2 * epsilon);
+    }
+
+    getNormalAt(x: number): Vec2 {
+        const slope = this.getSlopeAt(x);
+
+        // Perpendicular to tangent
+        const nx = -slope;
+        const ny = 1;
+
+        const length = Math.hypot(nx, ny);
+        return new Vec2(nx / length, ny / length);
+    }
 }

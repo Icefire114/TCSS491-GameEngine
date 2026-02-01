@@ -311,6 +311,8 @@ export class Player implements Entity, Collidable {
     }
 
     drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        ctx.save();
+        const mountain: Mountain = game.getUniqueEntityByTag("mountain") as Mountain;
         const sprite = game.getSprite(this.snowBoardSprite);
 
         const player_width_in_world_units = 5;
@@ -321,13 +323,28 @@ export class Player implements Entity, Collidable {
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
 
+        const normal: Vec2 = mountain.getNormalAt(this.position.x);
+        const tan = new Vec2(normal.y, -normal.x);
+
+        // Ensure it points to the right (downhill)
+        if (tan.x < 0) {
+            tan.x *= -1;
+            tan.y *= -1;
+        }
+
+        // Angle in radians
+        const rotation = Math.atan2(tan.y, tan.x);
+
+        ctx.translate(screenX, screenY - h + 5); // pivot at the sprite’s centre
+        ctx.rotate(rotation);                    // align +x with the tangent
         ctx.drawImage(
             sprite,
-            screenX - w / 2,
-            screenY - h + 10,
+            -w / 2,
+            -h / 2,
             w,
             h
-        )
+        );
+        ctx.restore();
     }
 
     damagePlayer(damage: number): void {
