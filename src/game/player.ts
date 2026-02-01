@@ -10,6 +10,7 @@ import { Mountain } from "./mountain.js";
 import { AnimationState, Animator } from "../engine/Animator.js";
 import { Bullet } from "./bullet.js";
 import { G_CONFIG } from "./CONSTANTS.js";
+import { clamp } from "../engine/util.js";
 
 /**
  * @author PG
@@ -306,8 +307,42 @@ export class Player implements Entity, Collidable {
     //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        const meter = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+
+        const screenX =
+            ((this.position.x - game.viewportX) * meter) / game.zoom;
+
+        const screenY =
+            ((this.position.y - game.viewportY) * meter) / game.zoom;
+
+        const mountain = game.getUniqueEntityByTag("mountain") as Mountain;
+        const normal = mountain.getNormalAt(this.position.x);
+        const tan = new Vec2(normal.y, -normal.x);
+
+        if (tan.x < 0) {
+            tan.x *= -1;
+            tan.y *= -1;
+        }
+
+        const rotation = Math.atan2(tan.y, tan.x);
+        const shearY = clamp(Math.tan(rotation) * 0.25, -0.4, 0.4);
+
+        const anim = this.animator;
+        const frame = anim["spriteSheet"][anim["currentState"]]!;
+        const worldH = frame.frameHeight / meter;
+        const screenH = (worldH * meter) / game.zoom;
+        const screenW = screenH; // assuming square frames
+
+        ctx.save();
+        ctx.translate(screenX, screenY);
+        ctx.rotate(rotation);
+        ctx.transform(1, shearY, 0, 1, 0, 0);
+
+        anim.drawCurrentAnimFrameLocal(ctx, screenW, screenH);
+
+        ctx.restore();
+
         this.drawSnowboard(ctx, game);
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
     }
 
     drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -333,7 +368,7 @@ export class Player implements Entity, Collidable {
         }
 
         // Angle in radians
-        const rotation = Math.atan2(tan.y, tan.x);
+        const rotation: number = Math.atan2(tan.y, tan.x);
 
         ctx.translate(screenX, screenY - h + 5); // pivot at the sprite’s centre
         ctx.rotate(rotation);                    // align +x with the tangent

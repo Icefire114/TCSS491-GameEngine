@@ -133,4 +133,35 @@ export class Animator {
             screenH                            // dstH
         );
     }
+
+    drawCurrentAnimFrameLocal(
+        ctx: CanvasRenderingContext2D,
+        screenW: number,
+        screenH: number
+    ): void {
+        const currentAnim = this.spriteSheet[this.currentState];
+        if (!currentAnim) throw new Error("Missing animation");
+
+        let frameIdx =
+            Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
+
+        if (
+            this.currentState === AnimationState.DEATH &&
+            Math.floor(this.elapsed / this.secondsPerFrame) >= currentAnim.frameCount
+        ) {
+            frameIdx = currentAnim.frameCount - 1;
+        }
+
+        ctx.drawImage(
+            currentAnim.sprite,
+            frameIdx * currentAnim.frameWidth,
+            0,
+            currentAnim.frameWidth,
+            currentAnim.frameHeight,
+            -screenW / 2,   // centered
+            -screenH,       // feet at y = 0
+            screenW,
+            screenH
+        );
+    }
 }
