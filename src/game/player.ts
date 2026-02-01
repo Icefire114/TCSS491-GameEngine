@@ -96,9 +96,6 @@ export class Player implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
         if (!this.dead) {
-            //console.log(`Player position: (${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)})`);
-            //console.log(`Player IWindow: ${this.iTime.toFixed(2)}`);
-            console.log(`deltaTime: ${deltaTime / 10}`);
             this.iTime -= deltaTime;
 
             if (!this.isInvulnerable())
