@@ -132,7 +132,7 @@ export class Player implements Entity, Collidable {
             mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
         }
 
-        this.animationLock();
+
         if (!this.dead) {
             this.iTime -= deltaTime;
 
@@ -150,11 +150,14 @@ export class Player implements Entity, Collidable {
                 }
             }
 
+            this.animationLock();
+            if (this.inAnimation || (keys["Mouse0"] && this.ammo > 0)) {
+                this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
+            }
+
             if (!this.inAnimation) {
                 // -- Shooting guns --
                 if (keys["Mouse0"] && this.ammo > 0) {
-                    this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
-
                     this.ammo -= 1;
                     this.endTime = 666.667; // duration of attack animation in ms
                     this.inAnimation = true;
