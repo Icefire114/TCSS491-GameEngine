@@ -2,12 +2,13 @@ import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
-import { Vec2 } from "../engine/types.js";
+import { DrawLayer, Vec2 } from "../engine/types.js";
 import { Item, ItemType, TempBuff } from "./Items/Item.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
 import { AnimationState, Animator } from "../engine/Animator.js";
+import { Bullet } from "./bullet.js";
 
 /**
  * @author PG
@@ -35,6 +36,16 @@ export class Player implements Entity, Collidable {
                     offestX: -5
                 },
                 AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Shot_2.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                    offestX: -5
+                },
+                AnimationState.ATTACK
             ]
         ]
     );
@@ -42,8 +53,10 @@ export class Player implements Entity, Collidable {
     prevGroundSpeed: number = 0;
 
     // Movement tuning constants
-    MIN_SPEED = 15;
-    MAX_SPEED = 350;
+    // MIN_SPEED = 15;
+    // MAX_SPEED = 350;
+     MIN_SPEED = 0;
+    MAX_SPEED = 0;
     SLIDE_FORCE = 50;
     ACCELERATION = 60;
     BRAKE_FORCE = 200;
@@ -74,6 +87,15 @@ export class Player implements Entity, Collidable {
     // god mode for testing
     godMode: boolean = false;
 
+    // player gun states (player spawns with a gun)
+    ammo: number = 30;
+    maxAmmo: number = 30;
+
+    // for animation locking
+    inAnimation: boolean = false;
+    endTime: number = 0;
+    timer: number = 0;
+
     /**
      * The items the player has picked up.
      */
@@ -84,10 +106,28 @@ export class Player implements Entity, Collidable {
     }
 
 
-    update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        //console.log(`Player position: (${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)})`);
+    update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2): void {
+        // Convert incoming DOM client coords -> canvas pixels -> world coords.
+        // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
+        let mouseWorldX: number | null = null;
+        let mouseWorldY: number | null = null;
+        const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
+        if (canvas && clickCoords) {
+            const rect = canvas.getBoundingClientRect();
+            // canvas pixel coords (account for CSS scaling)
+            const canvasPxX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
+            const canvasPxY = (clickCoords.y - rect.top)  * (canvas.height / rect.height);
+
+            const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            // inverse of: screen = (world - viewport) * meterInPixels / zoom
+            mouseWorldX = (canvasPxX * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportX;
+            mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
+        }
+
+        this.animationLock();
+        console.log(`Player position: (${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)})`);
         //console.log(`Player IWindow: ${this.iTime.toFixed(2)}`);
-        console.log(`deltaTime: ${deltaTime / 10}`);
+        //console.log(`deltaTime: ${deltaTime / 10}`);
         this.iTime -= deltaTime;
 
         if (!this.isInvulnerable())
@@ -104,8 +144,31 @@ export class Player implements Entity, Collidable {
             }
         }
 
+        if (!this.inAnimation) {
+            this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
 
-        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+             // -- Shooting guns --
+            if (keys["Mouse0"] && this.ammo > 0) {
+                this.ammo -= 1;
+                this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
+                this.endTime = 240; // duration of attack animation in ms
+                this.inAnimation = true;
+                this.timer = Date.now();
+
+                // Create bullet entity
+                console.log(`Click Coords: (${clickCoords.x.toFixed(2)}, ${clickCoords.y.toFixed(2)})`);
+                
+                // Only use converted world coords; fallback to a small offset if conversion failed.
+                const targetX = mouseWorldX ?? (this.position.x + 1);
+                const targetY = mouseWorldY ?? this.position.y;
+
+                // create bullet
+                const bullet = new Bullet(this.position.x, this.position.y, targetX, targetY);
+                GameEngine.g_INSTANCE.addEntity(bullet, 3 as DrawLayer);
+                //console.log(`ammo: ${this.ammo}`);
+            }
+        }
+        
         const onGround = this.velocity.y === 0; // TODO: fix later, dist between player and ground < some threshold?
 
         // ---------- Ground-only momentum ----------
@@ -211,6 +274,14 @@ export class Player implements Entity, Collidable {
                 this.iTime = this.iDuration; // start invulnerability time
                 console.log(`Player hit by a zombie`);
             }
+        }
+    }
+
+    animationLock(): void {
+        if (this.endTime <= Date.now() - this.timer) {
+            this.endTime = 0;
+            this.inAnimation = false;
+            //console.log(`exited animation lock`);
         }
     }
 

@@ -31,6 +31,7 @@ export type Entity = {
      * Called once per fram per entity, used to update the entity's state.
      * @param keys A map of key names to whether they're pressed or not.
      * @param deltaTime The time in seconds since the last frame.
+     * @param clickCoords The coordinates of the last click.
      */
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void;
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void;
 };

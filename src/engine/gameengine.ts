@@ -33,7 +33,7 @@ export class GameEngine {
     private options: { debugging: boolean };
     private running: boolean;
     private timer: Timer;
-    private rightclick: { x: number, y: number } | null;
+    private rightclick: { x: number, y: number };
     private clockTick: number;
     private assetManager: AssetManager;
 
@@ -72,7 +72,7 @@ export class GameEngine {
         };
         this.running = false;
         this.timer = new Timer();
-        this.rightclick = null;
+        this.rightclick = { x: 0, y: 0 };
         this.clockTick = 0;
         this.assetManager = assetManager;
 
@@ -130,6 +130,7 @@ export class GameEngine {
                 console.log("MOUSE_MOVE", getXandY(e));
             }
             this.mouse = getXandY(e);
+            this.rightclick = this.mouse;
         });
 
         this.ctx.canvas.addEventListener("click", e => {
@@ -138,6 +139,20 @@ export class GameEngine {
             }
             this.click = getXandY(e);
             unlockAudio();
+        });
+
+        this.ctx.canvas.addEventListener("mousedown", e => {
+            if (this.options.debugging) {
+                console.log("MOUSE_DOWN", getXandY(e));
+            }
+            this.keys["Mouse" + e.button] = true;
+        });
+
+        this.ctx.canvas.addEventListener("mouseup", e => {
+            if (this.options.debugging) {
+                console.log("MOUSE_UP", getXandY(e));
+            }
+            this.keys["Mouse" + e.button] = false;
         });
 
         this.ctx.canvas.addEventListener("wheel", e => {
@@ -240,7 +255,7 @@ export class GameEngine {
     update(dt: number) {
         for (const [entity] of this.entities) {
             if (!entity.removeFromWorld) {
-                entity.update(this.keys, dt);
+                entity.update(this.keys, dt, this.rightclick);
             }
         }
 
