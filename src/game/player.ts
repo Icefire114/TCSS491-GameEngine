@@ -64,13 +64,14 @@ export class Player implements Entity, Collidable {
 
     // Movement tuning constants
     MIN_SPEED = 15;
-    MAX_SPEED = 350;
+    MAX_SPEED = 150;
     SLIDE_FORCE = 50;
     ACCELERATION = 60;
     BRAKE_FORCE = 200;
     FRICTION = 0.01;
     GROUND_STICK_FORCE = 500;
-    JUMP_FORCE = -30;
+    JUMP_FORCE = -25;
+    SLOPE_GRAVITY_MULT = 1.2;
 
     isInSafeZone(): boolean {
         // TODO(pg): If in terrain flat zone, then its a safe zone.
@@ -179,39 +180,48 @@ export class Player implements Entity, Collidable {
                 }
             }
 
-            const onGround = this.velocity.y === 0; // TODO: fix later, dist between player and ground < some threshold?
 
+            const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+            const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
             // ---------- Ground-only momentum ----------
             if (onGround) {
-                // Base downhill slide (only if not in a safe zone)
-                if (!this.isInSafeZone()) {
-                    this.velocity.x += this.SLIDE_FORCE * deltaTime;
+                // --- Slope-based gravity ---
+                const normal = mountain.getNormalAt(this.position.x);
+
+                // Tangent parallel to slope
+                const tangent = new Vec2(normal.y, -normal.x);
+
+                // Ensure downhill (rightward)
+                if (tangent.x < 0) {
+                    tangent.x *= -1;
+                    tangent.y *= -1;
                 }
 
-                // D key: Speed up
-                if (keys["d"]) {
+
+
+                // Project gravity along slope
+                const slopeAccel = GameEngine.g_INSTANCE.G * this.SLOPE_GRAVITY_MULT;
+                this.velocity.x += tangent.x * slopeAccel * deltaTime;
+                this.velocity.y += tangent.y * slopeAccel * deltaTime;
+
+                // --- Player input (ground only) ---
+                if (!this.isInSafeZone() && keys["d"]) {
                     this.velocity.x += this.ACCELERATION * deltaTime;
                 }
 
-                // A key: Brake
                 if (keys["a"]) {
                     this.velocity.x -= this.BRAKE_FORCE * deltaTime;
                 }
 
-                // Stick to ground
+                // Stick player to terrain
                 this.velocity.y += this.GROUND_STICK_FORCE * deltaTime;
-
-                // Convert some gravity into forward motion (slope feel)
-                const GRAVITY_TO_FORWARD = 0.4;
-                this.velocity.x += GameEngine.g_INSTANCE.G * GRAVITY_TO_FORWARD * deltaTime;
             } else {
                 // ---------- In air: no momentum gains ----------
-                // Optional small air drag to prevent creeping speed increases
                 const AIR_DRAG = 0.9995;
                 this.velocity.x *= AIR_DRAG;
             }
 
-            // ---------- Jump (ground only) ----------
+            // ---------- Jump ----------
             if ((keys["w"] || keys[" "]) && onGround) {
                 this.velocity.y = this.JUMP_FORCE;
             }
@@ -219,32 +229,30 @@ export class Player implements Entity, Collidable {
             // ---------- Gravity ----------
             this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
 
-            // ---------- Ground friction only ----------
+            // ---------- Ground friction ----------
             if (onGround) {
                 this.velocity.x *= (1 - this.FRICTION);
             }
 
-            // ---------- Enforce right-only + min/max speed ----------
+            // ---------- Speed limits ----------
             if (onGround) {
                 this.velocity.x = Math.max(this.MIN_SPEED, this.velocity.x);
+                this.prevGroundSpeed = this.velocity.x;
             } else {
-                // In air: never allow speed to increase
-                this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed ?? this.velocity.x);
+                this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed);
             }
 
             this.velocity.x = Math.min(this.MAX_SPEED, this.velocity.x);
 
-            // Store last grounded speed
-            if (onGround) {
-                this.prevGroundSpeed = this.velocity.x;
-            }
+            // ---------- Integrate ----------
+            this.position.x += this.velocity.x * deltaTime;
+            this.position.y += this.velocity.y * deltaTime;
 
             // ---------- Integrate ----------
             this.position.x += this.velocity.x * deltaTime;
             this.position.y += this.velocity.y * deltaTime;
 
             // ---------- Collision with terrain ----------
-            const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
             if (mountain && mountain.physicsCollider) {
                 if (this.physicsCollider.collides(this, mountain)) {
                     this.velocity.y = 0;
