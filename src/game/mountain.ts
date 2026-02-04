@@ -4,6 +4,7 @@ import { MountainCollider } from "../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
 import { G_CONFIG } from "./CONSTANTS.js";
+import Rand from 'rand-seed'; 
 
 export class Mountain implements Entity {
     // Required identifcation used by the Game Engine
@@ -14,6 +15,9 @@ export class Mountain implements Entity {
     velocity: Vec2 = new Vec2();
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
+
+    // Random Seed Generator
+    private rng: Rand;
 
     // Anchor Points Setup
     private anchorPointsList: Vec2[] = [];
@@ -46,6 +50,7 @@ export class Mountain implements Entity {
      */
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        this.rng = new Rand(G_CONFIG.MOUTAIN_SEED);
 
         // Initialize the staring anchor
         const startingAnchorPoint = { x: -50, y: 0};
@@ -208,10 +213,10 @@ export class Mountain implements Entity {
         const cooldownForFlat = currentX > (this.flatEndX + this.flatCooldown);
 
         // Probablity for Ravine Spawn, Flat Geneartion, else do normal
-        if (pastSpawnPoint && coolDown && Math.random() < 0.1) {
+        if (pastSpawnPoint && coolDown && this.rng.next() < 0.1) {
             this.startRavineSequence();
             console.log("Ravine Spawn")
-        } else if (pastSpawnPointForFlat && cooldownForFlat && Math.random() < .15) {
+        } else if (pastSpawnPointForFlat && cooldownForFlat && this.rng.next() < .15) {
             this.startFlatSequence();
             console.log("Flat Spawn")
         } else {
@@ -224,27 +229,11 @@ export class Mountain implements Entity {
      */
     generateNormalAnchor() {
         // Getting our last anchor values that we generated
-        let anchorX = this.lastAnchor.x;
-        let anchorY = this.lastAnchor.y;
-
-        // How much our new anchor is going to go in the x direction
-        anchorX += 25;
-
-        // Logic what anchor y direction should go, up or down, and how much so
-        const movementChoice = Math.random() < 0.5 ? "Up" : "Down";
-        let changeOfY = 0;
-        if (movementChoice == "Up") {
-            changeOfY -= this.randomIntFromInterval(3, 7);
-        } else {
-            changeOfY += this.randomIntFromInterval(3, 30);
-        }
-
-        // Applying the change y to our variables
-        anchorY += changeOfY;
-        this.slopeBeforeRavine = changeOfY;
+        let anchorX = this.lastAnchor.x + 25;
+        let changeAnchorY = this.rng.next() < 0.5 ? -this.randomIntFromInterval(3, 7) : this.randomIntFromInterval(3, 30);
 
         // Setting the new generated anchor point into our list
-        const newAnchor = { x: anchorX, y: anchorY};
+        const newAnchor = { x: anchorX, y: this.lastAnchor.y + changeAnchorY};
         this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
     }
@@ -340,7 +329,7 @@ export class Mountain implements Entity {
      * @returns a randomly generated number between min and max. 
      */
     randomIntFromInterval(min: number, max: number) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
+        return Math.floor(this.rng.next() * (max - min + 1) + min);
     }
 
     getHeightAt(x: number): number {
