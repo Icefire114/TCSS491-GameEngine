@@ -4,7 +4,7 @@ import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
-import { unwrap } from "../../engine/util.js";
+import { randomOf, unwrap } from "../../engine/util.js";
 import { Mountain } from "../mountain.js";
 
 export class Bush implements Entity {
@@ -16,23 +16,29 @@ export class Bush implements Entity {
     velocity: Vec2 = new Vec2(0, 0);
     // Player does not collide with this, its just a decoration.
     physicsCollider: Collider | null = null;
-    sprite: ImagePath = new ImagePath("res/img/world_deco/bush_1.png");
+    sprite: ImagePath;
     removeFromWorld: boolean = false;
-    animator: Animator = new Animator([
-        [
-            {
-                frameCount: 1,
-                frameHeight: 512,
-                frameWidth: 512,
-                sprite: new ImagePath("res/img/world_deco/bush_1.png")
-            },
-            AnimationState.IDLE
-        ]
-    ]);
+    animator: Animator;
 
     constructor(position: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = position;
+        this.sprite = randomOf([
+            new ImagePath("res/img/world_deco/bush_1.png"),
+            new ImagePath("res/img/world_deco/berry_bush_1.png"),
+            new ImagePath("res/img/world_deco/berry_bush_2.png")
+        ]);
+        this.animator = new Animator([
+            [
+                {
+                    frameCount: 1,
+                    frameHeight: 512,
+                    frameWidth: 512,
+                    sprite: this.sprite
+                },
+                AnimationState.IDLE
+            ]
+        ]);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

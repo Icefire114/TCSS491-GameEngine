@@ -73,6 +73,8 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -210,6 +212,42 @@ function main() {
             new Bush(
                 new Vec2(
                     149,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    168,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    184,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    200,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    218,
                     0
                 )
             ),
