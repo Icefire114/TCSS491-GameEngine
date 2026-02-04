@@ -84,7 +84,7 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 
 function main() {
     if (!ShaderEngine.isWebGL2Supported() || !G_CONFIG.NEW_RENDERER) {
-        console.warn(`WebGL2 Unsupported or disabled ${G_CONFIG.NEW_RENDERER}!`);
+        console.warn(`WebGL2 Unsupported or disabled NEW_RENDERER=${G_CONFIG.NEW_RENDERER}!`);
         if (G_CONFIG.NEW_RENDERER) {
             alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
         } else {
