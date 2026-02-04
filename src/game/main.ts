@@ -16,6 +16,7 @@ import { Player } from "./player.js";
 import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
+import { Bush } from "./worldDeco/Bush.js";
 import { Tree } from "./worldDeco/Tree.js";
 
 
@@ -71,6 +72,7 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -199,6 +201,15 @@ function main() {
             new Tree(
                 new Vec2(
                     132,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    149,
                     0
                 )
             ),
