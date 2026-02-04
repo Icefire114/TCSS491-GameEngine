@@ -20,14 +20,28 @@ export class Bush implements Entity {
     removeFromWorld: boolean = false;
     animator: Animator;
 
-    constructor(position: Vec2) {
+    static readonly SPRITE_PATHS = [
+        new ImagePath("res/img/world_deco/bush_1.png"),
+        new ImagePath("res/img/world_deco/berry_bush_1.png"),
+        new ImagePath("res/img/world_deco/berry_bush_2.png")
+    ] as const;
+
+    /**
+     * 
+     * @param position 
+     * @param variant An optional override to force a certain sprite to be rendered.
+     *  Must be a valid index of {@link Bush.SPRITE_PATHS}.
+     */
+    constructor(position: Vec2, variant?: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = position;
-        this.sprite = randomOf([
-            new ImagePath("res/img/world_deco/bush_1.png"),
-            new ImagePath("res/img/world_deco/berry_bush_1.png"),
-            new ImagePath("res/img/world_deco/berry_bush_2.png")
-        ]);
+        this.sprite = randomOf(Bush.SPRITE_PATHS);
+        if (variant) {
+            if (variant >= Bush.SPRITE_PATHS.length) {
+                throw new Error("Invalid variant index");
+            }
+            this.sprite = Bush.SPRITE_PATHS[variant];
+        }
         this.animator = new Animator([
             [
                 {
