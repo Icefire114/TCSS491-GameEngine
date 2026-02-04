@@ -126,7 +126,7 @@ function main() {
             ],
                 { x: 3, y: 3 }
             ),
-            2, 2,
+            3, 3,
             { x: 90, y: 0 })
             , DrawLayer.ITEM);
 
@@ -148,7 +148,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                2, 2,
+                3, 3,
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
@@ -168,7 +168,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                2, 2,
+                3, 3,
                 { x: 70, y: 0 }
             ),
             DrawLayer.ITEM
