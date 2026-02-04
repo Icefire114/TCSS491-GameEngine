@@ -5,6 +5,7 @@ import { DrawLayer, Vec2 } from "../engine/types.js";
 import { ShaderEngine } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 import { GunItem } from "./Items/gun.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
@@ -82,9 +83,13 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    if (!ShaderEngine.isWebGL2Supported()) {
-        console.warn("WebGL2 Unsupported!");
-        alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
+    if (!ShaderEngine.isWebGL2Supported() || !G_CONFIG.NEW_RENDERER) {
+        console.warn(`WebGL2 Unsupported or disabled ${G_CONFIG.NEW_RENDERER}!`);
+        if (G_CONFIG.NEW_RENDERER) {
+            alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
+        } else {
+            alert("[!] WebGL support has been disabled! Lets hope things are feature flagged correctly :)");
+        }
     } else {
         console.log("WebGL2 Supported!");
     }
