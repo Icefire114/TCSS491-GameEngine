@@ -5,9 +5,6 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 
-// Object that holds the anchor point x, y and that camera angle 
-type MountainPoint = Vec2 & { cameraTargetY: number };
-
 export class Mountain implements Entity {
     tag: string = "mountain";
     id: EntityID;
@@ -18,8 +15,8 @@ export class Mountain implements Entity {
     removeFromWorld: boolean = false;
 
     // Anchor Points Setup
-    private points: MountainPoint[] = [];
-    private lastAnchor: MountainPoint;
+    private points: Vec2[] = [];
+    private lastAnchor: Vec2;
 
     // Ravine use fields
     private isRavineSequence: boolean = false;
@@ -54,7 +51,7 @@ export class Mountain implements Entity {
 
         // Initialize the staring anchor
         const startY = 0;
-        const startingPoint = { x: -50, y: startY, cameraTargetY: startY };
+        const startingPoint = { x: -50, y: startY};
         this.points.push(startingPoint);
         this.lastAnchor = startingPoint;
 
@@ -245,7 +242,7 @@ export class Mountain implements Entity {
 
         // Creating the new anchor along with that camera angle for that specific x position
         // Then adding it our point array and updating our lastAnchor points too
-        const newAnchor = { x: anchorX, y: anchorY, cameraTargetY: anchorY };
+        const newAnchor = { x: anchorX, y: anchorY};
         this.points.push(newAnchor);
         this.lastAnchor = newAnchor;
     }
@@ -269,41 +266,34 @@ export class Mountain implements Entity {
         let x = this.lastAnchor.x;
         let y = this.lastAnchor.y;
 
-        // Setting the camera to follow along the last and not through the ravine points
-        let ghostCamera = this.lastAnchor.cameraTargetY;
 
         // Ravine sequence where it dips, then gap, then rise back up
         switch (this.ravineStep) {
             case 0: // The ravine entrance
                 x += 5;
                 y += 0;
-                ghostCamera += 5;
                 break;
             case 1: // The ravine drop
                 x += 3;
                 y += 5000;
-                ghostCamera += this.ravineWidth / 2;
                 break;
             case 2: // The ravine gap
                 x += this.ravineWidth;
                 y += 0;
-                ghostCamera += this.ravineWidth / 2;
                 break;
             case 3: // Rising up from the ravine
                 x += 1;
                 y = this.ravineBaseY;
-                ghostCamera += 0;
                 break;
             case 4: // Continuing as normal
                 x += 10;
                 y = this.ravineBaseY + this.slopeBeforeRavine;
-                ghostCamera = y;
                 this.isRavineSequence = false;
                 this.lastRavineEndX = x;
                 break;
         }
 
-        const newAnchor: MountainPoint = { x, y, cameraTargetY: ghostCamera };
+        const newAnchor: Vec2 = { x, y};
         this.points.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.ravineStep++;
@@ -326,7 +316,7 @@ export class Mountain implements Entity {
         let x = this.lastAnchor.x + 15;
         let y = this.flatBaseY;
 
-        const newAnchor = { x: x, y: y, cameraTargetY: y };
+        const newAnchor = { x: x, y: y};
         this.points.push(newAnchor);
         this.lastAnchor = newAnchor;
 
