@@ -216,7 +216,7 @@ export class Mountain implements Entity {
         if (pastSpawnPoint && coolDown && this.rng.next() < 0.1) {
             this.startRavineSequence();
             console.log("Ravine Spawn")
-        } else if (pastSpawnPointForFlat && cooldownForFlat && this.rng.next() < .15) {
+        } else if (pastSpawnPointForFlat && cooldownForFlat && this.rng.next() < .009) {
             this.startFlatSequence();
             console.log("Flat Spawn")
         } else {
