@@ -14,7 +14,7 @@ export class Mountain implements Entity {
     physicsCollider: MountainCollider | null = null;
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
-    sprite: ImagePath | null = null;
+    sprite1: ImagePath | null = null;
     removeFromWorld: boolean = false;
 
     // Anchor Points Setup

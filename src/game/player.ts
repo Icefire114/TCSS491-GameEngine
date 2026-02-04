@@ -22,7 +22,7 @@ export class Player implements Entity, Collidable {
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(2.5, 6.5);
-    sprite: ImagePath = new ImagePath("res/img/player_new.png");
+    sprite1: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
     dead: boolean = false;
 

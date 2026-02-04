@@ -22,6 +22,7 @@ import { UILayer } from "./UI.js";
 
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine(ASSET_MANAGER);
+const background = new Background();
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
@@ -55,12 +56,21 @@ ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 // === Bullet Assets ===
 ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
 
+// === SKY Background Assets ===
+ASSET_MANAGER.queueDownload("res/img/background/background/day.png");
+ASSET_MANAGER.queueDownload("res/img/background/background/night.png");
+ASSET_MANAGER.queueDownload("res/img/background/sky/sun.png");
+ASSET_MANAGER.queueDownload("res/img/background/sky/moon.png");
+ASSET_MANAGER.queueDownload("res/img/background/sky/cloud.png");
+
 // === Background Assets ===
-ASSET_MANAGER.queueDownload("res/img/Plan 2.png");
-ASSET_MANAGER.queueDownload("res/img/Plan 4.png");
-ASSET_MANAGER.queueDownload("res/img/Plan 5.png");
-ASSET_MANAGER.queueDownload("res/img/sun.png");
-ASSET_MANAGER.queueDownload("res/img/cloud.png");
+ASSET_MANAGER.queueDownload("res/img/background/middleground/middle1.png");
+ASSET_MANAGER.queueDownload("res/img/background/middleground/middle2.png");
+
+// === Foreground Assets ===
+ASSET_MANAGER.queueDownload("res/img/background/foreground/fore1.png");
+ASSET_MANAGER.queueDownload("res/img/background/foreground/fore2.png");
+ASSET_MANAGER.queueDownload("res/img/background/foreground/fore3.png");
 
 // === Music Assets ===
 ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
@@ -81,7 +91,8 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
-        gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
+        background.start();
+        //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 

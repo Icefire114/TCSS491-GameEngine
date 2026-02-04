@@ -22,7 +22,7 @@ export type Entity = {
     /**
      * The fallback sprite for the entity if it's not animatable.
      */
-    sprite: ImagePath | null;
+    sprite1: ImagePath | null;
 
     removeFromWorld: boolean;
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void;

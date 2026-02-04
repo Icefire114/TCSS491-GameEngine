@@ -2,8 +2,10 @@ export type DrawLayer = number & { __brand: "DrawLayer" };
 export namespace DrawLayer {
     export const HIGHEST: DrawLayer = 1000000 as DrawLayer;
 
-    export const BACKGROUND: DrawLayer = HIGHEST - 1 as DrawLayer;
-    export const MOUNTAIN_TERRAIN: DrawLayer = BACKGROUND - 1 as DrawLayer;
+    export const SKY: DrawLayer = HIGHEST - 1 as DrawLayer;
+    export const BACKGROUND: DrawLayer = SKY - 1 as DrawLayer;
+    export const FOREGROUND: DrawLayer = BACKGROUND - 1 as DrawLayer;
+    export const MOUNTAIN_TERRAIN: DrawLayer = FOREGROUND - 1 as DrawLayer;
     export const SPIKE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
     export const ZOMBIE: DrawLayer = SPIKE - 1 as DrawLayer;
     export const ITEM: DrawLayer = ZOMBIE - 1 as DrawLayer;
