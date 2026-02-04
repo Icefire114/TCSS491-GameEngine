@@ -57,7 +57,7 @@ export class Tree implements Entity {
             }
 
 
-            this.shader.render(-50);
+            this.shader.render(-60);
 
             const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const worldW = currentAnim.frameWidth / meterInPixels;
