@@ -6,6 +6,7 @@ import { Vec2 } from "../engine/types.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 
 export class Mountain implements Entity {
+    // Required identifcation used by the Game Engine
     tag: string = "mountain";
     id: EntityID;
     physicsCollider: MountainCollider | null = null;
@@ -15,107 +16,108 @@ export class Mountain implements Entity {
     removeFromWorld: boolean = false;
 
     // Anchor Points Setup
-    private points: Vec2[] = [];
+    private anchorPointsList: Vec2[] = [];
     private lastAnchor: Vec2;
 
-    // Ravine use fields
-    private isRavineSequence: boolean = false;
-    private ravineStep: number = 0;
-    private ravineBaseY: number = 0;
+    // Ravine Setup
+    private isRavineSequence = false;
+    private ravineStep = 0;
+    private ravineBaseY = 0;
     private ravineWidth = 0;
-    private minRavineWidth: number = 10;
-    private maxRavineWidth: number = 25;
-    private slopeBeforeRavine: number = 0;
-    private lastRavineEndX: number = 0;
+    private minRavineWidth = 10;
+    private maxRavineWidth = 25;
+    private slopeBeforeRavine = 0;
+    private lastRavineEndX = 0;
     private ravineCooldown = 150;
     private ravineStartShowing = 150;
 
-
-    // Flat plains logic
-    private flatSequenceOn: boolean = false;
-    private flatStep: number = 0;
-    private flatBaseY: number = 0;
+    // Plain Setup (Level Checkpoint)
+    private flatSequenceOn = false;
+    private flatStep = 0;
+    private flatBaseY = 0;
     private flatGenerationTick = 10;
     private flatCooldown = 150;
     private flatStartShowing = 150
     private flatEndX: number = 0;
 
+
+    /**
+     * Initalizing the moutain entity.
+     */
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        // Load the default level into the engine
-        // fetch('res/levels/testing.json').then(response => response.json()).then(data => {
-        //     GameEngine.g_INSTANCE.terrainData = data;
-        //     this.physicsCollider = new MountainCollider(data.y);
-        //     unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
-        // });
 
         // Initialize the staring anchor
-        const startY = 0;
-        const startingPoint = { x: -50, y: startY};
-        this.points.push(startingPoint);
-        this.lastAnchor = startingPoint;
+        const startingAnchorPoint = { x: -50, y: 0};
+        this.anchorPointsList.push(startingAnchorPoint);
+        this.lastAnchor = startingAnchorPoint;
 
-        // Setting the collider to have the live points array
-        this.physicsCollider = new MountainCollider(this.points);
+        // Passing the anchor points array to the collider 
+        this.physicsCollider = new MountainCollider(this.anchorPointsList);
     }
 
 
     /**
-     * Main method to draw for the moutain
+     * Main method to draw for the moutain.
      * 
-     * @param ctx is the canvas
-     * @param game is the gameengine
+     * @param ctx is the canvas.
+     * @param game is the gameengine.
      */
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        /* Info Page:
-            - game.viewportX value is always constantly increasing...
-            - GameEngine.WORLD_UNITS_IN_VIEWPORT = 100;
-            - Canvas Width = 1024
-        */
-
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const viewport_right_world = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const viewportRightWorld = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
-        // Generating anchor points ahead of the player
-        if (this.lastAnchor.x < viewport_right_world) {
-            while (this.lastAnchor.x < viewport_right_world + 3000) {
+        // Generating anchor points ahead of the player by 3000 pixels
+        if (this.lastAnchor.x < viewportRightWorld) {
+            while (this.lastAnchor.x < viewportRightWorld + 3000) {
                 this.generatingAnchor();
             }
         }
 
-        // If anchor point is beyound the Viewport screen, delete anchor points
+        // If anchor point is beyound the Viewport screen, delete anchor points (after 300)
         const cleanupThreshold = game.viewportX - 300;
-        while (this.points.length > 0 && this.points[0].x < cleanupThreshold) {
-            this.points.shift();
+        while (this.anchorPointsList.length > 0 && this.anchorPointsList[0].x < cleanupThreshold) {
+            this.anchorPointsList.shift();
         }
 
         // Drawing the moutain 
         this.drawMoutain(ctx, game, scale);
 
-        // Uncomment to see anchor dots
+        // Seeing anchor points
         if (G_CONFIG.DRAW_TERRAIN_ANCHOR_POINTS) {
             this.drawPoints(ctx, game, scale);
         }
     }
 
+
+    /**
+     * Method that handles the overarching moutain logic generation. 
+     * 
+     * @param ctx is the canvas.
+     * @param game is the game engine.
+     * @param scale is the canvs with in relation to the game engine world viewport. 
+     * @returns early if there's less than 2 anchor points
+     */
     drawMoutain(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number) {
-        if (this.points.length < 2) return;
+        if (this.anchorPointsList.length < 2) return;
 
         ctx.beginPath();
 
-        // This will closed propelry when filling 
-        const startX = (this.points[0].x - game.viewportX) * scale;
-        const startY = (this.points[0].y - game.viewportY) * scale;
+        // Setting the canvas path position (leftmost rendered point)
+        const startX = (this.anchorPointsList[0].x - game.viewportX) * scale;
+        const startY = (this.anchorPointsList[0].y - game.viewportY) * scale;
 
         // Were drawing from the very bottom of the canvas at the start X
         ctx.moveTo(startX, ctx.canvas.height);
         ctx.lineTo(startX, startY);
 
-        for (let i = 0; i < this.points.length - 1; i++) {
-            const currentPoint = this.points[i];
-            const nextPoint = this.points[i + 1];
+        // Drawing points iteslf 
+        for (let i = 0; i < this.anchorPointsList.length - 1; i++) {
+            // Getting the anchor points of current + next
+            const currentPoint = this.anchorPointsList[i];
+            const nextPoint = this.anchorPointsList[i + 1];
 
-            // Getting each anchor point x and y values
+            // Convert each anchor point x and y values with in relation to viewport offset + scaling 
             const currentPointX = (currentPoint.x - game.viewportX) * scale;
             const currentPointY = (currentPoint.y - game.viewportY) * scale;
             const nextPointX = (nextPoint.x - game.viewportX) * scale;
@@ -125,14 +127,13 @@ export class Mountain implements Entity {
             const midX = (currentPointX + nextPointX) / 2;
             const midY = (currentPointY + nextPointY) / 2;
 
-            // Using quadraticCurveTo method taht uses some quadratic Bezier Interpolation
+            // Using quadraticCurveTo method that uses some quadratic Bezier Interpolation to draw the points
             ctx.quadraticCurveTo(currentPointX, currentPointY, midX, midY);
         }
 
-        // Closeign the shape at the bottom-right
-        const lastPoint = this.points[this.points.length - 1];
+        // Closing the shape at the bottom-right
+        const lastPoint = this.anchorPointsList[this.anchorPointsList.length - 1];
         const lastX = (lastPoint.x - game.viewportX) * scale;
-
         ctx.lineTo(lastX, ctx.canvas.height);
         ctx.lineTo(startX, ctx.canvas.height);
 
@@ -140,7 +141,6 @@ export class Mountain implements Entity {
         ctx.lineTo(ctx.canvas.width, ctx.canvas.height);
         ctx.lineTo(0, ctx.canvas.height);
         ctx.closePath();
-
         ctx.fillStyle = "#C2D4E6";
         ctx.fill();
         ctx.strokeStyle = "#ffffff";
@@ -149,19 +149,20 @@ export class Mountain implements Entity {
     }
 
     /**
-     * test method to visually see the anchor points
+     * Method to visually see the anchor points
      * 
      * @param ctx is the context of the canvas.
      * @param game is the game engine.
      */
     drawPoints(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number): void {
+        // Points Design
         ctx.fillStyle = "red";
         ctx.strokeStyle = "black";
         ctx.lineWidth = 1;
 
         // Looping through the points array and drawing base on viewpoint
-        for (let i = 0; i < this.points.length; i++) {
-            const point = this.points[i];
+        for (let i = 0; i < this.anchorPointsList.length; i++) {
+            const point = this.anchorPointsList[i];
             const screenX = (point.x - game.viewportX) * scale;
             const screenY = (point.y - game.viewportY) * scale;
 
@@ -172,13 +173,15 @@ export class Mountain implements Entity {
         }
     }
 
+
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
         // Unused.
     }
 
+
     /**
      * Method to generate anchor situation.
-     * Either normal or ravine anchor events. 
+     * Either normal, ravine, or flat. 
      */
     generatingAnchor() {
         // Check weren't in a ravin sequence
@@ -193,32 +196,31 @@ export class Mountain implements Entity {
             return;
         }
 
+        // Storing the last anchor x position 
         const currentX = this.lastAnchor.x;
 
-        // Spawn ravine only if it past the spawn point area
+        // Spawn and cool down constrains for ravine generation
         const pastSpawnPoint = currentX > this.ravineStartShowing;
-        // Try to spawn a ravine only if the cool down is gone
         const coolDown = currentX > (this.lastRavineEndX + this.ravineCooldown);
 
-
-        // Spawn and cool down for flats
+        // Spawn and cool down constraints for the flat generation 
         const pastSpawnPointForFlat = currentX > this.flatStartShowing;
         const cooldownForFlat = currentX > (this.flatEndX + this.flatCooldown);
 
-        // Probablity of a ravine spawns or not, if not, then do normal 
+        // Probablity for Ravine Spawn, Flat Geneartion, else do normal
         if (pastSpawnPoint && coolDown && Math.random() < 0.1) {
             this.startRavineSequence();
-            console.log("RAVINE SPAWN")
+            console.log("Ravine Spawn")
         } else if (pastSpawnPointForFlat && cooldownForFlat && Math.random() < .15) {
             this.startFlatSequence();
-            console.log("Im being generated?")
+            console.log("Flat Spawn")
         } else {
             this.generateNormalAnchor();
         }
     }
 
     /**
-     * Generating a normal anchor points
+     * Generating a normal anchor points logic. 
      */
     generateNormalAnchor() {
         // Getting our last anchor values that we generated
@@ -237,13 +239,13 @@ export class Mountain implements Entity {
             changeOfY += this.randomIntFromInterval(3, 30);
         }
 
+        // Applying the change y to our variables
         anchorY += changeOfY;
         this.slopeBeforeRavine = changeOfY;
 
-        // Creating the new anchor along with that camera angle for that specific x position
-        // Then adding it our point array and updating our lastAnchor points too
+        // Setting the new generated anchor point into our list
         const newAnchor = { x: anchorX, y: anchorY};
-        this.points.push(newAnchor);
+        this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
     }
 
@@ -265,7 +267,6 @@ export class Mountain implements Entity {
         // Getting the last anchor points
         let x = this.lastAnchor.x;
         let y = this.lastAnchor.y;
-
 
         // Ravine sequence where it dips, then gap, then rise back up
         switch (this.ravineStep) {
@@ -293,8 +294,9 @@ export class Mountain implements Entity {
                 break;
         }
 
+        // Setting the new anchor to our list 
         const newAnchor: Vec2 = { x, y};
-        this.points.push(newAnchor);
+        this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.ravineStep++;
     }
@@ -313,23 +315,22 @@ export class Mountain implements Entity {
      * Generating a flat ground
      */
     generateFlatAnchor() {
+        // x is increasing +15 pixels, while y stays the same
         let x = this.lastAnchor.x + 15;
         let y = this.flatBaseY;
 
+        // Setting the new anchor point, and continuing the generation 
         const newAnchor = { x: x, y: y};
-        this.points.push(newAnchor);
+        this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
-
         this.flatStep++;
 
         // After 10 ticks, return to normal generation
         if (this.flatStep >= this.flatGenerationTick) {
             this.flatSequenceOn = false;
             this.flatEndX = x;
-
         }
     }
-
 
     /**
      * Random generate a number between a min and max
@@ -343,9 +344,9 @@ export class Mountain implements Entity {
     }
 
     getHeightAt(x: number): number {
-        for (let i = 0; i < this.points.length - 1; i++) {
-            const p0 = this.points[i];
-            const p1 = this.points[i + 1];
+        for (let i = 0; i < this.anchorPointsList.length - 1; i++) {
+            const p0 = this.anchorPointsList[i];
+            const p1 = this.anchorPointsList[i + 1];
 
             if (x >= p0.x && x <= p1.x) {
                 const t = (x - p0.x) / (p1.x - p0.x);
