@@ -1,7 +1,8 @@
 import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
-import { DrawLayer } from "../engine/types.js";
+import { DrawLayer, Vec2 } from "../engine/types.js";
+import { ShaderEngine } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
 import { GunItem } from "./Items/gun.js";
@@ -14,6 +15,7 @@ import { Player } from "./player.js";
 import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
+import { Tree } from "./worldDeco/Tree.js";
 
 
 /**
@@ -67,6 +69,7 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -79,6 +82,14 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
+    if (!ShaderEngine.isWebGL2Supported()) {
+        console.warn("WebGL2 Unsupported!");
+        alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
+    } else {
+        console.log("WebGL2 Supported!");
+    }
+
+
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
         gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
@@ -178,6 +189,16 @@ function main() {
             ),
             DrawLayer.ITEM
         )
+
+        gameEngine.addEntity(
+            new Tree(
+                new Vec2(
+                    132,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
         gameEngine.start();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);

@@ -3,7 +3,8 @@ export namespace DrawLayer {
     export const HIGHEST: DrawLayer = 1000000 as DrawLayer;
 
     export const BACKGROUND: DrawLayer = HIGHEST - 1 as DrawLayer;
-    export const MOUNTAIN_TERRAIN: DrawLayer = BACKGROUND - 1 as DrawLayer;
+    export const WORLD_DECORATION: DrawLayer = BACKGROUND - 1 as DrawLayer;
+    export const MOUNTAIN_TERRAIN: DrawLayer = WORLD_DECORATION - 1 as DrawLayer;
     export const SPIKE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
     export const ZOMBIE: DrawLayer = SPIKE - 1 as DrawLayer;
     export const ITEM: DrawLayer = ZOMBIE - 1 as DrawLayer;
@@ -64,5 +65,15 @@ export namespace Vec2 {
      */
     export function cross(v1: Vec2, v2: Vec2): number {
         return v1.x * v2.y - v1.y * v2.x;
+    }
+
+    /**
+     * Normalizes a vector.
+     * @param v A vector to normalize.
+     * @returns Vector `v` normalized.
+     */
+    export function normalize(v: Vec2): Vec2 {
+        const mag = Math.sqrt(v.x * v.x + v.y * v.y);
+        return new Vec2(v.x / mag, v.y / mag);
     }
 }
