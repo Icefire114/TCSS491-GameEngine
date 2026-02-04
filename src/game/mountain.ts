@@ -45,12 +45,6 @@ export class Mountain implements Entity {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        // Load the default level into the engine
-        // fetch('res/levels/testing.json').then(response => response.json()).then(data => {
-        //     GameEngine.g_INSTANCE.terrainData = data;
-        //     this.physicsCollider = new MountainCollider(data.y);
-        //     unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position.y = data.y[0] + 20;
-        // });
 
         // Initialize the staring anchor
         const startY = 0;
