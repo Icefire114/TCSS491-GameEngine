@@ -17,6 +17,7 @@ import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
 import { Bush } from "./worldDeco/Bush.js";
+import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
 
 
@@ -75,6 +76,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -128,7 +130,7 @@ function main() {
             ],
                 { x: 3, y: 3 }
             ),
-            3, 3,
+            new Vec2(3, 3),
             { x: 90, y: 0 })
             , DrawLayer.ITEM);
 
@@ -150,7 +152,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                3, 3,
+                new Vec2(3, 3),
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
@@ -170,7 +172,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                3, 3,
+                new Vec2(3, 3),
                 { x: 70, y: 0 }
             ),
             DrawLayer.ITEM
@@ -193,7 +195,7 @@ function main() {
                     ],
                     { x: 6, y: 3 }
                 ),
-                6, 3,
+                new Vec2(6, 3),
                 { x: 13, y: 0 }
             ),
             DrawLayer.ITEM
@@ -253,6 +255,12 @@ function main() {
             ),
             DrawLayer.WORLD_DECORATION
         );
+        gameEngine.addEntity(
+            new Rock(
+                new Vec2(230, 0)
+            ),
+            DrawLayer.WORLD_DECORATION
+        )
         gameEngine.start();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
