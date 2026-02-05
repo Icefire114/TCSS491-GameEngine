@@ -332,29 +332,70 @@ export class Mountain implements Entity {
         return Math.floor(this.rng.next() * (max - min + 1) + min);
     }
 
+    /**
+     * Finding the height when given a x (solve by using the quadratic Bezier)
+     */
     getHeightAt(x: number): number {
-        for (let i = 0; i < this.anchorPointsList.length - 1; i++) {
-            const p0 = this.anchorPointsList[i];
-            const p1 = this.anchorPointsList[i + 1];
+        if (this.anchorPointsList.length < 2) return 0;
 
-            if (x >= p0.x && x <= p1.x) {
-                const t = (x - p0.x) / (p1.x - p0.x);
-                return p0.y + t * (p1.y - p0.y);
+        for (let i = 0; i < this.anchorPointsList.length - 1; i++) {
+            const pPrev = i === 0 ? this.anchorPointsList[0] : this.anchorPointsList[i - 1];
+            const pCurr = this.anchorPointsList[i];
+            const pNext = this.anchorPointsList[i + 1];
+
+            const startX = (pPrev.x + pCurr.x) / 2;
+            const endX = (pCurr.x + pNext.x) / 2;
+
+            // Checking if the given x is within our area
+            if (x >= startX && x <= endX) {
+                const startY = (pPrev.y + pCurr.y) / 2;
+                const endY = (pCurr.y + pNext.y) / 2;
+
+                // Solving the 't', aka which position is our x in relation to our area
+                // Reference:  
+                // Bezier formula for x is: x = (1-t)^2*x0 + 2(1-t)t*x1 + t^2*x2
+                // Quadratic equation: at^2 + bt + c = 0
+                const a = startX - 2 * pCurr.x + endX;
+                const b = 2 * (pCurr.x - startX);
+                const c = startX - x;
+
+                let t = 0;
+                if (Math.abs(a) < 0.0001) {
+\                    t = -c / b;
+                } else {
+                    const discriminant = b * b - 4 * a * c;
+                    t = (-b + Math.sqrt(Math.max(0, discriminant))) / (2 * a);
+                }
+
+                //  Calculating the Y using that found t we just did 
+                return (Math.pow(1 - t, 2) * startY) +
+                       (2 * (1 - t) * t * pCurr.y) +
+                       (Math.pow(t, 2) * endY);
             }
         }
-        return 0;
+        
+        // For boundaries
+        if (x < this.anchorPointsList[0].x) {
+            return this.anchorPointsList[0].y;
+        }
+        return this.anchorPointsList[this.anchorPointsList.length - 1].y;
     }
 
-    getSlopeAt(x: number, epsilon = 0.1): number {
+    /**
+     * Calculting the slope at point x.
+     */
+    getSlopeAt(x: number): number {
+        const epsilon = 0.01; 
         const y1 = this.getHeightAt(x - epsilon);
         const y2 = this.getHeightAt(x + epsilon);
         return (y2 - y1) / (2 * epsilon);
     }
 
+    /**
+     * Returns  a vector that points away from the surface.
+     */
     getNormalAt(x: number): Vec2 {
         const slope = this.getSlopeAt(x);
-
-        // Perpendicular to tangent
         const nx = -slope;
         const ny = 1;
 
