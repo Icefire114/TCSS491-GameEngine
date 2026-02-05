@@ -82,7 +82,7 @@ function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
         gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
-        gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
+        gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
 
         gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);

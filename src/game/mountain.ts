@@ -4,7 +4,7 @@ import { MountainCollider } from "../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
 import { G_CONFIG } from "./CONSTANTS.js";
-import Rand from 'rand-seed'; 
+import Rand from 'rand-seed';
 
 export class Mountain implements Entity {
     // Required identifcation used by the Game Engine
@@ -48,12 +48,12 @@ export class Mountain implements Entity {
     /**
      * Initalizing the moutain entity.
      */
-    constructor() {
+    constructor(seed: string) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.rng = new Rand(G_CONFIG.MOUTAIN_SEED);
+        this.rng = new Rand(seed);
 
         // Initialize the staring anchor
-        const startingAnchorPoint = { x: -50, y: 0};
+        const startingAnchorPoint = { x: -50, y: 0 };
         this.anchorPointsList.push(startingAnchorPoint);
         this.lastAnchor = startingAnchorPoint;
 
@@ -233,7 +233,7 @@ export class Mountain implements Entity {
         let changeAnchorY = this.rng.next() < 0.5 ? -this.randomIntFromInterval(3, 7) : this.randomIntFromInterval(3, 30);
 
         // Setting the new generated anchor point into our list
-        const newAnchor = { x: anchorX, y: this.lastAnchor.y + changeAnchorY};
+        const newAnchor = { x: anchorX, y: this.lastAnchor.y + changeAnchorY };
         this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
     }
@@ -284,7 +284,7 @@ export class Mountain implements Entity {
         }
 
         // Setting the new anchor to our list 
-        const newAnchor: Vec2 = { x, y};
+        const newAnchor: Vec2 = { x, y };
         this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.ravineStep++;
@@ -309,7 +309,7 @@ export class Mountain implements Entity {
         let y = this.flatBaseY;
 
         // Setting the new anchor point, and continuing the generation 
-        const newAnchor = { x: x, y: y};
+        const newAnchor = { x: x, y: y };
         this.anchorPointsList.push(newAnchor);
         this.lastAnchor = newAnchor;
         this.flatStep++;
@@ -361,7 +361,7 @@ export class Mountain implements Entity {
 
                 let t = 0;
                 if (Math.abs(a) < 0.0001) {
-\                    t = -c / b;
+                    t = -c / b;
                 } else {
                     const discriminant = b * b - 4 * a * c;
                     t = (-b + Math.sqrt(Math.max(0, discriminant))) / (2 * a);
@@ -369,11 +369,11 @@ export class Mountain implements Entity {
 
                 //  Calculating the Y using that found t we just did 
                 return (Math.pow(1 - t, 2) * startY) +
-                       (2 * (1 - t) * t * pCurr.y) +
-                       (Math.pow(t, 2) * endY);
+                    (2 * (1 - t) * t * pCurr.y) +
+                    (Math.pow(t, 2) * endY);
             }
         }
-        
+
         // For boundaries
         if (x < this.anchorPointsList[0].x) {
             return this.anchorPointsList[0].y;
@@ -385,7 +385,7 @@ export class Mountain implements Entity {
      * Calculting the slope at point x.
      */
     getSlopeAt(x: number): number {
-        const epsilon = 0.01; 
+        const epsilon = 0.01;
         const y1 = this.getHeightAt(x - epsilon);
         const y2 = this.getHeightAt(x + epsilon);
         return (y2 - y1) / (2 * epsilon);
