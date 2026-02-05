@@ -72,10 +72,6 @@ export class Tree implements Entity {
 
             ctx.drawImage(
                 this.shader.canvas,
-                0,
-                0,
-                this.shader.canvas.width,
-                this.shader.canvas.height,
                 screenX,
                 screenY,
                 screenW,
