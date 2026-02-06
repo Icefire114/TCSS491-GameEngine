@@ -129,17 +129,11 @@ export class ChristmasTree implements Entity {
                         
                         // Convert texture coordinates to centered position (-0.5 to 0.5)
                         vec2 relPos = v_texCoord - 0.5f;
-                        
-                        // Flip Y to match typical 2D coordinate system where Y+ is up
-                        relPos.y = -relPos.y;
-                        
-                        // Project position onto sun direction to get distance from sun-facing edge
-                        // Dot product gives us how far along the sun direction we are
                         float distanceAlongSun = dot(relPos, u_sunDirection);
-                        
-                        // Convert to 0..1 range where 0 is the sun-facing edge, 1 is the opposite edge
-                        // The range of distanceAlongSun is approximately -0.7 to 0.7 (diagonal of 0.5x0.5 square)
-                        float edgeFade = 1.0 - (distanceAlongSun + 0.7) / 1.4;
+                    
+                        // relPos.x = relPos.x - 0.15;
+                        // relPos.y = relPos.y - 0.05;
+                        float edgeFade = dot(normalize(relPos), u_sunDirection);
                         edgeFade = clamp(edgeFade, 0.0, 1.0);
                         
                         // basic lighting: ambient + directional based on edge proximity
@@ -158,14 +152,13 @@ export class ChristmasTree implements Entity {
             console.log("Shader created, canvas size:", this.shader.canvas.width, this.shader.canvas.height);
         }
 
-        const sunAngle = 270; // or calculate based on game time
+        const sunAngle = -130; // or calculate based on game time
         const rad = (sunAngle * Math.PI) / 180;
         const sunDir = [Math.cos(rad), Math.sin(rad)];
 
         this.shader.render([
             // Snow shader uniforms
             {
-                // u_time: performance.now() * 0.001,
                 u_snowHeight: 0.5,
                 u_snowThickness: 0.5
             },
@@ -173,8 +166,8 @@ export class ChristmasTree implements Entity {
             {
                 u_sunDirection: sunDir,
                 u_intensity: 0.6,
-                u_baseLight: 0,
-                u_warmth: 0.6
+                u_baseLight: 0.25,
+                u_warmth: 0.2
             },
         ])
 
