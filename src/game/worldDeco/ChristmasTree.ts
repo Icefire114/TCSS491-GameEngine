@@ -107,9 +107,11 @@ export class ChristmasTree implements Entity {
                     precision mediump float;
 
                     uniform sampler2D u_image;
-                    uniform vec2 u_sunDirection;
-                    uniform float u_intensity;
-                    uniform float u_baseLight;
+                    uniform vec2      u_sunDirection; // must be normalized on the CPU side
+                    uniform float     u_intensity;    // 0..1
+                    uniform float     u_baseLight;    // ambient light level (0..1)
+                    uniform float     u_warmth;       // extra warm tint on lit areas
+
 
                     in vec2 v_texCoord;
                     out vec4 fragColor;
@@ -122,6 +124,8 @@ export class ChristmasTree implements Entity {
                         }
 
                         vec2 relPos = (v_texCoord - 0.5) * 2.0;
+                        // relPos.y -= 0.25;
+                        // relPos.x += 0.5;
                         float alignment = dot(normalize(relPos), u_sunDirection);
                         float shadeFactor = u_baseLight + alignment * u_intensity;
 
@@ -147,7 +151,7 @@ export class ChristmasTree implements Entity {
                 u_sunDirection: sunDir,
                 u_intensity: 0.3,
                 u_baseLight: 0.6,
-                u_warmth: 0.05
+                u_warmth: 0.05 // (unused atm)
             },
         ])
 
