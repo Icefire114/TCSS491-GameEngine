@@ -1,9 +1,11 @@
 import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
-import { DrawLayer } from "../engine/types.js";
+import { DrawLayer, Vec2 } from "../engine/types.js";
+import { ShaderEngine } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 import { GunItem } from "./Items/gun.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
@@ -14,6 +16,9 @@ import { Player } from "./player.js";
 import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
+import { Bush } from "./worldDeco/Bush.js";
+import { Rock } from "./worldDeco/Rock.js";
+import { Tree } from "./worldDeco/Tree.js";
 
 
 /**
@@ -67,6 +72,11 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -79,6 +89,18 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
+    if (!ShaderEngine.isWebGL2Supported() || !G_CONFIG.NEW_RENDERER) {
+        console.warn(`WebGL2 Unsupported or disabled NEW_RENDERER=${G_CONFIG.NEW_RENDERER}!`);
+        if (G_CONFIG.NEW_RENDERER) {
+            alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
+        } else {
+            alert("[!] WebGL support has been disabled! Lets hope things are feature flagged correctly :)");
+        }
+    } else {
+        console.log("WebGL2 Supported!");
+    }
+
+
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
         gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
@@ -108,7 +130,7 @@ function main() {
             ],
                 { x: 3, y: 3 }
             ),
-            2, 2,
+            new Vec2(3, 3),
             { x: 90, y: 0 })
             , DrawLayer.ITEM);
 
@@ -130,7 +152,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                2, 2,
+                new Vec2(3, 3),
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
@@ -150,7 +172,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                2, 2,
+                new Vec2(3, 3),
                 { x: 70, y: 0 }
             ),
             DrawLayer.ITEM
@@ -173,10 +195,71 @@ function main() {
                     ],
                     { x: 6, y: 3 }
                 ),
-                6, 3,
+                new Vec2(6, 3),
                 { x: 13, y: 0 }
             ),
             DrawLayer.ITEM
+        )
+
+        gameEngine.addEntity(
+            new Tree(
+                new Vec2(
+                    132,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    149,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    168,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    184,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    200,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Bush(
+                new Vec2(
+                    218,
+                    0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Rock(
+                new Vec2(230, 0)
+            ),
+            DrawLayer.WORLD_DECORATION
         )
         gameEngine.start();
     } catch (e) {

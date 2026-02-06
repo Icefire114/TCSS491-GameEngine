@@ -27,7 +27,7 @@ export class ItemEntity implements Entity, Collidable {
      */
     item: Item;
 
-    constructor(item: Item, animator: Animator, BBX: number, BBY: number, position?: Vec2) {
+    constructor(item: Item, animator: Animator, colliderSize: Vec2, position?: Vec2) {
         this.id = `${this.tag}__${item.tag}#${crypto.randomUUID()}`;
         this.item = item;
         this.sprite = item.sprite;
@@ -35,12 +35,12 @@ export class ItemEntity implements Entity, Collidable {
         if (position) {
             this.position = position;
         }
-        this.physicsCollider = new BoxCollider(BBX, BBY)
+        this.physicsCollider = new BoxCollider(colliderSize.x, colliderSize.y)
     }
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        const positionWithBBOffset = new Vec2(this.position.x , this.position.y);
+        const positionWithBBOffset = new Vec2(this.position.x, this.position.y);
         this.animation.drawCurrentAnimFrameAtPos(ctx, positionWithBBOffset);
     }
 

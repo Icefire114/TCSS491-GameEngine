@@ -23,3 +23,54 @@ export function unwrap<T>(v: T | undefined | null, msg?: string): T {
     }
     return v;
 }
+
+/**
+ * Converts the given angle in radians to degrees.
+ * @param r The angle in radians
+ * @returns The angle in degrees
+ */
+export function RtoD(r: number): number {
+    return r * (180 / Math.PI);
+}
+
+/**
+ * Converts the given angle in degrees to radians.
+ * @param d The angle in degress
+ * @returns The angle in radians
+ */
+export function DtoR(d: number): number {
+    return d * (Math.PI / 180);
+}
+
+/**
+ * Samples a random element from the given array.
+ * @param arr The array to sample a random element from.
+ * @returns A random element from the array
+ */
+export function randomOf<T>(arr: readonly [T, ...T[]]): T;
+
+/**
+ * Samples a random element from the given array.
+ * @param arr The array to sample a random element from.
+ * @returns A random element from the array or undefined if the array is empty
+ */
+export function randomOf<T>(arr: readonly T[]): T | undefined;
+
+/**
+ * Samples a random element from the given array.
+ * @param arr The array to sample a random element from.
+ * @param fallback The element to return if the array is empty.
+ * @returns A random element from the array or `fallback` if the array is empty
+ */
+export function randomOf<T>(arr: readonly T[], fallback: T): T;
+
+/**
+ * Samples a random element from the given array.
+ * @param arr The array to sample a random element from.
+ * @param fallback The element to return if the array is empty.
+ * @returns A random element from the array or `fallback` if the array is empty
+ */
+export function randomOf<T>(arr: readonly T[], fallback?: T): T | undefined {
+    if (arr.length === 0) return fallback;
+    return arr[Math.floor(Math.random() * arr.length)];
+}

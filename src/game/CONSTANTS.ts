@@ -9,5 +9,7 @@ export const G_CONFIG = {
     // If true, don't generate terrain just a flat plane
     TERRAIN_GENERATION_FORCE_FLAT: false,
     // If true, player does not take damage
-    GOD_MODE: false
+    GOD_MODE: false,
+    // If true, use the new renderer, else use the old renderer
+    NEW_RENDERER: false,
 }

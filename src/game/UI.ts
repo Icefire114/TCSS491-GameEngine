@@ -94,6 +94,6 @@ export class UILayer implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-
+        // Should do nothing.
     }
 }
