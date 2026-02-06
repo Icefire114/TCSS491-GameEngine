@@ -68,10 +68,25 @@ export class WorldSpawner implements Entity {
             // 30% chance for Zombie
             GameEngine.g_INSTANCE.addEntity(new BasicZombie({ x, y: y - 5 }), DrawLayer.ZOMBIE);
         } 
-        else if (roll < 0.45) {
-            // 45% chance for Spike
-            GameEngine.g_INSTANCE.addEntity(new Spike({ x, y }), DrawLayer.SPIKE);
+         else if (roll < 0.45) {
+            // 15% chance for Spike
+            // How many spikes to generate from 2 to 4
+            const clusterSize = Math.floor(this.rng.next() * 10000) + 2; 
+            const spacing = 2.1; 
+
+            for (let i = 0; i < clusterSize; i++) {
+                const currentX = x + (i * spacing);
+                const currentY = mountain.getHeightAt(currentX);
+                
+                // Calculate rotation so each spike in the group tilts with the slope
+                const normal = mountain.getNormalAt(currentX);
+                const rotation = Math.atan2(normal.y, normal.x) - Math.PI / 2;
+
+                const spike = new Spike({ x: currentX, y: currentY }, rotation);
+                GameEngine.g_INSTANCE.addEntity(spike, DrawLayer.SPIKE);
+            }
         } 
+
         else if (roll < 0.2) {
             // 20% chance for Item
             const pos = new Vec2(x, y - 2);
