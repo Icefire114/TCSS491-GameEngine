@@ -147,7 +147,78 @@ export class ChristmasTree implements Entity {
                         
                         fragColor = vec4(color.rgb * shadeFactor * warmTint, color.a);
                     }
-                `);
+                `)
+                .addPass(`#version 300 es
+                    precision highp float;
+
+                    in vec2 v_texCoord;
+                    out vec4 fragColor;
+
+                    uniform sampler2D u_texture;
+                    uniform float u_time;
+
+                    // Simple hash function for consistent random values
+                    float hash(vec2 p) {
+                        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                    }
+
+                    void main() {
+                        vec4 texColor = texture(u_texture, v_texCoord);
+                        
+                        // Only apply lights to non-transparent pixels
+                        if (texColor.a < 0.01) {
+                            fragColor = texColor;
+                            return;
+                        }
+                        
+                        // Create a grid of potential light positions
+                        vec2 gridPos = v_texCoord * vec2(128.0, 128.0); // Adjust density here
+                        vec2 cellId = floor(gridPos);
+                        vec2 cellUV = fract(gridPos);
+                        
+                        // Use hash to randomly place lights (not all grid cells get a light)
+                        float shouldHaveLight = step(0.95, hash(cellId)); // 5% chance per cell
+                        
+                        // Calculate distance from cell center
+                        vec2 centerOffset = cellUV - 0.5;
+                        float dist = length(centerOffset);
+                        
+                        // Create light bulb shape (only near center of cell)
+                        float bulbSize = 0.25;
+                        float bulb = smoothstep(bulbSize, bulbSize * 0.5, dist);
+                        
+                        // Random color per light using cell position
+                        float colorSeed = hash(cellId + vec2(0.5));
+                        vec3 lightColor;
+                        if (colorSeed < 0.25) {
+                            lightColor = vec3(1.0, 0.1, 0.1); // Red
+                        } else if (colorSeed < 0.5) {
+                            lightColor = vec3(0.1, 1.0, 0.1); // Green
+                        } else if (colorSeed < 0.75) {
+                            lightColor = vec3(0.1, 0.5, 1.0); // Blue
+                        } else {
+                            lightColor = vec3(1.0, 0.8, 0.1); // Yellow/Gold
+                        }
+                        
+                        // Twinkle effect - each light has its own phase
+                        float twinklePhase = hash(cellId + vec2(1.0)) * 6.28;
+                        float twinkle = sin(u_time * 3.0 + twinklePhase) * 0.5 + 0.5;
+                        twinkle = pow(twinkle, 2.0); // Make twinkle more pronounced
+                        
+                        // Combine everything
+                        float lightIntensity = bulb * shouldHaveLight * twinkle;
+                        
+                        // Add glow around the light
+                        float glowSize = 0.4;
+                        float glow = smoothstep(glowSize, 0.0, dist) * 0.3;
+                        glow *= shouldHaveLight * twinkle;
+                        
+                        // Blend light with original texture
+                        vec3 finalColor = texColor.rgb + (lightColor * lightIntensity * 2.0) + (lightColor * glow);
+                        
+                        fragColor = vec4(finalColor, texColor.a);
+                    }
+    `);
 
             console.log("Shader created, canvas size:", this.shader.canvas.width, this.shader.canvas.height);
         }
@@ -169,6 +240,9 @@ export class ChristmasTree implements Entity {
                 u_baseLight: 0.6,
                 u_warmth: 0.05
             },
+            {
+                u_time: performance.now()
+            }
         ])
 
         const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
