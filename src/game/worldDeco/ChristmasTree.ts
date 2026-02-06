@@ -128,19 +128,19 @@ export class ChristmasTree implements Entity {
                         }
                         
                         // Convert texture coordinates to centered position (-0.5 to 0.5)
-                        vec2 relPos = v_texCoord - 0.5f;
-                        float distanceAlongSun = dot(relPos, u_sunDirection);
-                    
+                        vec2 relPos = (v_texCoord - 0.5) * 2.0;
                         relPos.x = relPos.x - 0.06;
-                        relPos.y = relPos.y - 0.09;
+                        relPos.y = relPos.y - 0.165;
                         float edgeFade = dot(normalize(relPos), u_sunDirection);
                         edgeFade = clamp(edgeFade, 0.0, 1.0);
+                        float alignment = dot(normalize(relPos), u_sunDirection);
+                        float shadeFactor = u_baseLight + (edgeFade * u_intensity) + (alignment * u_intensity);
                         
                         // basic lighting: ambient + directional based on edge proximity
-                        float shadeFactor = u_baseLight + edgeFade * u_intensity;
+                        // float shadeFactor = u_baseLight + edgeFade * u_intensity;
                         
                         // warm tint on the lit side
-                        float warmFactor = edgeFade * u_warmth;
+                        float warmFactor = max(0.0, alignment) * u_warmth;
                         vec3 warmTint = vec3(1.0 + warmFactor,
                                             1.0 + warmFactor * 0.5,
                                             1.0);
@@ -159,15 +159,15 @@ export class ChristmasTree implements Entity {
         this.shader.render([
             // Snow shader uniforms
             {
-                u_snowHeight: 0.5,
+                u_snowHeight: 0.6,
                 u_snowThickness: 0.5
             },
             // Sun shader uniforms
             {
                 u_sunDirection: sunDir,
-                u_intensity: 0.75,
-                u_baseLight: 0.25,
-                u_warmth: 0.2
+                u_intensity: 0.3,
+                u_baseLight: 0.6,
+                u_warmth: 0.05
             },
         ])
 
