@@ -131,8 +131,8 @@ export class ChristmasTree implements Entity {
                         vec2 relPos = v_texCoord - 0.5f;
                         float distanceAlongSun = dot(relPos, u_sunDirection);
                     
-                        // relPos.x = relPos.x - 0.15;
-                        // relPos.y = relPos.y - 0.05;
+                        relPos.x = relPos.x - 0.06;
+                        relPos.y = relPos.y - 0.09;
                         float edgeFade = dot(normalize(relPos), u_sunDirection);
                         edgeFade = clamp(edgeFade, 0.0, 1.0);
                         
@@ -165,7 +165,7 @@ export class ChristmasTree implements Entity {
             // Sun shader uniforms
             {
                 u_sunDirection: sunDir,
-                u_intensity: 0.6,
+                u_intensity: 0.75,
                 u_baseLight: 0.25,
                 u_warmth: 0.2
             },
