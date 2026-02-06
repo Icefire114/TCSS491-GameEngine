@@ -57,7 +57,10 @@ export class ChristmasTree implements Entity {
             }
 
 
-            this.shader.render(-60);
+            this.shader.render(-60, {
+                intensity: 0.8,
+                baseLight: 1.5,
+            });
 
             const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const worldW = currentAnim.frameWidth / meterInPixels;
