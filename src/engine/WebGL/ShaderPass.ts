@@ -15,12 +15,10 @@ export class ShaderPass {
             in  vec2 a_position;
             in  vec2 a_texCoord;
             out vec2 v_texCoord;
-            out vec2 v_quadPos;
 
             void main() {
                 gl_Position = vec4(a_position, 0.0, 1.0);
                 v_texCoord  = a_texCoord;
-                v_quadPos = a_position;
             }
         `;
         this.program = this.createProgram(vertexShaderSource, fragmentShaderSource);
@@ -32,10 +30,10 @@ export class ShaderPass {
         ]);
 
         const texCoords = new Float32Array([
-            0, 1,
-            1, 1,
-            0, 0,
-            1, 0
+  0, 0,  // Changed from 0, 1
+  1, 0,  // Changed from 1, 1
+  0, 1,  // Changed from 0, 0
+  1, 1   // Changed from 1, 0
         ]);
 
         this.positionBuffer = this.gl.createBuffer()!;
@@ -51,7 +49,7 @@ export class ShaderPass {
         this.locations = {
             position: this.gl.getAttribLocation(this.program, 'a_position'),
             texCoord: this.gl.getAttribLocation(this.program, 'a_texCoord'),
-            image: this.gl.getUniformLocation(this.program, 'u_image'),
+            image: this.gl.getUniformLocation(this.program, 'u_texture'),
             resolution: this.gl.getUniformLocation(this.program, 'u_resolution')
         };
     }
