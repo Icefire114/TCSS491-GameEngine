@@ -17,7 +17,10 @@ import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
 import { Bush } from "./worldDeco/Bush.js";
+import { ChristmasTree } from "./worldDeco/ChristmasTree.js";
+import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
+import { WorldSpawner } from "./WorldSpawner.js";
 
 
 /**
@@ -72,9 +75,11 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/tree_2.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -102,9 +107,9 @@ function main() {
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
         gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
-        gameEngine.addUniqueEntity(new Mountain(), DrawLayer.MOUNTAIN_TERRAIN);
+        gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
-
+        gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
@@ -128,7 +133,7 @@ function main() {
             ],
                 { x: 3, y: 3 }
             ),
-            3, 3,
+            new Vec2(3, 3),
             { x: 90, y: 0 })
             , DrawLayer.ITEM);
 
@@ -150,7 +155,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                3, 3,
+                new Vec2(3, 3),
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
@@ -170,7 +175,7 @@ function main() {
                     ],
                     { x: 3, y: 3 }
                 ),
-                3, 3,
+                new Vec2(3, 3),
                 { x: 70, y: 0 }
             ),
             DrawLayer.ITEM
@@ -193,7 +198,7 @@ function main() {
                     ],
                     { x: 6, y: 3 }
                 ),
-                6, 3,
+                new Vec2(6, 3),
                 { x: 13, y: 0 }
             ),
             DrawLayer.ITEM
@@ -249,6 +254,20 @@ function main() {
                 new Vec2(
                     218,
                     0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new Rock(
+                new Vec2(230, 0)
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
+        gameEngine.addEntity(
+            new ChristmasTree(
+                new Vec2(
+                    300, 0
                 )
             ),
             DrawLayer.WORLD_DECORATION

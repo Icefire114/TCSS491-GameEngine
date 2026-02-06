@@ -48,6 +48,7 @@ export class GameEngine {
     viewportX: number = 0;
     viewportY: number = 0;
     zoom: number = 1;
+    private loopCall = () => this.loop();
 
     constructor(assetManager: AssetManager, options?: { debugging: boolean; }) {
         if (GameEngine.g_INSTANCE != undefined) {
@@ -175,7 +176,7 @@ export class GameEngine {
             this.keys[event.key] = true
             unlockAudio();
         });
-        
+
         this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
     };
 
@@ -280,6 +281,7 @@ export class GameEngine {
         }
     };
 
+
     loop() {
         let frameTime = this.timer.tick();
         frameTime = Math.min(frameTime, 0.25); // prevent spiral of death
@@ -292,7 +294,7 @@ export class GameEngine {
         }
 
         this.draw();
-        requestAnimationFrame(() => this.loop());
+        requestAnimationFrame(this.loopCall);
     }
 
     /**

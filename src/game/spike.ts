@@ -1,3 +1,4 @@
+
 import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
@@ -16,6 +17,9 @@ export class Spike implements Entity {
     position: Vec2 = { x: 0, y: 0 };
     velocity: Vec2 = { x: 0, y: 0 };
 
+    // Used for spike rotation
+    rotation: number = 0;
+
     physicsCollider: BoxCollider = new BoxCollider(2, 2);
     sprite: ImagePath = new ImagePath("res/img/spike.png");
 
@@ -33,11 +37,12 @@ export class Spike implements Entity {
     ],
         { x: 2, y: 2 });
 
-    constructor(position?: Vec2) {
+    constructor(position?: Vec2, rotation: number = 0) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         if (position) {
             this.position = position;
         }
+        this.rotation = rotation;
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
@@ -45,6 +50,23 @@ export class Spike implements Entity {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position)
+        ctx.save();
+        
+        // Converting the pixles to game units
+        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenX = (this.position.x - game.viewportX) * scale;
+        const screenY = (this.position.y - game.viewportY) * scale;
+
+        // Setting up the correct position and angle for the spikes
+        ctx.translate(screenX, screenY);
+        ctx.rotate(this.rotation);
+ 
+        // Handling the various offset of the sprite and the viewport
+        const heightOffset = .01; 
+        const viewPointOffset = new Vec2(game.viewportX, game.viewportY - heightOffset);
+
+        this.animator.drawCurrentAnimFrameAtPos(ctx, viewPointOffset);
+        
+        ctx.restore();
     }
 }

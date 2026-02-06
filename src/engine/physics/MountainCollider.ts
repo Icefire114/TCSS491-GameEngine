@@ -2,14 +2,11 @@ import { Vec2 } from "../types.js";
 import { BoxCollider } from "./BoxCollider.js";
 import { Collider, Collidable } from "./Collider.js";
 
-type MountainPoint = Vec2 & { cameraTargetY: number };
-
 export class MountainCollider implements Collider {
 
+    private anchorPointsReference: Vec2[];
 
-    private anchorPointsReference: MountainPoint[];
-
-    constructor(points: MountainPoint[]) {
+    constructor(points: Vec2[]) {
         this.anchorPointsReference = points;
     }
 
@@ -66,7 +63,7 @@ export class MountainCollider implements Collider {
         return -1;
     }
 
-    calculatePointsMidpoint(pointA: MountainPoint, pointB: MountainPoint): Vec2 {
+    calculatePointsMidpoint(pointA: Vec2, pointB: Vec2): Vec2 {
         let midPointX = (pointB.x + pointA.x) / 2;
         let midPointY = (pointB.y + pointA.y) / 2;
 
@@ -87,7 +84,7 @@ export class MountainCollider implements Collider {
 
     }
 
-    calculatingQuadraticBezier(entityPosition: number, midPointAB: Vec2, steeringPoint: MountainPoint, midPointBC: Vec2) {
+    calculatingQuadraticBezier(entityPosition: number, midPointAB: Vec2, steeringPoint: Vec2, midPointBC: Vec2) {
         /* QuadraticBezier Formula: 
         B(t) = (1 - t)^2 * P0 + 
                2(1 - t)t * P1 + 
