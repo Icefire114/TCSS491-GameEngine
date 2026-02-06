@@ -17,6 +17,7 @@ import { Spike } from "./spike.js";
 import { ThrowerZombie } from "./ThrowerZombie.js";
 import { UILayer } from "./UI.js";
 import { Bush } from "./worldDeco/Bush.js";
+import { ChristmasTree } from "./worldDeco/ChristmasTree.js";
 import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
 import { WorldSpawner } from "./WorldSpawner.js";
@@ -74,6 +75,7 @@ ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/tree_2.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
@@ -261,7 +263,15 @@ function main() {
                 new Vec2(230, 0)
             ),
             DrawLayer.WORLD_DECORATION
-        )
+        );
+        gameEngine.addEntity(
+            new ChristmasTree(
+                new Vec2(
+                    300, 0
+                )
+            ),
+            DrawLayer.WORLD_DECORATION
+        );
         gameEngine.start();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
