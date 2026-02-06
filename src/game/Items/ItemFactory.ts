@@ -15,14 +15,14 @@ export class ItemFactory {
         return new ItemEntity(
             new InstantHealthItem(),
             new Animator([
-                [{ 
-                    frameCount: 4, 
-                    frameHeight: 40, 
-                    frameWidth: 42, 
-                    sprite: new ImagePath("res/img/items/instant_health_pickup.png") 
+                [{
+                    frameCount: 4,
+                    frameHeight: 40,
+                    frameWidth: 42,
+                    sprite: new ImagePath("res/img/items/instant_health_pickup.png")
                 }, AnimationState.IDLE]
             ], { x: 3, y: 3 }),
-            2, 2, 
+            new Vec2(2, 2),
             position
         );
     }
@@ -32,14 +32,14 @@ export class ItemFactory {
         return new ItemEntity(
             new ShieldRestorePickupItem(),
             new Animator([
-                [{ 
-                    frameCount: 10, 
-                    frameHeight: 64, 
-                    frameWidth: 54, 
-                    sprite: new ImagePath("res/img/items/shield_pickup.png") 
+                [{
+                    frameCount: 10,
+                    frameHeight: 64,
+                    frameWidth: 54,
+                    sprite: new ImagePath("res/img/items/shield_pickup.png")
                 }, AnimationState.IDLE]
             ], { x: 3, y: 3 }),
-            2, 2, pos
+            new Vec2(2, 2), pos
         );
     }
 
@@ -48,22 +48,22 @@ export class ItemFactory {
         return new ItemEntity(
             new GunItem(),
             new Animator([
-                [{ 
-                    frameCount: 7, 
-                    frameHeight: 24, 
-                    frameWidth: 43, 
-                    offestX: 0.1, 
-                    sprite: new ImagePath("res/img/items/rifle.png") 
+                [{
+                    frameCount: 7,
+                    frameHeight: 24,
+                    frameWidth: 43,
+                    offestX: 0.1,
+                    sprite: new ImagePath("res/img/items/rifle.png")
                 }, AnimationState.IDLE]
             ], { x: 6, y: 3 }),
-            6, 3, pos
+            new Vec2(6, 3), pos
         );
     }
 
     // Creating Immunity
     static createImmunity(position: Vec2): ItemEntity {
         return new ItemEntity(
-            new InfectionImmunityItem (),
+            new InfectionImmunityItem(),
             new Animator([
                 [{
                     frameCount: 15,
@@ -73,8 +73,8 @@ export class ItemFactory {
                 },
                 AnimationState.IDLE]
             ], { x: 3, y: 3 }),
-            2, 2,
+            new Vec2(2, 2),
             position
-        );    
+        );
     }
 }
