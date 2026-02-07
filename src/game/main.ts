@@ -6,7 +6,8 @@ import { ShaderEngine } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./BasicZombie.js";
 import { G_CONFIG } from "./CONSTANTS.js";
-import { GunItem } from "./Items/gun.js";
+import { AmmoRestore } from "./Items/AmmoRestore.js";
+import { BuffEntity } from "./Items/BuffEntity.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
@@ -118,7 +119,7 @@ function main() {
         gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new ItemEntity(
+        gameEngine.addEntity(new BuffEntity(
             new InfectionImmunityItem(),
             new Animator([
                 [
@@ -139,7 +140,7 @@ function main() {
 
 
         gameEngine.addEntity(
-            new ItemEntity(
+            new BuffEntity(
                 new InstantHealthItem(),
                 new Animator(
                     [
@@ -159,7 +160,7 @@ function main() {
                 { x: 60, y: 0 })
             , DrawLayer.ITEM);
         gameEngine.addEntity(
-            new ItemEntity(
+            new BuffEntity(
                 new ShieldRestorePickupItem(),
                 new Animator(
                     [
@@ -181,8 +182,8 @@ function main() {
             DrawLayer.ITEM
         )
         gameEngine.addEntity(
-            new ItemEntity(
-                new GunItem(),
+            new BuffEntity(
+                new AmmoRestore(),
                 new Animator(
                     [
                         [

@@ -2,9 +2,7 @@ import { ImagePath } from "../../engine/assetmanager.js";
 
 export enum ItemType {
     GUN,
-    PERM_BUFF,
-    TEMP_BUFF,
-    INSTANT_APPLY,
+    MISC
 }
 
 export type Item = {
@@ -16,20 +14,7 @@ export type Item = {
     sprite: ImagePath,
 
     /**
-     * Called when the item is picked up in the case of a buff, 
-     * or when the item is used in the case of a gun.
+     * Called when the item is picked up, or when the item is used in the case of a gun.
      */
     onActivate(): void;
-}
-
-export type TempBuff = {
-    /**
-     * The duration of the buff in seconds.
-     */
-    startingDuration: number;
-
-    /**
-     * The amount of time remaining on the buff.
-     */
-    currentDuration: number;
 }

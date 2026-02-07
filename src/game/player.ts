@@ -3,13 +3,15 @@ import { GameEngine } from "../engine/gameengine.js";
 import { BoxCollider } from "../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { DrawLayer, Vec2 } from "../engine/types.js";
-import { Item, ItemType, TempBuff } from "./Items/Item.js";
+import { Item } from "./Items/Item.js";
 import { ItemEntity } from "./Items/ItemEntity.js";
 import { Collidable } from "../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
 import { AnimationState, Animator } from "../engine/Animator.js";
 import { Bullet } from "./bullet.js";
 import { G_CONFIG } from "./CONSTANTS.js";
+import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
+import { BuffEntity } from "./Items/BuffEntity.js";
 
 /**
  * @author PG
@@ -110,6 +112,11 @@ export class Player implements Entity, Collidable {
      */
     items: Item[] = [];
 
+    /**
+     * The buffs the player currently has applied.
+     */
+    buffs: Buff[] = [];
+
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
@@ -140,14 +147,15 @@ export class Player implements Entity, Collidable {
             if (!this.isInvulnerable())
                 this.hitMultiplier = this.hitMultiplier < 1 ? 1 : this.hitMultiplier - deltaTime / 10; // hit multiplier decays over time, min is 1
 
-            for (const item of
-                this.items.filter(
-                    (item) => item.type === ItemType.TEMP_BUFF
-                ) as (Item & TempBuff)[]
+            // Decrease timer for our temp buffs
+            for (const buff of
+                this.buffs.filter(
+                    (item) => item.type === BuffType.TEMP_BUFF
+                ) as (Buff & TempBuff)[]
             ) {
-                item.currentDuration = item.currentDuration - deltaTime;
-                if (item.currentDuration <= 0) {
-                    this.items.splice(this.items.indexOf(item), 1);
+                buff.currentDuration = buff.currentDuration - deltaTime;
+                if (buff.currentDuration <= 0) {
+                    this.buffs.splice(this.buffs.indexOf(buff), 1);
                 }
             }
 
@@ -265,11 +273,24 @@ export class Player implements Entity, Collidable {
                 if (this.physicsCollider.collides(this, itemEnt)) {
                     console.log(`We hit item ${itemEnt.id}`);
                     const item: Item = itemEnt.pickup();
-                    if (item.type === ItemType.INSTANT_APPLY || item.type === ItemType.PERM_BUFF || item.type === ItemType.TEMP_BUFF) {
-                        this.items.push(item);
-                    }
+                    this.items.push(item);
 
                     itemEnt.removeFromWorld = true;
+                }
+            }
+
+            // -- Collision with buffs --
+            const buffs = GameEngine.g_INSTANCE.getEntitiesByTag("BuffEntity") as BuffEntity[];
+            for (const buffEnt of buffs) {
+                if (this.physicsCollider.collides(this, buffEnt)) {
+                    console.log(`We hit buff ${buffEnt.id}`);
+                    // no need to apply the buff, it is applied when `pickup` is called.
+                    const buff: Buff = buffEnt.pickup();
+                    // We only care about tracking temp buffs.
+                    if (buff.type === BuffType.TEMP_BUFF) {
+                        this.buffs.push(buff);
+                    }
+                    buffEnt.removeFromWorld = true;
                 }
             }
 

@@ -4,7 +4,8 @@ import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { Vec2 } from "../engine/types.js";
 import { unwrap } from "../engine/util.js";
-import { Item, ItemType, TempBuff } from "./Items/Item.js";
+import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
+import { ItemType } from "./Items/Item.js";
 import { Player } from "./player.js";
 
 export class UILayer implements Entity {
@@ -27,9 +28,9 @@ export class UILayer implements Entity {
 
 
         // Collect TEMP_BUFFS
-        const tempBuffs: (Item & TempBuff)[] = player.items.filter(
-            (item) => item.type === ItemType.TEMP_BUFF
-        ) as (Item & TempBuff)[];
+        const tempBuffs: (Buff & TempBuff)[] = player.buffs.filter(
+            (item) => item.type === BuffType.TEMP_BUFF
+        ) as (Buff & TempBuff)[];
 
         // Draw TEMP_BUFFS in the top-right, 2% in from the left edge
         const margin = Math.round(ctx.canvas.width * 0.02);
@@ -55,14 +56,6 @@ export class UILayer implements Entity {
             switch (item.type) {
                 // TODO: Find a better place to display these to the user (in a safe zone?)
                 case ItemType.GUN:
-                    break;
-                case ItemType.PERM_BUFF:
-                    break;
-
-                // Already drawn
-                case ItemType.TEMP_BUFF:
-                // These are instantly applied buffs, and should not be displayed
-                case ItemType.INSTANT_APPLY:
                     break;
             }
             ctx.restore();

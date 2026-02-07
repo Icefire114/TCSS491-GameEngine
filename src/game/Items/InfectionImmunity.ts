@@ -1,8 +1,8 @@
 import { ImagePath } from "../../engine/assetmanager.js";
-import { Item, ItemType, TempBuff } from "./Item.js";
+import { Buff, BuffType, TempBuff } from "./Buff.js";
 
-export class InfectionImmunityItem implements Item, TempBuff {
-    type: ItemType = ItemType.TEMP_BUFF;
+export class InfectionImmunityItem implements Buff, TempBuff {
+    type: BuffType = BuffType.TEMP_BUFF;
     tag: string = "InfectionImmunityItem";
     sprite: ImagePath = new ImagePath("res/img/items/infection_immunity_UI.png");
 
@@ -11,6 +11,6 @@ export class InfectionImmunityItem implements Item, TempBuff {
     startingDuration: number = 10;
     currentDuration: number = this.startingDuration;
 
-    onActivate(): void {
+    onApply(): void {
     }
 }
