@@ -10,7 +10,7 @@ export class Mountain implements Entity {
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
     id: EntityID;
-    physicsCollider: MountainCollider | null = null;
+    physicsCollider: MountainCollider;
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     sprite: ImagePath | null = null;
