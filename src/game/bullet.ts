@@ -18,7 +18,7 @@ export class Bullet implements Entity, Collidable {
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(1, 1);
-    sprite1: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
+    sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
     removeFromWorld: boolean = false;
 
     speed: number = 100 // world units per second

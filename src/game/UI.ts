@@ -14,7 +14,7 @@ export class UILayer implements Entity {
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     physicsCollider: Collider | null = null;
-    sprite1: ImagePath | null = null;
+    sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
 
 

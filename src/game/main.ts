@@ -61,16 +61,20 @@ ASSET_MANAGER.queueDownload("res/img/background/background/day.png");
 ASSET_MANAGER.queueDownload("res/img/background/background/night.png");
 ASSET_MANAGER.queueDownload("res/img/background/sky/sun.png");
 ASSET_MANAGER.queueDownload("res/img/background/sky/moon.png");
-ASSET_MANAGER.queueDownload("res/img/background/sky/cloud.png");
 
 // === Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/background/middleground/middle1.png");
 ASSET_MANAGER.queueDownload("res/img/background/middleground/middle2.png");
+ASSET_MANAGER.queueDownload("res/img/background/middleground/middle3.png");
+ASSET_MANAGER.queueDownload("res/img/background/middleground/middle4.png");
+ASSET_MANAGER.queueDownload("res/img/background/middleground/middle5.png");
 
 // === Foreground Assets ===
 ASSET_MANAGER.queueDownload("res/img/background/foreground/fore1.png");
 ASSET_MANAGER.queueDownload("res/img/background/foreground/fore2.png");
 ASSET_MANAGER.queueDownload("res/img/background/foreground/fore3.png");
+ASSET_MANAGER.queueDownload("res/img/background/foreground/fore4.png");
+ASSET_MANAGER.queueDownload("res/img/background/foreground/fore5.png");
 
 // === Music Assets ===
 ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");

@@ -18,7 +18,7 @@ export class ItemEntity implements Entity, Collidable {
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     physicsCollider: BoxCollider;
-    sprite1: ImagePath;
+    sprite: ImagePath;
     removeFromWorld: boolean = false;
     animation: Animator;
 
@@ -30,7 +30,7 @@ export class ItemEntity implements Entity, Collidable {
     constructor(item: Item, animator: Animator, BBX: number, BBY: number, position?: Vec2) {
         this.id = `${this.tag}__${item.tag}#${crypto.randomUUID()}`;
         this.item = item;
-        this.sprite1 = item.sprite;
+        this.sprite = item.sprite;
         this.animation = animator;
         if (position) {
             this.position = position;

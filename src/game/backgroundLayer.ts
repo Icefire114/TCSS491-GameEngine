@@ -15,7 +15,7 @@ export class BackgroundLayer implements Entity {
 
     physicsCollider = null;
     spriteType: string;
-    sprite1: ImagePath;
+    sprite: ImagePath;
     sprite2: ImagePath;
     spritePaths: ImagePath[];
 
@@ -32,12 +32,12 @@ export class BackgroundLayer implements Entity {
 
     // used for different middle and foreground layers
     spawnRandom: boolean;
-    timeInterval: number; // in seconds
+    timeInterval = 20; // in seconds
     timeSinceLastChange: number = 0; //in seconds
 
     // used for night/day stuff
     dayNightCycleTime: number = 0; // Time in the cycle
-    cycleDuration: number = 20; // 2 minutes for full day/night cycle
+    cycleDuration: number = 120; // 2 minutes for full day/night cycle
     timeOfDayAlpha: number = 1; // 0 = night, 1 = day
     sunOrMoon: number = 0; // 0 = sun, 1 = moon
 
@@ -49,13 +49,12 @@ export class BackgroundLayer implements Entity {
         startX: number,
         startY: number,
         spawnRandom: boolean = true,
-        timeInterval: number = 5,
     ) {
         let parts = spritePaths[0].split("/");
         this.spriteType = parts[parts.length - 2];
 
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.sprite1 = new ImagePath(spritePaths[0]);
+        this.sprite = new ImagePath(spritePaths[0]);
         this.sprite2 = new ImagePath(spritePaths[0]);
         this.spritePaths = spritePaths.map(path => new ImagePath(path));
 
@@ -70,13 +69,13 @@ export class BackgroundLayer implements Entity {
         this.widthInWorldUnits = widthInWorldUnits;
 
         this.spawnRandom = spawnRandom;
-        this.timeInterval = timeInterval;
+        console.log(`Created ${this.spriteType} layer with ID ${this.id}`);
     }
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        let sprite = game.getSprite(this.sprite1);
-        let sprite2 = game.getSprite(this.sprite2);
+        const sprite = game.getSprite(this.sprite);
+        const sprite2 = game.getSprite(this.sprite2);
 
         const player_width_in_world_units = this.widthInWorldUnits;
 
@@ -115,25 +114,28 @@ export class BackgroundLayer implements Entity {
 
             // blend for day/night cycle
             if (this.spriteType == "background") {
-                sprite = game.getSprite(this.spritePaths[1]);
-                sprite2 = game.getSprite(this.spritePaths[1]);
+                //get night sprites
+                const nightSprite = game.getSprite(this.spritePaths[1]);
+                const nightSprite2 = game.getSprite(this.spritePaths[1]);
+
                 ctx.globalAlpha = this.timeOfDayAlpha;
 
                 ctx.drawImage(
-                    sprite,
+                    nightSprite,
                     screenX - w / 2,
                     screenY - h,
                     w,
                     h
                 );
+                
+                
                 ctx.drawImage(
-                    sprite2,
+                    nightSprite2,
                     screenX2 - w / 2,
                     screenY2 - h,
                     w,
                     h
                 );
-                ctx.globalAlpha = 1;
             }
         }
     }
@@ -158,10 +160,10 @@ export class BackgroundLayer implements Entity {
                 
                 // swap sprites when position resets
                 if (this.spawnRandom && this.timeSinceLastChange >= this.timeInterval) {
-                    this.sprite1 = this.spritePaths[Math.floor(Math.random() * this.spritePaths.length)];
+                    this.sprite = this.spritePaths[Math.floor(Math.random() * this.spritePaths.length)];
                     this.timeSinceLastChange = 0;
                 } else {
-                    this.sprite1 = this.sprite2;
+                    this.sprite = this.sprite2;
                 }
 
             } else {
@@ -175,7 +177,7 @@ export class BackgroundLayer implements Entity {
                     this.sprite2 = this.spritePaths[Math.floor(Math.random() * this.spritePaths.length)];
                     this.timeSinceLastChange = 0;
                 } else {
-                    this.sprite2 = this.sprite1;
+                    this.sprite2 = this.sprite;
                 }
             } else {
                 this.position2.x -= this.velocity.x * this.parallaxSpeed;
@@ -191,23 +193,23 @@ export class BackgroundLayer implements Entity {
     
             if (cycleProgress < 0.5) {
                 // day
-                this.sprite1 = this.spritePaths[0]; // sun
+                this.sprite = this.spritePaths[0]; // sun
                 const sunProgress = cycleProgress * 2;
 
                 this.position.x = this.playerPosition.x + this.worldWidth - (sunProgress * this.worldWidth * 2);
                 // Arc motion
                 const angleInArc = sunProgress * Math.PI * 1.5;
-                this.position.y = this.playerPosition.y - 20 - (Math.sin(angleInArc) * verticalHeight);
+                this.position.y = this.playerPosition.y - 5 - (Math.sin(angleInArc) * verticalHeight);
             } else {
                 // night
-                this.sprite1 = this.spritePaths[1]; // moon
+                this.sprite = this.spritePaths[1]; // moon
                 const moonProgress = (cycleProgress - 0.5) * 2;
         
                 // Move from right to left
                 this.position.x = this.playerPosition.x + this.worldWidth - (moonProgress * this.worldWidth * 2);
                 // Arc motion
                 const angleInArc = moonProgress * Math.PI * 1.5;
-                this.position.y = this.playerPosition.y - 20 - (Math.sin(angleInArc) * verticalHeight);
+                this.position.y = this.playerPosition.y - 5 - (Math.sin(angleInArc) * verticalHeight);
             }
         }
     }

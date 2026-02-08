@@ -17,7 +17,7 @@ export class Spike implements Entity {
     velocity: Vec2 = { x: 0, y: 0 };
 
     physicsCollider: BoxCollider = new BoxCollider(2, 2);
-    sprite1: ImagePath = new ImagePath("res/img/spike.png");
+    sprite: ImagePath = new ImagePath("res/img/spike.png");
 
     removeFromWorld = false;
     animator: Animator = new Animator([

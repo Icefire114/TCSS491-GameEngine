@@ -40,17 +40,19 @@ export class Background {
         GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
             paths, //paths
             0.05, //parallaxSpeed
-            10, //widthInWorldUnits
+            40, //widthInWorldUnits
             0,  //startX doesnt matter here
             0, //startY doesnt matter here
             false, //spawnRandom
-            2000, //TimeInterval
         ), DrawLayer.BACKGROUND);
 
         // this is used for mountains
         paths = [
             "res/img/background/middleground/middle1.png",
             "res/img/background/middleground/middle2.png",
+            "res/img/background/middleground/middle3.png",
+            "res/img/background/middleground/middle4.png",
+            "res/img/background/middleground/middle5.png"
         ];
 
         GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
@@ -68,6 +70,8 @@ export class Background {
             "res/img/background/foreground/fore1.png",
             "res/img/background/foreground/fore2.png",
             "res/img/background/foreground/fore3.png",
+            "res/img/background/foreground/fore4.png",
+            "res/img/background/foreground/fore5.png"
         ];
 
         GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
