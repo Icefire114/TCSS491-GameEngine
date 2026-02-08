@@ -24,7 +24,7 @@ export class BackgroundLayer implements Entity {
     id: EntityID;
 
     parallaxSpeed: number;
-    worldWidth = 99; 
+    worldWidth = GameEngine.WORLD_UNITS_IN_VIEWPORT;
     widthInWorldUnits: number;
     changeSky: number = 0;
 
@@ -94,12 +94,12 @@ export class BackgroundLayer implements Entity {
         ctx.globalAlpha = 1;
         // first slide
         ctx.drawImage(
-                sprite,
-                screenX - w / 2,
-                screenY - h,
-                w,
-                h
-            );
+            sprite,
+            screenX - w / 2,
+            screenY - h,
+            w,
+            h
+        );
 
         if (this.spriteType != "sky") {
             // second slide
@@ -110,13 +110,12 @@ export class BackgroundLayer implements Entity {
                 w,
                 h
             );
-        
+
 
             // blend for day/night cycle
             if (this.spriteType == "background") {
                 //get night sprites
                 const nightSprite = game.getSprite(this.spritePaths[1]);
-                const nightSprite2 = game.getSprite(this.spritePaths[1]);
 
                 ctx.globalAlpha = this.timeOfDayAlpha;
 
@@ -127,10 +126,10 @@ export class BackgroundLayer implements Entity {
                     w,
                     h
                 );
-                
-                
+
+
                 ctx.drawImage(
-                    nightSprite2,
+                    nightSprite,
                     screenX2 - w / 2,
                     screenY2 - h,
                     w,
@@ -147,17 +146,17 @@ export class BackgroundLayer implements Entity {
         if (this.dayNightCycleTime > this.cycleDuration) {
             this.dayNightCycleTime = 0;
         }
-        
+
         const cycleProgress = this.dayNightCycleTime / this.cycleDuration;
         this.timeOfDayAlpha = (Math.sin(cycleProgress * Math.PI * 2 - Math.PI / 2) + 1) / 2;
 
         if (this.spriteType != "sky") {
             this.timeSinceLastChange += deltaTime;
-            
+
             // horizontal movement logic
             if (this.position.x + this.worldWidth < this.playerPosition.x + 35) {
                 this.position.x = this.position2.x + this.worldWidth;
-                
+
                 // swap sprites when position resets
                 if (this.spawnRandom && this.timeSinceLastChange >= this.timeInterval) {
                     this.sprite = this.spritePaths[Math.floor(Math.random() * this.spritePaths.length)];
@@ -171,7 +170,7 @@ export class BackgroundLayer implements Entity {
             }
             if (this.position2.x + this.worldWidth < this.playerPosition.x + 35) {
                 this.position2.x = this.position.x + this.worldWidth;
-               
+
                 // swap sprites when position2 resets
                 if (this.spawnRandom && this.timeSinceLastChange >= this.timeInterval) {
                     this.sprite2 = this.spritePaths[Math.floor(Math.random() * this.spritePaths.length)];
@@ -186,11 +185,11 @@ export class BackgroundLayer implements Entity {
             // verticle movement logic 
             this.position.y = this.playerPosition.y + this.startY;
             this.position2.y = this.playerPosition.y + this.startY;
-            
+
         } else {
             // sun and moon logic
             const verticalHeight = 7;
-    
+
             if (cycleProgress < 0.5) {
                 // day
                 this.sprite = this.spritePaths[0]; // sun
@@ -204,7 +203,7 @@ export class BackgroundLayer implements Entity {
                 // night
                 this.sprite = this.spritePaths[1]; // moon
                 const moonProgress = (cycleProgress - 0.5) * 2;
-        
+
                 // Move from right to left
                 this.position.x = this.playerPosition.x + this.worldWidth - (moonProgress * this.worldWidth * 2);
                 // Arc motion

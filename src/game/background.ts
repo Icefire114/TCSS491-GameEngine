@@ -20,6 +20,7 @@ export class Background {
             "res/img/background/background/night.png"
         ];
 
+        // Day/ Night sprites
         GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
             paths, //paths
             0, //parallaxSpeed

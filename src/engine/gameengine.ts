@@ -175,7 +175,7 @@ export class GameEngine {
             this.keys[event.key] = true
             unlockAudio();
         });
-        
+
         this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
     };
 
@@ -215,7 +215,9 @@ export class GameEngine {
         // And then draw them, no garuntee of order when their draw priority is the same.
         this.entities.sort((a, b) => b[1] - a[1])
         for (const ent of this.entities) {
+            this.ctx.save();
             ent[0].draw(this.ctx, this);
+            this.ctx.restore();
         }
 
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
