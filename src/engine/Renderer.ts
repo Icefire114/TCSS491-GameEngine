@@ -1,3 +1,6 @@
-export class Renderer {
+export namespace Renderer {
 
+    export function renderSpriteAtPosition(): void {
+
+    }
 }
