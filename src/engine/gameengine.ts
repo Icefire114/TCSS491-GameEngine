@@ -215,8 +215,13 @@ export class GameEngine {
         // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
         // And then draw them, no garuntee of order when their draw priority is the same.
         this.entities.sort((a, b) => b[1] - a[1])
-        for (const ent of this.entities) {
-            ent[0].draw(this.ctx, this);
+        for (const [ent] of this.entities) {
+            const t0 = performance.now();
+            ent.draw(this.ctx, this);
+            const t = t0 - performance.now();
+            if (t > 10) {
+                console.warn(`Ent: ${ent.id} took ${t.toFixed(3)}ms to draw`);
+            }
         }
 
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
@@ -255,7 +260,13 @@ export class GameEngine {
     update(dt: number) {
         for (const [entity] of this.entities) {
             if (!entity.removeFromWorld) {
+                const t0 = performance.now();
                 entity.update(this.keys, dt, this.rightclick);
+                const t = t0 - performance.now();
+                if (t > 10) {
+                    console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
+                }
+
             }
         }
 
