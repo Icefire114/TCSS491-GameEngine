@@ -21,7 +21,7 @@ export class Background {
         ];
 
         // Day/ Night sprites
-        GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0, //parallaxSpeed
             140, //widthInWorldUnits
@@ -38,7 +38,7 @@ export class Background {
             "res/img/background/sky/moon.png",
         ];
 
-        GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0.05, //parallaxSpeed
             40, //widthInWorldUnits
@@ -56,7 +56,7 @@ export class Background {
             "res/img/background/middleground/middle5.png"
         ];
 
-        GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0.00001, //parallaxSpeed
             100, //widthInWorldUnits
@@ -75,7 +75,7 @@ export class Background {
             "res/img/background/foreground/fore5.png"
         ];
 
-        GameEngine.g_INSTANCE.addUniqueEntity(new BackgroundLayer(
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0.002, //parallaxSpeed
             100, //widthInWorldUnits
