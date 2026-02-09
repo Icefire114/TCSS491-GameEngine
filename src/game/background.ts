@@ -1,6 +1,4 @@
-import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
-import { Entity, EntityID } from "../engine/Entity.js";
 import { DrawLayer, Vec2 } from "../engine/types.js";
 import { BackgroundLayer } from "./backgroundLayer.js";
 
@@ -8,75 +6,82 @@ import { BackgroundLayer } from "./backgroundLayer.js";
  * @author JK
  * @description The main background class.
  */
-export class Background implements Entity {
-    velocity: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].velocity;
-    position: Vec2 = new Vec2();
-    physicsCollider = null;
-    sprite: ImagePath;
-    id: EntityID;
+export class Background {
 
-    removeFromWorld: boolean = false;
-    tag: string = "background";
-
-    playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].position;
-    widthInWorldUnits: number;
-    gameLayers: BackgroundLayer[] = [];
-
-    constructor(spritePath: string, widthInWorldUnits: number = 100, startX: number = 0, startY: number = 9450) {
-        this.sprite = new ImagePath(spritePath);
-        this.position.x = startX;
-        this.position.y = startY;
-        this.widthInWorldUnits = widthInWorldUnits;
-        this.init();
-        this.id = `${this.tag}#${crypto.randomUUID()}`;
-        console.log(startX, startY);
+    start(): void {
+        this.initBackgroundGround();
+        this.initMiddleGround();
+        this.initForegroundLayers();
     }
 
-    init(): void {
-        const layer1 = new BackgroundLayer("res/img/Plan 4.png", 0.0008);
-        const layer2 = new BackgroundLayer("res/img/Plan 2.png", 0.002);
-        const layer3 = new BackgroundLayer("res/img/cloud.png", 0.008, 20, 80, 9400, false);
+    initBackgroundGround(): void {
+        let paths = [
+            "res/img/background/background/day.png",
+            "res/img/background/background/night.png"
+        ];
 
-        this.gameLayers = [layer1, layer2, layer3];
-
-        // GameEngine.g_INSTANCE.addEntity(layer1, DrawLayer.of(DrawLayer.HIGHEST));
-        // GameEngine.g_INSTANCE.addEntity(layer2, DrawLayer.of(DrawLayer.HIGHEST - 1));
-        // GameEngine.g_INSTANCE.addEntity(layer3, DrawLayer.of(DrawLayer.HIGHEST - 2));
+        // Day/ Night sprites
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
+            paths, //paths
+            0, //parallaxSpeed
+            140, //widthInWorldUnits
+            0,  //startX
+            40, //startY
+            false //spawnRandom
+        ), DrawLayer.SKY);
     }
 
-    draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        const sprite = game.getSprite(this.sprite);
+    initMiddleGround(): void {
+        // this is used for sky objects like sun and moon
+        let paths = [
+            "res/img/background/sky/sun.png",
+            "res/img/background/sky/moon.png",
+        ];
 
-        const player_width_in_world_units = this.widthInWorldUnits;
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
+            paths, //paths
+            0.05, //parallaxSpeed
+            40, //widthInWorldUnits
+            0,  //startX doesnt matter here
+            0, //startY doesnt matter here
+            false, //spawnRandom
+        ), DrawLayer.BACKGROUND);
 
-        const meter_in_pixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        // this is used for mountains
+        paths = [
+            "res/img/background/middleground/middle1.png",
+            "res/img/background/middleground/middle2.png",
+            "res/img/background/middleground/middle3.png",
+            "res/img/background/middleground/middle4.png",
+            "res/img/background/middleground/middle5.png"
+        ];
 
-        const w = player_width_in_world_units * meter_in_pixels;
-        const h = sprite.height * (w / sprite.width);
-
-        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
-        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
-
-        ctx.drawImage(
-            sprite,
-            screenX - w / 2,
-            screenY - h,
-            w,
-            h
-        );
-
-        this.gameLayers.forEach(layer => {
-            layer.draw(ctx, game);
-        });
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
+            paths, //paths
+            0.00001, //parallaxSpeed
+            100, //widthInWorldUnits
+            0,  //startX
+            30, //startY
+            true //spawnRandom
+        ), DrawLayer.BACKGROUND);
     }
 
-    update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        this.gameLayers.forEach(layer => {
-            layer.update(keys, deltaTime);
-        });
+    initForegroundLayers() {
+        let paths = [
+            "res/img/background/foreground/fore1.png",
+            "res/img/background/foreground/fore2.png",
+            "res/img/background/foreground/fore3.png",
+            "res/img/background/foreground/fore4.png",
+            "res/img/background/foreground/fore5.png"
+        ];
 
-        this.position.x = this.playerPosition.x + 10;
-        this.position.y = this.playerPosition.y + 40;
+        GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
+            paths, //paths
+            0.002, //parallaxSpeed
+            100, //widthInWorldUnits
+            0,  //startX
+            40, //startY
+            true //spawnRandom
+        ), DrawLayer.FOREGROUND);
     }
 }

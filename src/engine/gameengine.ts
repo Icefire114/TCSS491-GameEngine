@@ -216,9 +216,11 @@ export class GameEngine {
         // And then draw them, no garuntee of order when their draw priority is the same.
         this.entities.sort((a, b) => b[1] - a[1])
         for (const [ent] of this.entities) {
+            this.ctx.save();
             const t0 = performance.now();
             ent.draw(this.ctx, this);
             const t = t0 - performance.now();
+            this.ctx.restore();
             if (t > 10) {
                 console.warn(`Ent: ${ent.id} took ${t.toFixed(3)}ms to draw`);
             }
