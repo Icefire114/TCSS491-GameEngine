@@ -87,8 +87,7 @@ export class WorldSpawner implements Entity {
                 GameEngine.g_INSTANCE.addEntity(spike, DrawLayer.SPIKE);
             }
         }
-
-        else if (roll < 0.2) {
+        else if (roll < 0.65) {
             // 20% chance for Item
             const pos = new Vec2(x, y - 2);
             const itemRoll = this.rng.next();
