@@ -5,6 +5,7 @@ import { AssetManager, AudioPath, ImagePath } from "./assetmanager.js";
 import { unwrap } from "./util.js";
 import { G_CONFIG } from "../game/CONSTANTS.js";
 import { BoxCollider } from "./physics/BoxCollider.js";
+import { Renderer } from "./Renderer.js";
 
 export class GameEngine {
     /**
@@ -23,7 +24,7 @@ export class GameEngine {
     private accumulator = 0;
     private audioUnlock = false;
 
-    private ctx: CanvasRenderingContext2D | null;
+    private ctx: CanvasRenderingContext2D;
     private entities: [Entity, DrawLayer][];
     private uniqueEntities: Record<string, [Entity, DrawLayer]> = {};
     private click: { x: number, y: number } | null;
@@ -36,6 +37,7 @@ export class GameEngine {
     private rightclick: { x: number, y: number };
     private clockTick: number;
     private assetManager: AssetManager;
+    private m_Renderer: Renderer;
 
     private m_terrainData: { y: number[]; } | null = null;
     public get terrainData(): { y: number[]; } | null {
@@ -54,9 +56,6 @@ export class GameEngine {
         if (GameEngine.g_INSTANCE != undefined) {
             throw new Error("GameEngine has already been initialized!");
         }
-        // What you will use to draw
-        // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
-        this.ctx = null;
 
         // Everything that will be updated and drawn each frame
         this.entities = [];
@@ -78,8 +77,11 @@ export class GameEngine {
         this.assetManager = assetManager;
 
         const canvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
-        const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-        this.init(ctx);
+        this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+        this.m_Renderer = new Renderer(this.ctx);
+        this.startInput();
+        this.timer = new Timer();
+
         GameEngine.g_INSTANCE = this;
     };
 
@@ -96,12 +98,6 @@ export class GameEngine {
         return unwrap(this.assetManager.getAudio(path), `Failed to get audio for ${path.asRaw()}!`);
     }
 
-
-    init(ctx: CanvasRenderingContext2D) {
-        this.ctx = ctx;
-        this.startInput();
-        this.timer = new Timer();
-    };
 
     start() {
         this.running = true;

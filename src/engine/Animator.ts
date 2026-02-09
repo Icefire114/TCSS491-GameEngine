@@ -26,6 +26,14 @@ export type SpriteSheetInfo = {
     offestX?: number;
 };
 
+export type AnimationData = {
+    sprite: HTMLImageElement,
+    frameWidth: number,
+    frameHeight: number,
+    frameCount: number,
+    offsetX: number,
+};
+
 export class Animator {
     private readonly ANIMATION_FPS = 6;
 
@@ -34,26 +42,18 @@ export class Animator {
     private secondsPerFrame = 1 / this.ANIMATION_FPS;
     private forceScaleToSize: Vec2 | undefined;
 
-    private spriteSheet: Record<AnimationState,
-        {
-            sprite: HTMLImageElement,
-            frameWidth: number,
-            frameHeight: number,
-            frameCount: number,
-            offsetX: number,
-        } | null
-    > = {
-            [AnimationState.IDLE]: null,
-            [AnimationState.WALK_L]: null,
-            [AnimationState.WALK_R]: null,
-            [AnimationState.JUMP_R]: null,
-            [AnimationState.JUMP_L]: null,
-            [AnimationState.FALL]: null,
-            [AnimationState.ATTACK]: null,
-            [AnimationState.HIT]: null,
-            [AnimationState.DEATH]: null,
-            [AnimationState.RUN]: null,
-        };
+    private spriteSheet: Record<AnimationState, AnimationData | null> = {
+        [AnimationState.IDLE]: null,
+        [AnimationState.WALK_L]: null,
+        [AnimationState.WALK_R]: null,
+        [AnimationState.JUMP_R]: null,
+        [AnimationState.JUMP_L]: null,
+        [AnimationState.FALL]: null,
+        [AnimationState.ATTACK]: null,
+        [AnimationState.HIT]: null,
+        [AnimationState.DEATH]: null,
+        [AnimationState.RUN]: null,
+    };
 
     /**
      * @param spriteSheets The spite sheets and the animation state that they correspond to.
@@ -82,6 +82,17 @@ export class Animator {
         }
     }
 
+    private computeFrameIdx(currentAnim: AnimationData): number {
+        let frameIdx =
+            Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
+        // If we are in death animation, then we do not want to replay the animation.
+        if (this.currentState === AnimationState.DEATH && Math.floor(this.elapsed / this.secondsPerFrame) >= currentAnim.frameCount) {
+            frameIdx = currentAnim.frameCount - 1;
+        }
+
+        return frameIdx;
+    }
+
     drawCurrentAnimFrameAtPos(ctx: CanvasRenderingContext2D, pos: Vec2): void {
         const currentAnim = this.spriteSheet[this.currentState];
         if (!currentAnim) {
@@ -89,13 +100,8 @@ export class Animator {
                 `SpriteSheet for animation state ${this.currentState} is null`
             );
         }
-
-        let frameIdx =
-            Math.floor(this.elapsed / this.secondsPerFrame) % currentAnim.frameCount;
-        // If we are in death animation, then we do not want to replay the animation.
-        if (this.currentState === AnimationState.DEATH && Math.floor(this.elapsed / this.secondsPerFrame) >= currentAnim.frameCount) {
-            frameIdx = currentAnim.frameCount - 1;
-        }
+        let frameIdx = this.computeFrameIdx(currentAnim);
+        
 
         const game = GameEngine.g_INSTANCE;
 
