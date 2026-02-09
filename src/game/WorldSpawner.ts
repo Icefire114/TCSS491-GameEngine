@@ -37,7 +37,7 @@ export class WorldSpawner implements Entity {
             return;
         }
 
-        // Check 100 game units ahead of the player
+        // Check 300 game units ahead of the player
         const spawnX = player.position.x + 300;
         const currentY = player.position.y;
 
