@@ -95,9 +95,6 @@ export class Player implements Entity, Collidable {
 
     hitMultiplier: number = 1;
 
-    // god mode for testing
-    godMode: boolean = false;
-
     // player gun states (player spawns with a gun)
     ammo: number = 30;
     maxAmmo: number = 30;
@@ -377,7 +374,7 @@ export class Player implements Entity, Collidable {
     }
 
     damagePlayer(damage: number): void {
-        if (!this.godMode && !G_CONFIG.GOD_MODE) {
+        if (!G_CONFIG.GOD_MODE) {
             // increase damage based on current health
             // Note: scaled damage is only applied to health, not shield
             const scalingFactor = 1 + (this.health / 100);
