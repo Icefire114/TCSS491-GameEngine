@@ -118,4 +118,14 @@ export namespace Vec2 {
     export function compDiv(v1: Vec2, v2: Vec2): Vec2 {
         return new Vec2(v1.x / v2.x, v1.y / v2.y);
     }
+
+    /**
+     * Divides a vector by a scalar
+     * @param v Vector to divide
+     * @param scalar Scalar to divide by
+     * @returns Vector `v` / `scalar`
+     */
+    export function compDivScalar(v: Vec2, scalar: number): Vec2 {
+        return new Vec2(v.x / scalar, v.y / scalar);
+    }
 }
