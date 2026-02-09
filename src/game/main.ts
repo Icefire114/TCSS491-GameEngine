@@ -20,6 +20,8 @@ import { Bush } from "./worldDeco/Bush.js";
 import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
 import { WorldSpawner } from "./WorldSpawner.js";
+import { DecorationSpawner } from "./DecorationSpanwer.js";
+
 
 
 /**
@@ -107,7 +109,8 @@ function main() {
         gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
-        gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND); 
+        gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
+        gameEngine.addEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND); 
         gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
