@@ -8,9 +8,11 @@ import { BasicZombie } from "./BasicZombie.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 import { AmmoRestore } from "./Items/AmmoRestore.js";
 import { BuffEntity } from "./Items/BuffEntity.js";
+import { ExplodingZombie } from "./ExplodingZombie.js";
+import { FastZombie } from "./FastZombie.js";
+import { GiantZombie } from "./GiantZombie.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthItem } from "./Items/InstantHealth.js";
-import { ItemEntity } from "./Items/ItemEntity.js";
 import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
@@ -48,12 +50,18 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Jump_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Attack_1.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Wild Zombie/Run.png");
+
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Walk_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_R.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Jump_L.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
+
+
 
 
 // === Item Assets ===
@@ -128,12 +136,18 @@ function main() {
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
         gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
-        gameEngine.addEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND); 
-        gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
+        // gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
         gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new FastZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
+
+
         gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);

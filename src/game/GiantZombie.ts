@@ -8,51 +8,53 @@ import { unwrap } from "../engine/util.js";
 import { Vec2 } from "../engine/types.js";
 import { Mountain } from "./mountain.js";
 
-
-export class ThrowerZombie implements Entity {
-    tag: string = "ThrowerZombie";
+export class GiantZombie implements Entity {
+    tag: string = "GiantZombie";
     id: EntityID;
-    attack_range: number = 7;
-    attack_cooldown: number = 1.5; // 1 second cooldown
+    attack_range: number = 4; 
+    attack_cooldown: number = 2.0; // slower attacks
     lastAttackTime: number = 0; // tracks when last attacked
-    run_range: number = 15; // distance at which zombie starts running
+    run_range: number = 7; // distance at which zombie starts running
 
+    
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
-    physicsCollider = new BoxCollider(2, 4);
+    physicsCollider = new BoxCollider(9, 12); // larger for large zombie
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
+    
+    // reusing sprites for now
     animator: Animator = new Animator([
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Idle.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Idle.png"),
                 frameHeight: 96,
                 frameWidth: 96,
-                frameCount: 5,
+                frameCount: 9,
             },
             AnimationState.IDLE
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Walk_L.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Walk_L.png"),
                 frameHeight: 96,
                 frameWidth: 96,
-                frameCount: 7
+                frameCount: 10
             },
             AnimationState.WALK_L
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Walk_R.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Walk_R.png"),
                 frameHeight: 96,
                 frameWidth: 96,
-                frameCount: 7
+                frameCount: 10
             },
             AnimationState.WALK_R
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Jump_R.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Jump_R.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 6
@@ -61,7 +63,7 @@ export class ThrowerZombie implements Entity {
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Jump_L.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Jump_L.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 6
@@ -70,7 +72,7 @@ export class ThrowerZombie implements Entity {
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Dead.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Dead.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 5
@@ -79,7 +81,7 @@ export class ThrowerZombie implements Entity {
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Attack.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Attack_1.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 4
@@ -88,14 +90,14 @@ export class ThrowerZombie implements Entity {
         ],
         [
             {
-                sprite: new ImagePath("res/img/zombies/Thrower Zombie/Run.png"),
+                sprite: new ImagePath("res/img/zombies/Wild Zombie/Run.png"),
                 frameHeight: 96,
                 frameWidth: 96,
                 frameCount: 4
             },
             AnimationState.RUN
-        ]
-    ]);
+        ] 
+    ], new Vec2(18,20));
 
     constructor(pos?: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -120,9 +122,8 @@ export class ThrowerZombie implements Entity {
         const deltaY = player.position.y - this.position.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); //calculate distance
 
-
-        const walk_speed = 40; //zombie walk speed
-        const run_speed = walk_speed * 2;
+        const walk_speed = 30; // walk speed
+        const run_speed = walk_speed * 1.5; // run speed
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
@@ -134,19 +135,16 @@ export class ThrowerZombie implements Entity {
                 // player is on the left of zombie
                 this.velocity.x = -MOVE_SPEED;
             }
-        //commented this for now so that the zombie attacks while moving and doesn't go idle
-        // } else {
-        //     // stop moving and attack when in rance
-        //     this.velocity.x = 0;
         }
-                    
+
         // attack if cooldown is done
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                     this.lastAttackTime = currentTime;
-                player.damagePlayer(15);
+                player.damagePlayer(50); //hella damage
             }
         }
+        
 
         // ---------- Gravity ----------
         this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 4;
@@ -158,25 +156,25 @@ export class ThrowerZombie implements Entity {
             }
         }
 
-
         // ---------- Integrate ----------
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
 
         // Update animation based on what zombie is doing
         if (distance <= this.attack_range) {
-        // attack animation
+            // attack animation
             this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
         } else if (distance > this.run_range) {
             // Running (far from player)
             if (this.velocity.x > 0) {
                 this.animator.updateAnimState(AnimationState.RUN, deltaTime);
             } else if (this.velocity.x < 0) {
-                this.animator.updateAnimState(AnimationState.RUN, deltaTime); //TODO make run left animation
+                this.animator.updateAnimState(AnimationState.RUN, deltaTime);
             } else {
-                this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-            }
-        } else {
+                this.animator.updateAnimState(AnimationState.IDLE, deltaTime); // Only idle if not moving
+            }            
+        }
+         else {
             // Walking (medium distance)
             if (this.velocity.x > 0) {
                 this.animator.updateAnimState(AnimationState.WALK_R, deltaTime);

@@ -13,6 +13,7 @@ export enum AnimationState {
     ATTACK,
     HIT,
     DEATH,
+    RUN,
 }
 
 export type SpriteSheetInfo = {
@@ -50,7 +51,8 @@ export class Animator {
             [AnimationState.FALL]: null,
             [AnimationState.ATTACK]: null,
             [AnimationState.HIT]: null,
-            [AnimationState.DEATH]: null
+            [AnimationState.DEATH]: null,
+            [AnimationState.RUN]: null,
         };
 
     /**
