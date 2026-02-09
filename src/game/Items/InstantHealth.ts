@@ -1,7 +1,7 @@
 import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { unwrap } from "../../engine/util.js";
-import { Player } from "../player.js";
+import { Player } from "../worldEntities/player.js";
 import { Buff, BuffType } from "./Buff.js";
 
 export class InstantHealthItem implements Buff {

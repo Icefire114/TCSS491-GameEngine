@@ -1,10 +1,10 @@
-import { ImagePath } from "../engine/assetmanager.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { Vec2 } from "../engine/types.js";
-import { Collidable } from "../engine/physics/Collider.js";
-import { AnimationState, Animator } from "../engine/Animator.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { Vec2 } from "../../engine/types.js";
+import { Collidable } from "../../engine/physics/Collider.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
 import { Mountain } from "./mountain.js";
 
 /**

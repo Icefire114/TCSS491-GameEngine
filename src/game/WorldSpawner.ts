@@ -1,12 +1,12 @@
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Vec2, DrawLayer } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
-import { BasicZombie } from "./BasicZombie.js";
-import { Spike } from "./spike.js";
+import { Mountain } from "./worldEntities/mountain.js";
+import { BasicZombie } from "./zombies/BasicZombie.js";
+import { Spike } from "./worldEntities/spike.js";
 import { ItemFactory } from "./Items/ItemFactory.js";
 import Rand from 'rand-seed';
-import { Player } from "./player.js";
+import { Player } from "./worldEntities/player.js";
 
 export class WorldSpawner implements Entity {
     // Required info
@@ -72,8 +72,8 @@ export class WorldSpawner implements Entity {
         else if (roll < 0.45) {
             // 15% chance for Spike
             // How many spikes to generate from 2 to 4
-            const clusterSize = Math.floor(this.rng.next() * 4) + 2; 
-            const spacing = 2.1; 
+            const clusterSize = Math.floor(this.rng.next() * 4) + 2;
+            const spacing = 2.1;
 
             for (let i = 0; i < clusterSize; i++) {
                 const currentX = x + (i * spacing);

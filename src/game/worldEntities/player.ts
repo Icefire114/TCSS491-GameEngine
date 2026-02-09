@@ -1,17 +1,17 @@
-import { ImagePath } from "../engine/assetmanager.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { DrawLayer, Vec2 } from "../engine/types.js";
-import { Item } from "./Items/Item.js";
-import { ItemEntity } from "./Items/ItemEntity.js";
-import { Collidable } from "../engine/physics/Collider.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { DrawLayer, Vec2 } from "../../engine/types.js";
+import { Item } from "../Items/Item.js";
+import { ItemEntity } from "../Items/ItemEntity.js";
+import { Collidable } from "../../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
-import { AnimationState, Animator } from "../engine/Animator.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
 import { Bullet } from "./bullet.js";
-import { G_CONFIG } from "./CONSTANTS.js";
-import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
-import { BuffEntity } from "./Items/BuffEntity.js";
+import { G_CONFIG } from "../CONSTANTS.js";
+import { Buff, BuffType, TempBuff } from "../Items/Buff.js";
+import { BuffEntity } from "../Items/BuffEntity.js";
 
 /**
  * @author PG
