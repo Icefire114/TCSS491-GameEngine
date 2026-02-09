@@ -1,9 +1,9 @@
-import { ImagePath } from "../engine/assetmanager.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { MountainCollider } from "../engine/physics/MountainCollider.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { Vec2 } from "../engine/types.js";
-import { G_CONFIG } from "./CONSTANTS.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { MountainCollider } from "../../engine/physics/MountainCollider.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { Vec2 } from "../../engine/types.js";
+import { G_CONFIG } from "../CONSTANTS.js";
 import Rand from 'rand-seed';
 
 export interface SafeZone {

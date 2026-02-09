@@ -1,4 +1,3 @@
-import { ItemEntity } from "./ItemEntity.js";
 import { InfectionImmunityItem } from "./InfectionImmunity.js";
 import { ShieldRestorePickupItem } from "./ShieldRestore.js";
 import { InstantHealthItem } from "./InstantHealth.js";

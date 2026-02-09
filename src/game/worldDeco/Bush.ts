@@ -5,7 +5,7 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
 import { randomOf, unwrap } from "../../engine/util.js";
-import { Mountain } from "../mountain.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 export class Bush implements Entity {
     tag: string = "bush";

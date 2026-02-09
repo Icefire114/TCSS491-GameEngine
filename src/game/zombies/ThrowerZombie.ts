@@ -1,12 +1,12 @@
-import { AnimationState, Animator } from "../engine/Animator.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Player } from "./player.js";
-import { unwrap } from "../engine/util.js";
-import { Vec2 } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Player } from "../worldEntities/player.js";
+import { unwrap } from "../../engine/util.js";
+import { Vec2 } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 
 export class ThrowerZombie implements Entity {
@@ -126,7 +126,7 @@ export class ThrowerZombie implements Entity {
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
-            
+
             if (deltaX > 0) {
                 // player it on the right of zombie
                 this.velocity.x = MOVE_SPEED;
@@ -134,16 +134,16 @@ export class ThrowerZombie implements Entity {
                 // player is on the left of zombie
                 this.velocity.x = -MOVE_SPEED;
             }
-        //commented this for now so that the zombie attacks while moving and doesn't go idle
-        // } else {
-        //     // stop moving and attack when in rance
-        //     this.velocity.x = 0;
+            //commented this for now so that the zombie attacks while moving and doesn't go idle
+            // } else {
+            //     // stop moving and attack when in rance
+            //     this.velocity.x = 0;
         }
-                    
+
         // attack if cooldown is done
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
-                    this.lastAttackTime = currentTime;
+                this.lastAttackTime = currentTime;
                 player.damagePlayer(15);
             }
         }
@@ -165,7 +165,7 @@ export class ThrowerZombie implements Entity {
 
         // Update animation based on what zombie is doing
         if (distance <= this.attack_range) {
-        // attack animation
+            // attack animation
             this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
         } else if (distance > this.run_range) {
             // Running (far from player)

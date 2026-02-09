@@ -1,7 +1,7 @@
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Vec2, DrawLayer } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
+import { Mountain } from "./worldEntities/mountain.js";
 import { Tree } from "./worldDeco/Tree.js";
 import { Bush } from "./worldDeco/Bush.js";
 import { Rock } from "./worldDeco/Rock.js";
@@ -18,9 +18,9 @@ export class DecorationSpawner implements Entity {
 
     // Logic
     private lastSpawnX = 0;
-    private spawnInterval = 15; 
+    private spawnInterval = 15;
     private rng: Rand;
-    private activeDecorations: Entity[] = []; 
+    private activeDecorations: Entity[] = [];
     private lastSafeZoneIndex: number = -1;
 
 
@@ -33,7 +33,7 @@ export class DecorationSpawner implements Entity {
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player");
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
-        
+
         // NO player, no moutain, don't run
         if (!player || !mountain) {
             return;
@@ -50,10 +50,10 @@ export class DecorationSpawner implements Entity {
         const spawnX = player.position.x + 350;
         const currentY = player.position.y;
 
-        
+
         // Rnadomzing the space to make it more "natural"
-        const randomSpace = (this.rng.next() * 10) - 5; 
-        
+        const randomSpace = (this.rng.next() * 10) - 5;
+
         // When to spawn logic
         if (spawnX > this.lastSpawnX + this.spawnInterval + randomSpace) {
             this.lastSpawnX = spawnX;
@@ -70,13 +70,13 @@ export class DecorationSpawner implements Entity {
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
         const y = mountain.getHeightAt(x);
-        
-        if (y > playerY + 1000){
+
+        if (y > playerY + 1000) {
             return;
         }
 
         const roll = this.rng.next();
-        let decoration: Entity | null = null; 
+        let decoration: Entity | null = null;
 
         // Heres all the spawn rate for all decorations
         if (roll < 0.5) {
@@ -93,7 +93,7 @@ export class DecorationSpawner implements Entity {
 
         if (decoration) {
             GameEngine.g_INSTANCE.addEntity(decoration, DrawLayer.WORLD_DECORATION);
-            this.activeDecorations.push(decoration); 
+            this.activeDecorations.push(decoration);
         }
     }
 
@@ -104,9 +104,9 @@ export class DecorationSpawner implements Entity {
 
     private cleanupOldDecorations() {
         for (const decoration of this.activeDecorations) {
-            decoration.removeFromWorld = true; 
+            decoration.removeFromWorld = true;
         }
-        
-        this.activeDecorations = []; 
+
+        this.activeDecorations = [];
     }
 }

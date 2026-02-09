@@ -1,12 +1,12 @@
-import { AnimationState, Animator } from "../engine/Animator.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Player } from "./player.js";
-import { unwrap } from "../engine/util.js";
-import { Vec2 } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Player } from "../worldEntities/player.js";
+import { unwrap } from "../../engine/util.js";
+import { Vec2 } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 export class FastZombie implements Entity {
     tag: string = "FastZombie";
@@ -15,14 +15,14 @@ export class FastZombie implements Entity {
     attack_cooldown: number = 0.5; // fast attacks
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 5;
-    
-    
+
+
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(2, 4.5); // smaller hitbox
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
-    
+
     // reusing sprites for now
     animator: Animator = new Animator([
         [
@@ -97,7 +97,7 @@ export class FastZombie implements Entity {
             },
             AnimationState.RUN
         ]
-    ], new Vec2(7,9));
+    ], new Vec2(7, 9));
 
     constructor(pos?: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -127,13 +127,13 @@ export class FastZombie implements Entity {
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
-            
+
             if (deltaX > 0) {
                 // player it on the right of zombie
                 this.velocity.x = MOVE_SPEED;
             } else {
                 // player is on the left of zombie
-                this.velocity.x = -MOVE_SPEED; 
+                this.velocity.x = -MOVE_SPEED;
             }
         }
 
@@ -144,8 +144,8 @@ export class FastZombie implements Entity {
                 player.damagePlayer(5);
             }
         }
-        
-       
+
+
 
         // ---------- Gravity ----------
         this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 4;

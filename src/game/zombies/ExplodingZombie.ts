@@ -1,17 +1,17 @@
-import { AnimationState, Animator } from "../engine/Animator.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Player } from "./player.js";
-import { unwrap } from "../engine/util.js";
-import { Vec2 } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Player } from "../worldEntities/player.js";
+import { unwrap } from "../../engine/util.js";
+import { Vec2 } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 export class ExplodingZombie implements Entity {
     tag: string = "ExplodingZombie";
     id: EntityID;
-    attack_range: number = 4; 
+    attack_range: number = 4;
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 5; // Runs until very close
@@ -20,13 +20,13 @@ export class ExplodingZombie implements Entity {
     explosion_radius: number = 8; // how far it reaches
     explosion_damage: number = 30; // damage dealt
     hasExploded: boolean = false; // track if already exploded
-    
+
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(2, 4);
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
-    
+
     // reusing Wild zombie sprites for now
     animator: Animator = new Animator([
         [
@@ -131,16 +131,16 @@ export class ExplodingZombie implements Entity {
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
-            
+
             if (deltaX > 0) {
                 // player it on the right of zombie
-                this.velocity.x = MOVE_SPEED; 
+                this.velocity.x = MOVE_SPEED;
             } else {
                 // player is on the left of zombie
-                this.velocity.x = -MOVE_SPEED; 
+                this.velocity.x = -MOVE_SPEED;
             }
         }
-        
+
         //Explode when close to player
         if (distance <= this.attack_range && !this.hasExploded) {
             this.explode(player);
@@ -176,21 +176,21 @@ export class ExplodingZombie implements Entity {
             }
         }
     }
-    
+
     //explosion logic
     explode(player: Player): void {
         const deltaX = player.position.x - this.position.x;
         const deltaY = player.position.y - this.position.y;
         const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
+
         // deal damage if player is in explosion radius
         if (distanceToPlayer <= this.explosion_radius) {
             console.log(`ExplodingZombie exploded! Dealing ${this.explosion_damage} damage to player`);
             player.damagePlayer(this.explosion_damage);
         }
-        
+
         // TODO: Add explosion visual effect here later
-        
+
         // remove this zombie after explosion
         this.removeFromWorld = true;
     }

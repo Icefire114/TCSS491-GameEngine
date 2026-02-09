@@ -1,12 +1,12 @@
-import { AnimationState, Animator } from "../engine/Animator.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { BoxCollider } from "../engine/physics/BoxCollider.js";
-import { Player } from "./player.js";
-import { unwrap } from "../engine/util.js";
-import { Vec2 } from "../engine/types.js";
-import { Mountain } from "./mountain.js";
+import { AnimationState, Animator } from "../../engine/Animator.js";
+import { ImagePath } from "../../engine/assetmanager.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { BoxCollider } from "../../engine/physics/BoxCollider.js";
+import { Player } from "../worldEntities/player.js";
+import { unwrap } from "../../engine/util.js";
+import { Vec2 } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 export class BasicZombie implements Entity {
     tag: string = "BasicZombie";
@@ -15,7 +15,7 @@ export class BasicZombie implements Entity {
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 10; // distance at which zombie starts running
-    
+
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
     physicsCollider = new BoxCollider(2, 4);
@@ -125,14 +125,14 @@ export class BasicZombie implements Entity {
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
-            
+
             if (deltaX > 0) {
                 // player it on the right of zombie
                 this.velocity.x = MOVE_SPEED;
             } else {
                 // player is on the left of zombie
                 this.velocity.x = -MOVE_SPEED;
-            } 
+            }
         }
 
         //commented this for now so that the zombie attacks while moving and doesn't go idle
@@ -143,7 +143,7 @@ export class BasicZombie implements Entity {
         // attack if cooldown is done
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
-                    this.lastAttackTime = currentTime;
+                this.lastAttackTime = currentTime;
                 player.damagePlayer(10);
             }
         }
@@ -184,7 +184,7 @@ export class BasicZombie implements Entity {
                 this.animator.updateAnimState(AnimationState.WALK_L, deltaTime);
             } else {
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+            }
         }
     }
-}
 }

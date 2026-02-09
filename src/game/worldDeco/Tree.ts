@@ -7,7 +7,7 @@ import { Vec2 } from "../../engine/types.js";
 import { unwrap } from "../../engine/util.js";
 import { SunShader } from "../../engine/WebGL/SunShader.js";
 import { G_CONFIG } from "../CONSTANTS.js";
-import { Mountain } from "../mountain.js";
+import { Mountain } from "../worldEntities/mountain.js";
 
 export class Tree implements Entity {
     tag: string = "Tree";
