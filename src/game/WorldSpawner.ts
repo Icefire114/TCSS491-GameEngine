@@ -72,8 +72,8 @@ export class WorldSpawner implements Entity {
         else if (roll < 0.45) {
             // 15% chance for Spike
             // How many spikes to generate from 2 to 4
-            const clusterSize = Math.floor(this.rng.next() * 2) + 2;
-            const spacing = 2.1;
+            const clusterSize = Math.floor(this.rng.next() * 4) + 2; 
+            const spacing = 2.1; 
 
             for (let i = 0; i < clusterSize; i++) {
                 const currentX = x + (i * spacing);

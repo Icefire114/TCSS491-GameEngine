@@ -6,6 +6,12 @@ import { Vec2 } from "../engine/types.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 import Rand from 'rand-seed';
 
+export interface SafeZone {
+    index: number;
+    startX: number;
+    endX: number;
+}
+
 export class Mountain implements Entity {
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
@@ -44,6 +50,11 @@ export class Mountain implements Entity {
     private flatStartShowing = 150
     private flatEndX: number = 0;
 
+    // "Safezone" tracking
+    private safeZones: SafeZone[] = [];
+    private tempSafeZoneStartX: number = 0;
+    private minDistanceBetweenZones = 2000;
+    private maxDistanceBetweenZones = 3500; 
 
     /**
      * Initalizing the moutain entity.
@@ -204,24 +215,43 @@ export class Mountain implements Entity {
         // Storing the last anchor x position 
         const currentX = this.lastAnchor.x;
 
-        // Spawn and cool down constrains for ravine generation
+        // Logic for safe zones
+
+        const distanceSinceLastSafeZone = currentX - this.flatEndX;
+
+        let shouldSpawnFlat = false;
+
+        // We havent taveled far enough
+        if (distanceSinceLastSafeZone < this.minDistanceBetweenZones) {
+            shouldSpawnFlat = false;
+        } 
+        // Travel way too long, we force a spawn
+        else if (distanceSinceLastSafeZone > this.maxDistanceBetweenZones) {
+            shouldSpawnFlat = true;
+            console.log("Force Spawning Safe Zone (Max Distance Reached)");
+        } 
+        else {
+            // Passed the min, then its a .5% chance per anchor point for it to spawn
+            if (this.rng.next() < 0.005) {
+                shouldSpawnFlat = true;
+            }
+        }
+
+        // logic for ravine
         const pastSpawnPoint = currentX > this.ravineStartShowing;
-        const coolDown = currentX > (this.lastRavineEndX + this.ravineCooldown);
-
-        // Spawn and cool down constraints for the flat generation 
-        const pastSpawnPointForFlat = currentX > this.flatStartShowing;
-        const cooldownForFlat = currentX > (this.flatEndX + this.flatCooldown);
-
-        // Probablity for Ravine Spawn, Flat Geneartion, else do normal
-        if (pastSpawnPoint && coolDown && this.rng.next() < 0.1) {
-            this.startRavineSequence();
-            console.log("Ravine Spawn")
-        } else if (pastSpawnPointForFlat && cooldownForFlat && this.rng.next() < .009) {
+        const coolDownRavine = currentX > (this.lastRavineEndX + this.ravineCooldown);
+        
+        if (shouldSpawnFlat) {
             this.startFlatSequence();
-            console.log("Flat Spawn")
-        } else {
+        } 
+        // We can only spawn a ravine if we're not in a safe zone
+        else if (pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
+            this.startRavineSequence();
+        } 
+        else {
             this.generateNormalAnchor();
         }
+        
     }
 
     /**
@@ -297,6 +327,7 @@ export class Mountain implements Entity {
         this.flatSequenceOn = true;
         this.flatStep = 0;
         this.flatBaseY = this.lastAnchor.y;
+        this.tempSafeZoneStartX = this.lastAnchor.x;
         console.log("Flat Generation is happening right now")
     }
 
@@ -318,6 +349,13 @@ export class Mountain implements Entity {
         if (this.flatStep >= this.flatGenerationTick) {
             this.flatSequenceOn = false;
             this.flatEndX = x;
+
+            // updating our safezone tracking with specific info
+             this.safeZones.push({
+                index: this.safeZones.length, 
+                startX: this.tempSafeZoneStartX,
+                endX: this.flatEndX
+            });
         }
     }
 
@@ -402,4 +440,37 @@ export class Mountain implements Entity {
         const length = Math.hypot(nx, ny);
         return new Vec2(nx / length, ny / length);
     }
+
+    // When given 
+     getSafeZone(index: number): SafeZone | null {
+        if (index < 0 || index >= this.safeZones.length) {
+            return null;
+        }
+        return this.safeZones[index];
+    }
+
+    getSafeZoneStatus(x: number) {
+        // Either before zone or during our game
+        let status = {
+            currentZoneIndex: -1, // -1  represents we're not in safe zone
+            lastPassedZoneIndex: -1
+        };
+
+        for (let i = 0; i < this.safeZones.length; i++) {
+            const z = this.safeZones[i];
+
+            if (x >= z.startX && x <= z.endX) {
+                // Represent were in the the zone
+                status.currentZoneIndex = i;
+                status.lastPassedZoneIndex = i - 1; 
+                return status;
+            } 
+            else if (x > z.endX) {
+                // Represnt were pass the zone
+                status.lastPassedZoneIndex = i;
+            }
+        }
+        return status;
+    }
+
 }
