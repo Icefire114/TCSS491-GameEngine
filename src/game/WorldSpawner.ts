@@ -7,6 +7,7 @@ import { Spike } from "./worldEntities/spike.js";
 import { ItemFactory } from "./Items/ItemFactory.js";
 import Rand from 'rand-seed';
 import { Player } from "./worldEntities/player.js";
+import { randomOf } from "../engine/util.js";
 
 export class WorldSpawner implements Entity {
     // Required info
@@ -88,21 +89,16 @@ export class WorldSpawner implements Entity {
             }
         }
         else if (roll < 0.65) {
-            // 20% chance for Item
+            // Each item has a even shot at being spawned
             const pos = new Vec2(x, y - 2);
-            const itemRoll = this.rng.next();
-            let item;
-
-            if (itemRoll < 0.4) {
-                item = ItemFactory.createHealthPack(pos);
-            } else if (itemRoll < 0.8) {
-                item = ItemFactory.createShieldRestore(pos);
-            } else if (itemRoll < 0.9) {
-                item = ItemFactory.createGun(pos);
-            } else {
-                item = ItemFactory.createImmunity(pos);
-            }
-            GameEngine.g_INSTANCE.addEntity(item, DrawLayer.ITEM);
+            GameEngine.g_INSTANCE.addEntity(
+                randomOf([
+                    ItemFactory.createHealthPack(pos),
+                    ItemFactory.createShieldRestore(pos),
+                    ItemFactory.createGun(pos),
+                    ItemFactory.createImmunity(pos)
+                ]),
+                 DrawLayer.ITEM);
         }
     }
 
