@@ -78,7 +78,7 @@ export class Tree implements Entity {
                 screenH
             );
         } else {
-            this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+            this.animator.drawCurrentAnimFrameAtPos(this.position);
         }
     }
 

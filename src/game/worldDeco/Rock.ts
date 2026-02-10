@@ -55,7 +55,7 @@ export class Rock implements Entity {
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+        this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {

@@ -51,7 +51,7 @@ export class Spike implements Entity {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         ctx.save();
-        
+
         // Converting the pixles to game units
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale;
@@ -60,13 +60,13 @@ export class Spike implements Entity {
         // Setting up the correct position and angle for the spikes
         ctx.translate(screenX, screenY);
         ctx.rotate(this.rotation);
- 
+
         // Handling the various offset of the sprite and the viewport
-        const heightOffset = .01; 
+        const heightOffset = .01;
         const viewPointOffset = new Vec2(game.viewportX, game.viewportY - heightOffset);
 
-        this.animator.drawCurrentAnimFrameAtPos(ctx, viewPointOffset);
-        
+        this.animator.drawCurrentAnimFrameAtPos(viewPointOffset);
+
         ctx.restore();
     }
 }

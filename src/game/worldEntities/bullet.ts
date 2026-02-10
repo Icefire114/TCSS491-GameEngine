@@ -87,6 +87,6 @@ export class Bullet implements Entity, Collidable {
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+        this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
 }

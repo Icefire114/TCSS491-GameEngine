@@ -11,19 +11,25 @@ export class ItemFactory {
     // PS: I just copy the setup from creating entity in main.ts
 
     // Creating Health Item
-    static createHealthPack(position: Vec2): BuffEntity {
+    static createHealthPack(pos: Vec2): BuffEntity {
         return new BuffEntity(
             new InstantHealthItem(),
-            new Animator([
-                [{
-                    frameCount: 4,
-                    frameHeight: 40,
-                    frameWidth: 42,
-                    sprite: new ImagePath("res/img/items/instant_health_pickup.png")
-                }, AnimationState.IDLE]
-            ], { x: 3, y: 3 }),
-            new Vec2(2, 2),
-            position
+            new Animator(
+                [
+                    [
+                        {
+                            frameCount: 4,
+                            frameHeight: 40,
+                            frameWidth: 42,
+                            sprite: new ImagePath("res/img/items/instant_health_pickup.png")
+                        },
+                        AnimationState.IDLE
+                    ]
+                ],
+                { x: 3, y: 3 }
+            ),
+            new Vec2(3, 3),
+            pos
         );
     }
 
@@ -39,7 +45,8 @@ export class ItemFactory {
                     sprite: new ImagePath("res/img/items/shield_pickup.png")
                 }, AnimationState.IDLE]
             ], { x: 3, y: 3 }),
-            new Vec2(2, 2), pos
+            new Vec2(3, 3),
+            pos
         );
     }
 
@@ -56,7 +63,8 @@ export class ItemFactory {
                     sprite: new ImagePath("res/img/items/rifle.png")
                 }, AnimationState.IDLE]
             ], { x: 6, y: 3 }),
-            new Vec2(6, 3), pos
+            new Vec2(6, 3),
+            pos
         );
     }
 
@@ -73,7 +81,7 @@ export class ItemFactory {
                 },
                 AnimationState.IDLE]
             ], { x: 3, y: 3 }),
-            new Vec2(2, 2),
+            new Vec2(3, 3),
             position
         );
     }

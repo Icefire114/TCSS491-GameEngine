@@ -23,7 +23,7 @@ export class Player implements Entity, Collidable {
 
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
-    physicsCollider = new BoxCollider(2.5, 6.5);
+    physicsCollider = new BoxCollider(2.5, 5.25);
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
     removeFromWorld: boolean = false;
     dead: boolean = false;
@@ -333,7 +333,7 @@ export class Player implements Entity, Collidable {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         this.drawSnowboard(ctx, game);
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+        this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
 
     drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {

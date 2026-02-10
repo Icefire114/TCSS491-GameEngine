@@ -19,8 +19,12 @@ export class Renderer {
         callback(this.ctx);
     }
 
-    public drawSpriteAtWorldPos(pos: Vec2, spriteData: AnimationData, currentAnimFrameInfo: { spriteSheetOffsetX: number, spriteSheetOffsetY: number }): void {
-        const { screenPos, screenSize } = this.computeScreenRect(pos, spriteData);
+    public drawSpriteAtWorldPos(
+        pos: Vec2,
+        spriteData: AnimationData,
+        currentAnimFrameInfo: { spriteSheetOffsetX: number, spriteSheetOffsetY: number },
+        forceScaleToSize?: Vec2): void {
+        const { screenPos, screenSize } = this.computeScreenRect(pos, spriteData, forceScaleToSize);
         this.ctx.drawImage(
             spriteData.sprite,
             currentAnimFrameInfo.spriteSheetOffsetX,        // srcX
@@ -59,15 +63,15 @@ export class Renderer {
     private computeScreenRect(pos: Vec2, anim: AnimationData, forceScaleToSize?: Vec2): { screenPos: Vec2, screenSize: Vec2 } {
         const mInPx = new Vec2(
             this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT,
-            this.ctx.canvas.height / GameEngine.WORLD_UNITS_IN_VIEWPORT,
+            this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT,
         )
 
         const worldSize = new Vec2(
             forceScaleToSize ? forceScaleToSize.x : anim.frameWidth / mInPx.x,
             forceScaleToSize ? forceScaleToSize.y : anim.frameHeight / mInPx.y
         );
-        const screenSize = Vec2.compDivScalar(Vec2.compMul(worldSize, mInPx), GameEngine.g_INSTANCE.zoom);
 
+        const screenSize = Vec2.compDivScalar(Vec2.compMul(worldSize, mInPx), GameEngine.g_INSTANCE.zoom);
 
         const screenPos = Vec2.compDivScalar(
             Vec2.compMul(
@@ -80,9 +84,6 @@ export class Renderer {
             GameEngine.g_INSTANCE.zoom
         );
 
-        return {
-            screenPos,
-            screenSize,
-        };
+        return { screenPos, screenSize };
     }
 }

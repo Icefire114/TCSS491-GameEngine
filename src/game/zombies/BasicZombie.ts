@@ -105,7 +105,7 @@ export class BasicZombie implements Entity {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         // TODO: if moving rotate sprite to be perpidicular to the normal of the mountain slope
-        this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+        this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {

@@ -41,7 +41,7 @@ export class BuffEntity implements Entity, Collidable {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const positionWithBBOffset = new Vec2(this.position.x, this.position.y);
-        this.animation.drawCurrentAnimFrameAtPos(ctx, positionWithBBOffset);
+        this.animation.drawCurrentAnimFrameAtPos(positionWithBBOffset);
     }
 
     update(_: { [key: string]: boolean; }, deltaTime: number): void {

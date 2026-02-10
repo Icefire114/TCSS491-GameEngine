@@ -39,12 +39,8 @@ export class GameEngine {
     private assetManager: AssetManager;
     private m_Renderer: Renderer;
 
-    private m_terrainData: { y: number[]; } | null = null;
-    public get terrainData(): { y: number[]; } | null {
-        return this.m_terrainData;
-    }
-    public set terrainData(value: { y: number[]; } | null) {
-        this.m_terrainData = value;
+    public get renderer(): Renderer {
+        return this.m_Renderer;
     }
 
     viewportX: number = 0;
@@ -223,23 +219,24 @@ export class GameEngine {
         }
 
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
-            const meterInPixels = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            const meterInPixelsY = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             for (const ent of this.entities) {
                 if (ent[0].physicsCollider !== null && ent[0].physicsCollider instanceof BoxCollider) {
                     const collider = ent[0].physicsCollider;
 
                     const screenX =
-                        ((ent[0].position.x - collider.width / 2 - this.viewportX) * meterInPixels) / this.zoom;
+                        ((ent[0].position.x - collider.width / 2 - this.viewportX) * meterInPixelsX) / this.zoom;
 
                     // Bottom-center -> top-left for canvas
                     const screenY =
-                        ((ent[0].position.y - collider.height - this.viewportY) * meterInPixels) / this.zoom;
+                        ((ent[0].position.y - collider.height - this.viewportY) * meterInPixelsY) / this.zoom;
 
                     const screenW =
-                        (collider.width * meterInPixels) / this.zoom;
+                        (collider.width * meterInPixelsX) / this.zoom;
 
                     const screenH =
-                        (collider.height * meterInPixels) / this.zoom;
+                        (collider.height * meterInPixelsY) / this.zoom;
 
                     this.ctx.beginPath();
                     this.ctx.strokeStyle = "red";
@@ -268,18 +265,16 @@ export class GameEngine {
             }
         }
 
-        // Update camera to follow player.
-        const player = this.getUniqueEntityByTag("player");
+        const player = this.getUniqueEntityByTag('player');
         if (player && this.ctx) {
-            // Horizontal following
-            const player_screen_pecentage_x = 0.15;
-            const player_world_offset_x = player_screen_pecentage_x * GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            this.viewportX = player.position.x - player_world_offset_x;
+            /* 1. Horizontal follow */
+            const playerScreenRatioX = 0.15;                       // 15 % from left edge
+            const playerWorldOffsetX = playerScreenRatioX * GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            this.viewportX = player.position.x - playerWorldOffsetX;
 
-            // Vertical following (center player)
-            const aspect_ratio = this.ctx.canvas.height / this.ctx.canvas.width;
-            const world_units_in_viewport_y = GameEngine.WORLD_UNITS_IN_VIEWPORT * aspect_ratio;
-            this.viewportY = player.position.y - (world_units_in_viewport_y / 2);
+            /* 2. Vertical follow – centre the player */
+            const worldUnitsH = this.ctx.canvas.height / (this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT);
+            this.viewportY = player.position.y - worldUnitsH / 2;
         }
 
         for (let i = this.entities.length - 1; i >= 0; --i) {
