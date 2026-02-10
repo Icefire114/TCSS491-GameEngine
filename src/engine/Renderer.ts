@@ -61,20 +61,17 @@ export class Renderer {
     }
 
     private computeScreenRect(pos: Vec2, anim: AnimationData, forceScaleToSize?: Vec2): { screenPos: Vec2, screenSize: Vec2 } {
-        const mInPx = new Vec2(
-            this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT,
-            this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT,
-        )
+        const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
         const worldSize = new Vec2(
-            forceScaleToSize ? forceScaleToSize.x : anim.frameWidth / mInPx.x,
-            forceScaleToSize ? forceScaleToSize.y : anim.frameHeight / mInPx.y
+            forceScaleToSize ? forceScaleToSize.x : anim.frameWidth / mInPx,
+            forceScaleToSize ? forceScaleToSize.y : anim.frameHeight / mInPx
         );
 
-        const screenSize = Vec2.compDivScalar(Vec2.compMul(worldSize, mInPx), GameEngine.g_INSTANCE.zoom);
+        const screenSize = Vec2.compDivScalar(Vec2.compMulScalar(worldSize, mInPx), GameEngine.g_INSTANCE.zoom);
 
         const screenPos = Vec2.compDivScalar(
-            Vec2.compMul(
+            Vec2.compMulScalar(
                 new Vec2(
                     (pos.x - worldSize.x / 2 - GameEngine.g_INSTANCE.viewportX + anim.offsetX),
                     (pos.y - worldSize.y - GameEngine.g_INSTANCE.viewportY)
