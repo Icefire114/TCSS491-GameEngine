@@ -45,6 +45,7 @@ export class GameEngine {
 
     viewportX: number = 0;
     viewportY: number = 0;
+    zoom: number = 1;
     private loopCall = () => this.loop();
 
     constructor(assetManager: AssetManager, options?: { debugging: boolean; }) {
@@ -218,19 +219,24 @@ export class GameEngine {
         }
 
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
-            const meterInPixels = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            const meterInPixelsY = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             for (const ent of this.entities) {
                 if (ent[0].physicsCollider !== null && ent[0].physicsCollider instanceof BoxCollider) {
                     const collider = ent[0].physicsCollider;
 
-                    const screenX = (ent[0].position.x - collider.width / 2 - this.viewportX) * meterInPixels;
+                    const screenX =
+                        ((ent[0].position.x - collider.width / 2 - this.viewportX) * meterInPixelsX) / this.zoom;
 
                     // Bottom-center -> top-left for canvas
-                    const screenY = (ent[0].position.y - collider.height - this.viewportY) * meterInPixels;
+                    const screenY =
+                        ((ent[0].position.y - collider.height - this.viewportY) * meterInPixelsY) / this.zoom;
 
-                    const screenW = collider.width * meterInPixels;
+                    const screenW =
+                        (collider.width * meterInPixelsX) / this.zoom;
 
-                    const screenH = collider.height * meterInPixels;
+                    const screenH =
+                        (collider.height * meterInPixelsY) / this.zoom;
 
                     this.ctx.beginPath();
                     this.ctx.strokeStyle = "red";

@@ -132,9 +132,9 @@ export class Player implements Entity, Collidable {
             const canvasPxY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
 
             const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            // inverse of: screen = (world - viewport) * meterInPixels
-            mouseWorldX = canvasPxX / meterInPixels + GameEngine.g_INSTANCE.viewportX;
-            mouseWorldY = canvasPxY / meterInPixels + GameEngine.g_INSTANCE.viewportY;
+            // inverse of: screen = (world - viewport) * meterInPixels / zoom
+            mouseWorldX = (canvasPxX * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportX;
+            mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
         }
 
 
@@ -346,8 +346,8 @@ export class Player implements Entity, Collidable {
         const w = player_width_in_world_units * meter_in_pixels;
         const h = sprite.height * (w / sprite.width);
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const screenX = (this.position.x - game.viewportX) * scale;
-        const screenY = (this.position.y - game.viewportY) * scale;
+        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
+        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
 
         const normal: Vec2 = mountain.getNormalAt(this.position.x);
         const tan = new Vec2(normal.y, -normal.x);

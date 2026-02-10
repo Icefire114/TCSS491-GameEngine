@@ -71,14 +71,17 @@ export class Renderer {
             forceScaleToSize ? forceScaleToSize.y : anim.frameHeight / mInPx.y
         );
 
-        const screenSize = Vec2.compMul(worldSize, mInPx);
+        const screenSize = Vec2.compDivScalar(Vec2.compMul(worldSize, mInPx), GameEngine.g_INSTANCE.zoom);
 
-        const screenPos = Vec2.compMul(
-            new Vec2(
-                (pos.x - worldSize.x / 2 - GameEngine.g_INSTANCE.viewportX + anim.offsetX),
-                (pos.y - worldSize.y - GameEngine.g_INSTANCE.viewportY)
+        const screenPos = Vec2.compDivScalar(
+            Vec2.compMul(
+                new Vec2(
+                    (pos.x - worldSize.x / 2 - GameEngine.g_INSTANCE.viewportX + anim.offsetX),
+                    (pos.y - worldSize.y - GameEngine.g_INSTANCE.viewportY)
+                ),
+                mInPx
             ),
-            mInPx
+            GameEngine.g_INSTANCE.zoom
         );
 
         return { screenPos, screenSize };
