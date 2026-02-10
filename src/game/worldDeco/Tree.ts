@@ -62,13 +62,11 @@ export class Tree implements Entity {
             const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const worldW = currentAnim.frameWidth / meterInPixels;
             const worldH = currentAnim.frameHeight / meterInPixels;
-            const screenW = (worldW * meterInPixels) / game.zoom;
-            const screenH = (worldH * meterInPixels) / game.zoom;
+            const screenW = worldW * meterInPixels;
+            const screenH = worldH * meterInPixels;
 
-            const screenX =
-                ((this.position.x - (worldW / 2) - game.viewportX + currentAnim.offsetX) * meterInPixels) / game.zoom;
-            const screenY =
-                ((this.position.y - worldH - game.viewportY) * meterInPixels) / game.zoom;
+            const screenX = (this.position.x - (worldW / 2) - game.viewportX + currentAnim.offsetX) * meterInPixels;
+            const screenY = (this.position.y - worldH - game.viewportY) * meterInPixels;
 
             ctx.drawImage(
                 this.shader.canvas,

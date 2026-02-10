@@ -85,11 +85,11 @@ export class BackgroundLayer implements Entity {
         const h = sprite.height * (w / sprite.width);
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
-        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
+        const screenX = (this.position.x - game.viewportX) * scale;
+        const screenY = (this.position.y - game.viewportY) * scale;
 
-        const screenX2 = (this.position2.x - game.viewportX) * scale / game.zoom;
-        const screenY2 = (this.position2.y - game.viewportY) * scale / game.zoom;
+        const screenX2 = (this.position2.x - game.viewportX) * scale;
+        const screenY2 = (this.position2.y - game.viewportY) * scale;
 
         ctx.globalAlpha = 1;
         // first slide
