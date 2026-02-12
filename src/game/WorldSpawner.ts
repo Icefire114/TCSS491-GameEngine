@@ -8,6 +8,10 @@ import { ItemFactory } from "./Items/ItemFactory.js";
 import Rand from 'rand-seed';
 import { Player } from "./worldEntities/player.js";
 import { randomOf } from "../engine/util.js";
+import { ExplodingZombie } from "./zombies/ExplodingZombie.js";
+import { FastZombie } from "./zombies/FastZombie.js";
+import { GiantZombie } from "./zombies/GiantZombie.js";
+import { ThrowerZombie } from "./zombies/ThrowerZombie.js";
 
 export class WorldSpawner implements Entity {
     // Required info
@@ -68,9 +72,18 @@ export class WorldSpawner implements Entity {
         // Probaiblty for the spawn 
         if (roll < 0.3) {
             // 30% chance for Zombie
-            GameEngine.g_INSTANCE.addEntity(new BasicZombie({ x, y: y - 5 }), DrawLayer.ZOMBIE);
-        }
-        else if (roll < 0.45) {
+            const zombieTypes = [
+                            BasicZombie,
+                            ExplodingZombie,
+                            FastZombie,
+                            GiantZombie,
+                            ThrowerZombie
+                        ];
+            // Randomly choose between those zombies and then spawning that choosen random spawn
+            const RandomZombieClass = zombieTypes[Math.floor(this.rng.next() * zombieTypes.length)];
+            GameEngine.g_INSTANCE.addEntity(new RandomZombieClass({ x, y: y - 5 }), DrawLayer.ZOMBIE);
+
+        } else if (roll < 0.45) {
             // 15% chance for Spike
             // How many spikes to generate from 2 to 4
             const clusterSize = Math.floor(this.rng.next() * 4) + 2;
@@ -87,8 +100,7 @@ export class WorldSpawner implements Entity {
                 const spike = new Spike({ x: currentX, y: currentY }, rotation);
                 GameEngine.g_INSTANCE.addEntity(spike, DrawLayer.SPIKE);
             }
-        }
-        else if (roll < 0.65) {
+        } else if (roll < 0.65) {
             // Each item has a even shot at being spawned
             const pos = new Vec2(x, y - 2);
             GameEngine.g_INSTANCE.addEntity(
