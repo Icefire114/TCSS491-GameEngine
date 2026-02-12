@@ -60,6 +60,72 @@ export class Renderer {
         );
     }
 
+    public convertWorldPosToScreenPos(pos: Vec2, objectSizePX: Vec2): Vec2 {
+        const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenPos = Vec2.compDivScalar(
+            Vec2.compMulScalar(
+                new Vec2(
+                    (pos.x - objectSizePX.x / 2 - GameEngine.g_INSTANCE.viewportX),
+                    (pos.y - objectSizePX.y - GameEngine.g_INSTANCE.viewportY)
+                ),
+                mInPx
+            ),
+            GameEngine.g_INSTANCE.zoom
+        );
+
+        return screenPos;
+    }
+
+    /**
+     * Draws a rectangle in world space coordinates.
+     * 
+     * @param worldPos The world position (center-bottom of the rectangle)
+     * @param worldSize The size of the rectangle in world units
+     * @param fillColor Optional fill color (e.g., 'rgba(255, 0, 0, 0.5)')
+     * @param strokeColor Optional stroke color (e.g., 'red')
+     * @param lineWidth Optional stroke line width in screen pixels (default: 1)
+     */
+    public drawRectAtWorldPos(
+        worldPos: Vec2,
+        worldSize: Vec2,
+        fillColor?: string,
+        strokeColor?: string,
+        lineWidth: number = 1
+    ): void {
+        const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+
+        // Convert world size to screen size
+        const screenSize = Vec2.compDivScalar(
+            Vec2.compMulScalar(worldSize, mInPx),
+            GameEngine.g_INSTANCE.zoom
+        );
+
+        // Convert world position to screen position
+        // Position represents bottom-left, so we offset by full height and 
+        const screenPos = Vec2.compDivScalar(
+            Vec2.compMulScalar(
+                new Vec2(
+                    worldPos.x - GameEngine.g_INSTANCE.viewportX,
+                    worldPos.y - worldSize.y - GameEngine.g_INSTANCE.viewportY
+                ),
+                mInPx
+            ),
+            GameEngine.g_INSTANCE.zoom
+        );
+
+        // Draw the rectangle
+        if (fillColor) {
+            this.ctx.fillStyle = fillColor;
+            this.ctx.fillRect(screenPos.x, screenPos.y, screenSize.x, screenSize.y);
+        }
+
+        if (strokeColor) {
+            this.ctx.strokeStyle = strokeColor;
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.strokeRect(screenPos.x, screenPos.y, screenSize.x, screenSize.y);
+        }
+    }
+
     private computeScreenRect(pos: Vec2, anim: AnimationData, forceScaleToSize?: Vec2): { screenPos: Vec2, screenSize: Vec2 } {
         const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 

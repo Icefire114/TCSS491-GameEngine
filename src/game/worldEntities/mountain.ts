@@ -2,11 +2,12 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { MountainCollider } from "../../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
-import { Vec2 } from "../../engine/types.js";
+import { DrawLayer, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
+import { SafeZone } from "./SafeZone.js";
 import Rand from 'rand-seed';
 
-export interface SafeZone {
+export interface SafeZoneData {
     index: number;
     startX: number;
     endX: number;
@@ -51,10 +52,10 @@ export class Mountain implements Entity {
     private flatEndX: number = 0;
 
     // "Safezone" tracking
-    private safeZones: SafeZone[] = [];
+    private safeZones: SafeZoneData[] = [];
     private tempSafeZoneStartX: number = 0;
     private minDistanceBetweenZones = 2000;
-    private maxDistanceBetweenZones = 3500; 
+    private maxDistanceBetweenZones = 3500;
 
     /**
      * Initalizing the moutain entity.
@@ -224,12 +225,12 @@ export class Mountain implements Entity {
         // We havent taveled far enough
         if (distanceSinceLastSafeZone < this.minDistanceBetweenZones) {
             shouldSpawnFlat = false;
-        } 
+        }
         // Travel way too long, we force a spawn
         else if (distanceSinceLastSafeZone > this.maxDistanceBetweenZones) {
             shouldSpawnFlat = true;
             console.log("Force Spawning Safe Zone (Max Distance Reached)");
-        } 
+        }
         else {
             // Passed the min, then its a .5% chance per anchor point for it to spawn
             if (this.rng.next() < 0.005) {
@@ -240,18 +241,20 @@ export class Mountain implements Entity {
         // logic for ravine
         const pastSpawnPoint = currentX > this.ravineStartShowing;
         const coolDownRavine = currentX > (this.lastRavineEndX + this.ravineCooldown);
-        
+
         if (shouldSpawnFlat) {
             this.startFlatSequence();
-        } 
+            console.log(`Spawning SafeZone at x: ${currentX}`);
+            GameEngine.g_INSTANCE.addEntity(new SafeZone(new Vec2(currentX, this.getHeightAt(currentX))), DrawLayer.WORLD_DECORATION);
+        }
         // We can only spawn a ravine if we're not in a safe zone
         else if (pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
             this.startRavineSequence();
-        } 
+        }
         else {
             this.generateNormalAnchor();
         }
-        
+
     }
 
     /**
@@ -351,8 +354,8 @@ export class Mountain implements Entity {
             this.flatEndX = x;
 
             // updating our safezone tracking with specific info
-             this.safeZones.push({
-                index: this.safeZones.length, 
+            this.safeZones.push({
+                index: this.safeZones.length,
                 startX: this.tempSafeZoneStartX,
                 endX: this.flatEndX
             });
@@ -430,7 +433,7 @@ export class Mountain implements Entity {
     }
 
     /**
-     * Returns  a vector that points away from the surface.
+     * Returns a vector that points away from the surface.
      */
     getNormalAt(x: number): Vec2 {
         const slope = this.getSlopeAt(x);
@@ -442,14 +445,17 @@ export class Mountain implements Entity {
     }
 
     // When given 
-     getSafeZone(index: number): SafeZone | null {
+    getSafeZone(index: number): SafeZoneData | null {
         if (index < 0 || index >= this.safeZones.length) {
             return null;
         }
         return this.safeZones[index];
     }
 
-    getSafeZoneStatus(x: number) {
+    getSafeZoneStatus(x: number): {
+        currentZoneIndex: number; // -1  represents we're not in safe zone
+        lastPassedZoneIndex: number;
+    } {
         // Either before zone or during our game
         let status = {
             currentZoneIndex: -1, // -1  represents we're not in safe zone
@@ -462,9 +468,9 @@ export class Mountain implements Entity {
             if (x >= z.startX && x <= z.endX) {
                 // Represent were in the the zone
                 status.currentZoneIndex = i;
-                status.lastPassedZoneIndex = i - 1; 
+                status.lastPassedZoneIndex = i - 1;
                 return status;
-            } 
+            }
             else if (x > z.endX) {
                 // Represnt were pass the zone
                 status.lastPassedZoneIndex = i;

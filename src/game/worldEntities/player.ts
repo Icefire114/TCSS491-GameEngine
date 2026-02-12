@@ -76,8 +76,15 @@ export class Player implements Entity, Collidable {
     SLOPE_GRAVITY_MULT = 1.2;
 
     isInSafeZone(): boolean {
-        // TODO(pg): If in terrain flat zone, then its a safe zone.
-        return false;
+        const mountain: Mountain | undefined = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain | undefined;
+        if (mountain === undefined) {
+            return false;
+        }
+        const currentSafeZone = mountain.getSafeZoneStatus(this.position.x);
+        if (currentSafeZone === null || currentSafeZone.currentZoneIndex === -1) {
+            return false;
+        }
+        return true;
     }
 
     // players current health and sheild health
@@ -188,48 +195,72 @@ export class Player implements Entity, Collidable {
 
             const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
             const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
-            // ---------- Ground-only momentum ----------
-            if (onGround) {
-                // --- Slope-based gravity ---
-                const normal = mountain.getNormalAt(this.position.x);
+            const inSafeZone = this.isInSafeZone();
+            if (inSafeZone) {
+                // Reset velocity when entering safe zone to avoid carrying momentum
+                const SAFE_ZONE_SPEED = this.MAX_SPEED * 0.5;
+                const SAFE_ZONE_ACCEL = 120;
 
-                // Tangent parallel to slope
-                const tangent = new Vec2(normal.y, -normal.x);
-
-                // Ensure downhill (rightward)
-                if (tangent.x < 0) {
-                    tangent.x *= -1;
-                    tangent.y *= -1;
+                // Horizontal movement
+                if (keys["d"]) {
+                    this.velocity.x += SAFE_ZONE_ACCEL * deltaTime;
                 }
-
-
-
-                // Project gravity along slope
-                const slopeAccel = GameEngine.g_INSTANCE.G * this.SLOPE_GRAVITY_MULT;
-                this.velocity.x += tangent.x * slopeAccel * deltaTime;
-                this.velocity.y += tangent.y * slopeAccel * deltaTime;
-
-                // --- Player input (ground only) ---
-                if (!this.isInSafeZone() && keys["d"]) {
-                    this.velocity.x += this.ACCELERATION * deltaTime;
-                }
-
                 if (keys["a"]) {
-                    this.velocity.x -= this.BRAKE_FORCE * deltaTime;
+                    this.velocity.x -= SAFE_ZONE_ACCEL * deltaTime;
                 }
 
-                // Stick player to terrain
-                this.velocity.y += this.GROUND_STICK_FORCE * deltaTime;
+                // Apply friction to slow down when no keys pressed
+                this.velocity.x *= 0.9;
+                this.velocity.y *= 0.9;
+
+                // Clamp speed
+                const speed = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2);
+                if (speed > SAFE_ZONE_SPEED) {
+                    this.velocity.x = (this.velocity.x / speed) * SAFE_ZONE_SPEED;
+                    this.velocity.y = (this.velocity.y / speed) * SAFE_ZONE_SPEED;
+                }
             } else {
-                // ---------- In air: no momentum gains ----------
-                const AIR_DRAG = 0.9995;
-                this.velocity.x *= AIR_DRAG;
+                // ---------- Ground-only momentum ----------
+                if (onGround) {
+                    // --- Slope-based gravity ---
+                    const normal = mountain.getNormalAt(this.position.x);
+
+                    // Tangent parallel to slope
+                    const tangent = new Vec2(normal.y, -normal.x);
+
+                    // Ensure downhill (rightward)
+                    if (tangent.x < 0) {
+                        tangent.x *= -1;
+                        tangent.y *= -1;
+                    }
+
+                    // Project gravity along slope
+                    const slopeAccel = GameEngine.g_INSTANCE.G * this.SLOPE_GRAVITY_MULT;
+                    this.velocity.x += tangent.x * slopeAccel * deltaTime;
+                    this.velocity.y += tangent.y * slopeAccel * deltaTime;
+
+                    // --- Player input (ground only) ---
+                    if (keys["d"]) {
+                        this.velocity.x += this.ACCELERATION * deltaTime;
+                    }
+
+                    if (keys["a"]) {
+                        this.velocity.x -= this.BRAKE_FORCE * deltaTime;
+                    }
+                    // ---------- Jump ----------
+                    if ((keys["w"] || keys[" "]) && onGround) {
+                        this.velocity.y = this.JUMP_FORCE;
+                    }
+
+                    // Stick player to terrain
+                    this.velocity.y += this.GROUND_STICK_FORCE * deltaTime;
+                } else {
+                    // ---------- In air: no momentum gains ----------
+                    const AIR_DRAG = 0.9995;
+                    this.velocity.x *= AIR_DRAG;
+                }
             }
 
-            // ---------- Jump ----------
-            if ((keys["w"] || keys[" "]) && onGround) {
-                this.velocity.y = this.JUMP_FORCE;
-            }
 
             // ---------- Gravity ----------
             this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
@@ -239,12 +270,15 @@ export class Player implements Entity, Collidable {
                 this.velocity.x *= (1 - this.FRICTION);
             }
 
+
             // ---------- Speed limits ----------
-            if (onGround) {
-                this.velocity.x = Math.max(this.MIN_SPEED, this.velocity.x);
-                this.prevGroundSpeed = this.velocity.x;
-            } else {
-                this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed);
+            if (!inSafeZone) {
+                if (onGround) {
+                    this.velocity.x = Math.max(this.MIN_SPEED, this.velocity.x);
+                    this.prevGroundSpeed = this.velocity.x;
+                } else {
+                    this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed);
+                }
             }
 
             this.velocity.x = Math.min(this.MAX_SPEED, this.velocity.x);
@@ -268,7 +302,6 @@ export class Player implements Entity, Collidable {
             const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
             for (const itemEnt of items) {
                 if (this.physicsCollider.collides(this, itemEnt)) {
-                    console.log(`We hit item ${itemEnt.id}`);
                     const item: Item = itemEnt.pickup();
                     this.items.push(item);
 
@@ -280,7 +313,6 @@ export class Player implements Entity, Collidable {
             const buffs = GameEngine.g_INSTANCE.getEntitiesByTag("BuffEntity") as BuffEntity[];
             for (const buffEnt of buffs) {
                 if (this.physicsCollider.collides(this, buffEnt)) {
-                    console.log(`We hit buff ${buffEnt.id}`);
                     // no need to apply the buff, it is applied when `pickup` is called.
                     const buff: Buff = buffEnt.pickup();
                     // We only care about tracking temp buffs.
@@ -291,26 +323,25 @@ export class Player implements Entity, Collidable {
                 }
             }
 
-            // -- Collision with spikes --
-            const spike: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
-            for (const spikeEntity of spike) {
-                if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
-                    console.log(`Player hit a spike!`);
-                    this.damagePlayer(5);
-                    this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
-                    this.velocity.y = -10; // bounce player up a bit on spike hit
-                    this.iTime = this.iDuration; // start invulnerability time
-                    console.log('Player hit a spike');
+            if (!inSafeZone) {
+                // -- Collision with spikes --
+                const spike: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
+                for (const spikeEntity of spike) {
+                    if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
+                        this.damagePlayer(5);
+                        this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
+                        this.velocity.y = -10; // bounce player up a bit on spike hit
+                        this.iTime = this.iDuration; // start invulnerability time
+                    }
                 }
-            }
 
-            // -- Collision with zombies --
-            const zombies: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
-            for (const zombie of zombies) {
-                if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
-                    this.damagePlayer(10);
-                    this.iTime = this.iDuration; // start invulnerability time
-                    console.log(`Player hit by a zombie`);
+                // -- Collision with zombies --
+                const zombies: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
+                for (const zombie of zombies) {
+                    if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
+                        this.damagePlayer(10);
+                        this.iTime = this.iDuration; // start invulnerability time
+                    }
                 }
             }
         } else {
