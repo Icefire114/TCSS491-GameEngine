@@ -25,7 +25,7 @@ export class SafeZone implements Entity {
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
                 Vec2.compAdd(this.position, new Vec2(5, 0)),
-                new Vec2(1, 100),
+                new Vec2(1, this.size.y),
                 ["player"],
                 false,
                 (ent: Entity) => {
