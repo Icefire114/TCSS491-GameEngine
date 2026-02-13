@@ -78,6 +78,11 @@ export class DecorationSpawner implements Entity {
      * @returns only return if were trying to spawn in the ravines
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
+        const zoneStatus = mountain.getSafeZoneStatus(x);
+        if (zoneStatus.currentZoneIndex !== -1) {
+            return;
+        }
+
         const roll = this.rng.next();
         const yCenter = mountain.getHeightAt(x);
 
