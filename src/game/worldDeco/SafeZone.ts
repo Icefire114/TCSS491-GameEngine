@@ -3,6 +3,7 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2, DrawLayer } from "../../engine/types.js";
 import { Mountain } from "../worldEntities/mountain.js"; 
+import { ShopUI } from "../ShopUI.js";
 import { Tree } from "../worldDeco/Tree.js"; 
 
 export class SafeZone implements Entity {
@@ -18,6 +19,8 @@ export class SafeZone implements Entity {
     private endX: number;
     private midX: number;
     private hasSpawnedTree: boolean = false;
+    private isPlayerInside: boolean = false;
+    private wasPlayerInside: boolean = false;
 
     constructor(startX: number, endX: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -40,18 +43,74 @@ export class SafeZone implements Entity {
             this.hasSpawnedTree = true;
         }
 
+        // Handles the logic with player is in safezone/shop
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player");
-        if (player && player.position.x > this.endX + 1000) {
-            this.removeFromWorld = true;
+        if (player) {
+            this.isPlayerInside = player.position.x >= this.startX && player.position.x <= this.endX;
+
+            const shop = GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui") as ShopUI;
+
+            // Our keybind to open the shop
+            if (this.isPlayerInside && (keys["e"] || keys["E"])) {
+                if (shop) shop.isOpen = !shop.isOpen;
+                keys["e"] = false;
+                keys["E"] = false;
+            }
+
+            // Various miscellaneous tracking properties of player 
+            if (this.wasPlayerInside && !this.isPlayerInside) {
+                if (shop) shop.isOpen = false;
+            }
+
+            this.wasPlayerInside = this.isPlayerInside;
+
+            if (player.position.x > this.endX + 1000) {
+                this.removeFromWorld = true;
+            }
         }
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         // TEMP: Only used for visualization
         this.drawTempSafeZoneLooks(ctx, game);
-        
-    }
+
+        const shop = game.getUniqueEntityByTag("shop_ui") as ShopUI;
+
     
+        // Drawing the "Click E to open shop" message
+        if (this.isPlayerInside && shop && !shop.isOpen) {
+                this.drawInteractionPrompt(ctx, game);
+        }
+    }
+
+    /**
+     * Helper method to draw the message above player for opening shop
+     */
+    private drawInteractionPrompt(ctx: CanvasRenderingContext2D, game: GameEngine) {
+        const player = game.getUniqueEntityByTag("player");
+        if (!player) return;
+
+        // Positioning of the message
+        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenX = (player.position.x - game.viewportX) * scale;
+        const screenY = (player.position.y - game.viewportY) * scale - 75;
+
+        ctx.save();
+        
+        // Drawing the message itself
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        const boxWidth = 200;
+        const boxHeight = 30;
+        ctx.fillRect(screenX - boxWidth / 2, screenY - boxHeight, boxWidth, boxHeight);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 14px monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("PRESS [E] TO OPEN SHOP", screenX, screenY - boxHeight / 2);
+        
+        ctx.restore();
+    }
+
     /**
      * Method to draw all the TEMP DRAWINGS
      * 
@@ -62,20 +121,20 @@ export class SafeZone implements Entity {
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
-        // 1. Draw Gray Walls at Start and End
+        // Gray Wall
         this.drawWall(ctx, game, scale, this.startX + 15, mountain.getHeightAt(this.startX) + 5);
         this.drawWall(ctx, game, scale, this.endX - 15, mountain.getHeightAt(this.endX));
 
-        // 2. Draw Miniature Stores (Brown Stubs) with equal spacing
-        const numStoresPerSide = 2; // Adjust for more/less density
+        // Drawing the Shop
+        const numStoresPerSide = 2;
 
-        // Left Side (Wall to Tree)
+        // Drawing shops to the left of the tree
         for (let i = 1; i <= numStoresPerSide; i++) {
             const x = this.startX + (this.midX - this.startX) * (i / (numStoresPerSide + 1)) + 5;
             this.drawStore(ctx, game, scale, x, mountain.getHeightAt(x));
         }
 
-        // Right Side (Tree to Wall)
+        // Drawing shops to the right of the tree
         for (let i = 1; i <= numStoresPerSide; i++) {
             const x = this.midX + (this.endX - this.midX) * (i / (numStoresPerSide + 1)) - 10;
             this.drawStore(ctx, game, scale, x, mountain.getHeightAt(x));

@@ -1,7 +1,7 @@
 import { GameEngine } from "../engine/gameengine.js";
 import { Vec2 } from "../engine/types.js";
-import { Player } from "./worldEntities/player.js";
 import { ImagePath } from "../engine/assetmanager.js";
+import { Entity, EntityID } from "../engine/Entity.js";
 
 interface ShopItem {
     id: string;
@@ -18,7 +18,14 @@ interface ShopItem {
 /**
  * Class that represents the Shop UI
  */
-export class ShopUI {
+export class ShopUI implements Entity {
+    tag: string = "shop_ui";
+    id: EntityID;
+    position: Vec2 = new Vec2(0,0);
+    velocity: Vec2 = new Vec2(0,0);
+    physicsCollider = null;
+    sprite = null;
+    removeFromWorld: boolean = false;
     public isOpen: boolean = false;
     
     // List of all items
@@ -52,8 +59,12 @@ export class ShopUI {
         }
     ];
 
-    update(clickCoords: Vec2, player: Player) {
-        
+    constructor() {
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
+    }
+
+    update(keys: { [key: string]: boolean; }, deltaTime: number): void {        
+    
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine) {
@@ -62,6 +73,7 @@ export class ShopUI {
         const w = ctx.canvas.width;
         const h = ctx.canvas.height;
 
+        // Color scheme of the UI
         const borderDark = "#5C3A2E";      
         const borderLight = "#C9A87C";    
         const bgMain = "#D4A574";          

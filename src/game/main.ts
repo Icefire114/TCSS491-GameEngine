@@ -25,6 +25,7 @@ import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
 import { WorldSpawner } from "./WorldSpawner.js";
 import { DecorationSpawner } from "./DecorationSpanwer.js";
+import { ShopUI } from "./ShopUI.js"; 
 
 
 
@@ -134,6 +135,7 @@ function main() {
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
+        gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER); 
         gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
         gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
