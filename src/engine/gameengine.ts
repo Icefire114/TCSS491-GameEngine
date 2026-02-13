@@ -336,6 +336,15 @@ export class GameEngine {
             .map(ent => ent[0]);
     };
 
+    /**
+     * @returns A list of all the zombie enteties.
+     */
+    getAllZombies(): Entity[] {
+        return this.entities
+            .filter(ent => ent[0].tag.includes("Zombie"))
+            .map(ent => ent[0]);
+    };
+
     startMusic(): void {
         const audioPath = new AudioPath("res/aud/game_music.ogg");
         const audio = this.getAudio(audioPath);

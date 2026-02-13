@@ -40,8 +40,8 @@ export class UILayer implements Entity {
 
         tempBuffs.forEach((buff, idx) => {
             const sprite: HTMLImageElement = game.getSprite(buff.sprite);
-            const x = margin + idx * (iconSize + spacing);
-            const y = margin;
+            const x = margin;
+            const y = margin + idx * (iconSize + spacing);
 
             ctx.drawImage(sprite, x, y, iconSize, iconSize);
             ctx.fillStyle = "red";

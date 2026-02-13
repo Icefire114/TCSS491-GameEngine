@@ -8,7 +8,8 @@ export namespace DrawLayer {
     export const WORLD_DECORATION: DrawLayer = FOREGROUND - 1 as DrawLayer;
     export const MOUNTAIN_TERRAIN: DrawLayer = WORLD_DECORATION - 1 as DrawLayer;
     export const SPIKE: DrawLayer = MOUNTAIN_TERRAIN - 1 as DrawLayer;
-    export const ZOMBIE: DrawLayer = SPIKE - 1 as DrawLayer;
+    export const BULLET: DrawLayer = SPIKE - 1 as DrawLayer;
+    export const ZOMBIE: DrawLayer = BULLET - 1 as DrawLayer;
     export const ITEM: DrawLayer = ZOMBIE - 1 as DrawLayer;
     export const PLAYER: DrawLayer = ITEM - 1 as DrawLayer;
 
@@ -51,6 +52,15 @@ export class Vec2 {
 }
 
 export namespace Vec2 {
+    /**
+     * @param v1 Vector 1
+     * @param v2 Vector 1
+     * @returns The distance between `v1` and`v2`.
+     */
+    export function dist(v1: Vec2, v2: Vec2): number {
+        return Math.sqrt(Math.pow(v2.x - v1.x, 2) + Math.pow(v2.y - v1.y, 2));
+    }
+
     /**
      * @param v1 Vector 1
      * @param v2 Vector 2

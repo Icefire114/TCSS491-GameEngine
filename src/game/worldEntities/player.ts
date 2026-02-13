@@ -184,8 +184,9 @@ export class Player implements Entity, Collidable {
                     const targetY = mouseWorldY ?? this.position.y;
 
                     // create bullet
-                    const bullet = new Bullet(this.position.x, this.position.y, targetX, targetY);
-                    GameEngine.g_INSTANCE.addEntity(bullet, DrawLayer.of(3));
+                    GameEngine.g_INSTANCE.addEntity(
+                        new Bullet(this.position.x, this.position.y, targetX, targetY),
+                        DrawLayer.BULLET);
                     //console.log(`ammo: ${this.ammo}`);
                 } else {
                     this.animator.updateAnimState(AnimationState.IDLE, deltaTime);

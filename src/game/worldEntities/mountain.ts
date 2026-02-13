@@ -4,7 +4,7 @@ import { MountainCollider } from "../../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { DrawLayer, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
-import { SafeZone } from "./SafeZone.js";
+import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
 
 export interface SafeZoneData {
