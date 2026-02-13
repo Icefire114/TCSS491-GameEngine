@@ -34,12 +34,23 @@ export class WorldSpawner implements Entity {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        const engine = GameEngine.g_INSTANCE;
+
         // Ensures that player and mountain is created before updating
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player;
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         if (!player || !mountain) {
             return;
         }
+
+        const viewportRight = engine.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const isPitAhead = mountain.isRavineInView(player.position.x, viewportRight, player.position.y);
+
+        if (isPitAhead) {
+            // Pit is ahead, then dont spawn anything until it passed the player x
+            return;
+        }
+
 
         // Check 300 game units ahead of the player
         const spawnX = player.position.x + 300;

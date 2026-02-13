@@ -14,6 +14,7 @@ export interface SafeZoneInfo {
 }
 
 export class Mountain implements Entity {
+    [x: string]: any;
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
     id: EntityID;
@@ -496,4 +497,23 @@ export class Mountain implements Entity {
         return status;
     }
 
+    /**
+     * Checks if a ravine is within a range when a given x
+     * 
+     * @param startX the begining of the range
+     * @param endX the end of the range
+     * @returns true if pit is within our player view
+     */
+    public isRavineInView(startX: number, endX: number, playerY: number): boolean {
+        // Checking 20 steps at a time
+        const step = 20; 
+
+        // Checking If ground is 1000 units below player then its a pit 
+        for (let x = startX; x <= endX; x += step) {
+            if (this.getHeightAt(x) > playerY + 1000) {
+                return true;
+            }
+        }
+    return false;
+    }
 }
