@@ -19,7 +19,7 @@ export class DecorationSpawner implements Entity {
     // Logic
     private lastSpawnX = 0;
     // Min distance palyer travel before spawning another decoration 
-    private spawnInterval = 60;
+    private spawnInterval = 35;
     private rng: Rand;
     private activeDecorations: Entity[] = [];
     private lastSafeZoneIndex: number = -1;
@@ -45,20 +45,28 @@ export class DecorationSpawner implements Entity {
         if (status.currentZoneIndex !== -1 && status.currentZoneIndex > this.lastSafeZoneIndex) {
             this.cleanupOldDecorations();
             this.lastSafeZoneIndex = status.currentZoneIndex;
+
+            if (this.lastSpawnX < player.position.x) {
+                this.lastSpawnX = player.position.x;
+            }
+        }
+
+        if (this.lastSpawnX < player.position.x - 500) {
+            this.lastSpawnX = player.position.x - 400;
         }
 
 
         const spawnX = player.position.x + 350;
-        const currentY = player.position.y;
-
-
-        // Rnadomzing the space to make it more "natural"
-        const randomSpace = (this.rng.next() * 40) - 20;
 
         // When to spawn logic
-        if (spawnX > this.lastSpawnX + this.spawnInterval + randomSpace) {
-            this.lastSpawnX = spawnX;
-            this.executeSpawn(spawnX, currentY, mountain);
+        while (this.lastSpawnX < spawnX) {
+            this.lastSpawnX += this.spawnInterval;
+            
+             // Rnadomzing the space to make it more "natural"
+            const randomSpace = (this.rng.next() * 20);
+            const actualX = this.lastSpawnX + randomSpace;
+            
+            this.executeSpawn(actualX, player.position.y, mountain);
         }
     }
 
@@ -70,29 +78,58 @@ export class DecorationSpawner implements Entity {
      * @returns only return if were trying to spawn in the ravines
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
-        const y = mountain.getHeightAt(x);
+        const roll = this.rng.next();
+        const yCenter = mountain.getHeightAt(x);
 
-        if (y > playerY + 1000) {
+        // Safety constraints to sure decorations doesn't spawn or near ravines
+        const safetyBuffer = 60; 
+        const yCheckLeft = mountain.getHeightAt(x - safetyBuffer);
+        const yCheckRight = mountain.getHeightAt(x + safetyBuffer);
+
+        const isNearEdge = (yCheckLeft > yCenter + 100) || (yCheckRight > yCenter + 100);
+        const isRavineFloor = yCenter > playerY + 800;
+
+        if (isNearEdge || isRavineFloor) {
             return;
         }
 
-        const roll = this.rng.next();
+        // Calculate slope for the center point
+        const sampleDistance = 20;
+        const yLeft = mountain.getHeightAt(x - sampleDistance); 
+        const yRight = mountain.getHeightAt(x + sampleDistance);
+        const maxSlope = Math.max(
+            Math.abs(Math.atan2(yCenter - yLeft, sampleDistance) * (180 / Math.PI)),
+            Math.abs(Math.atan2(yRight - yCenter, sampleDistance) * (180 / Math.PI))
+        );
+
+        if (maxSlope > 25) return;
+
         let decoration: Entity | null = null;
+        let yAdjustment = 0;
+
 
         // Heres all the spawn rate for all decorations
         if (roll < 0.4) {
             // 30% Bush
-            decoration = new Bush(new Vec2(x, y));
-        } else if (roll < 0.5) {
+            decoration = new Bush(new Vec2(x, yCenter));
+            yAdjustment = 30; 
+        } else if (roll < 0.7) {
             // 20% Tree
-            decoration = new Tree(new Vec2(x, y));
-        } else if (roll < 0.6) {
+            decoration = new Tree(new Vec2(x, yCenter));
+            yAdjustment = -100; 
+        } else if (roll < 0.85) {
             // 10% Rock
-            decoration = new Rock(new Vec2(x, y));
+            decoration = new Rock(new Vec2(x, yCenter));
+            yAdjustment = 42; 
         }
         // 20% Empty space (clearing)
 
         if (decoration) {
+            // Working to get that decoration sink in ground
+            const lowestGround = Math.max(yCenter, yLeft, yRight);
+            const safetyBury = 5;
+
+            decoration.position.y = lowestGround - yAdjustment + safetyBury;
             GameEngine.g_INSTANCE.addEntity(decoration, DrawLayer.WORLD_DECORATION);
             this.activeDecorations.push(decoration);
         }
