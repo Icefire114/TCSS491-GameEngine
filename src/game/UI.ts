@@ -7,6 +7,7 @@ import { unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
+import { ShopUI } from "./ShopUI.js"; 
 
 export class UILayer implements Entity {
     readonly id: EntityID;
@@ -17,6 +18,10 @@ export class UILayer implements Entity {
     physicsCollider: Collider | null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
+
+    // Shop UI Properties
+    private shop: ShopUI = new ShopUI();
+    private lWasPressed: boolean = false;
 
 
     constructor() {
@@ -84,9 +89,18 @@ export class UILayer implements Entity {
         ctx.font = "30px Arial";
         ctx.fillText(`Ammo: ${player.ammo}/${player.maxAmmo}`, ctx.canvas.width - 200, 120);
         //console.log(`Player Ammo: ${player.ammo}`);
+
+        // Shop UI Drawing
+        if (this.shop.isOpen) {
+            this.shop.draw(ctx, game);
+        }
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        // Should do nothing.
+        // DEBUG: To see the visualization of the Shop UI (WILL DELETE LATERRRRR)
+        if (keys['l'] && !this.lWasPressed) {
+            this.shop.isOpen = !this.shop.isOpen;
+        }
+        this.lWasPressed = keys['l'];
     }
 }
