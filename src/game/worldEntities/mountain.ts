@@ -2,11 +2,12 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { MountainCollider } from "../../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
-import { Vec2 } from "../../engine/types.js";
+import { DrawLayer, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
+import { SafeZone } from "../worldDeco/SafeZone.js";
 import Rand from 'rand-seed';
 
-export interface SafeZone {
+export interface SafeZoneInfo {
     index: number;
     startX: number;
     endX: number;
@@ -51,7 +52,7 @@ export class Mountain implements Entity {
     private flatEndX: number = 0;
 
     // "Safezone" tracking
-    private safeZones: SafeZone[] = [];
+    private safeZones: SafeZoneInfo[] = [];
     private tempSafeZoneStartX: number = 0;
     private minDistanceBetweenZones = 2000;
     private maxDistanceBetweenZones = 3500; 
@@ -191,8 +192,26 @@ export class Mountain implements Entity {
 
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        // Unused.
-    }
+            // USED TO DEBUG AND SEE THE SAFE ZONE
+            if (keys["T"]) { 
+                const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player");
+                
+                if (player) {
+                    const newX = 3400;
+                    const newY = this.getHeightAt(newX);
+                    
+                    player.position.x = newX;
+                    player.position.y = newY - 50; 
+                    player.velocity.x = 0;
+                    player.velocity.y = 0;
+
+                    GameEngine.g_INSTANCE.viewportX = newX - 300; 
+                    console.log(`Teleported to X: ${newX.toFixed(0)}, Y: ${newY.toFixed(0)}`);
+                
+                    keys["T"] = false; 
+                }
+            }
+        }
 
 
     /**
@@ -350,6 +369,10 @@ export class Mountain implements Entity {
             this.flatSequenceOn = false;
             this.flatEndX = x;
 
+            // Drawing the safezone here
+            const safeZoneEntity = new SafeZone(this.tempSafeZoneStartX, this.flatEndX);
+            GameEngine.g_INSTANCE.addEntity(safeZoneEntity, DrawLayer.WORLD_DECORATION);
+
             // updating our safezone tracking with specific info
              this.safeZones.push({
                 index: this.safeZones.length, 
@@ -442,7 +465,7 @@ export class Mountain implements Entity {
     }
 
     // When given 
-     getSafeZone(index: number): SafeZone | null {
+     getSafeZone(index: number): SafeZoneInfo | null {
         if (index < 0 || index >= this.safeZones.length) {
             return null;
         }
