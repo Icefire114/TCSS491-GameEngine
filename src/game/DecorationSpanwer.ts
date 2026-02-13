@@ -18,7 +18,8 @@ export class DecorationSpawner implements Entity {
 
     // Logic
     private lastSpawnX = 0;
-    private spawnInterval = 15;
+    // Min distance palyer travel before spawning another decoration 
+    private spawnInterval = 60;
     private rng: Rand;
     private activeDecorations: Entity[] = [];
     private lastSafeZoneIndex: number = -1;
@@ -52,7 +53,7 @@ export class DecorationSpawner implements Entity {
 
 
         // Rnadomzing the space to make it more "natural"
-        const randomSpace = (this.rng.next() * 10) - 5;
+        const randomSpace = (this.rng.next() * 40) - 20;
 
         // When to spawn logic
         if (spawnX > this.lastSpawnX + this.spawnInterval + randomSpace) {
@@ -79,17 +80,17 @@ export class DecorationSpawner implements Entity {
         let decoration: Entity | null = null;
 
         // Heres all the spawn rate for all decorations
-        if (roll < 0.5) {
-            // 50% Bush
+        if (roll < 0.4) {
+            // 30% Bush
             decoration = new Bush(new Vec2(x, y));
-        } else if (roll < 0.8) {
-            // 30% Tree
+        } else if (roll < 0.5) {
+            // 20% Tree
             decoration = new Tree(new Vec2(x, y));
-        } else if (roll < 0.9) {
+        } else if (roll < 0.6) {
             // 10% Rock
             decoration = new Rock(new Vec2(x, y));
         }
-        // 10% Empty space (clearing)
+        // 20% Empty space (clearing)
 
         if (decoration) {
             GameEngine.g_INSTANCE.addEntity(decoration, DrawLayer.WORLD_DECORATION);
