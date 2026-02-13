@@ -12,6 +12,7 @@ import { Bullet } from "./bullet.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { Buff, BuffType, TempBuff } from "../Items/Buff.js";
 import { BuffEntity } from "../Items/BuffEntity.js";
+import { Zombie } from "../zombies/Zombie.js";
 
 /**
  * @author PG
@@ -113,6 +114,11 @@ export class Player implements Entity, Collidable {
      * The buffs the player currently has applied.
      */
     buffs: Buff[] = [];
+
+    /**
+     * The amount of currency the player has collected.
+     */
+    currency: number = 0;
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -401,5 +407,9 @@ export class Player implements Entity, Collidable {
 
     isInvulnerable(): boolean {
         return this.iTime >= 0;
+    }
+
+    killedEnemy(enemy: Zombie): void {
+            this.currency += enemy.reward;
     }
 }

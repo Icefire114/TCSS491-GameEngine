@@ -6,6 +6,9 @@ import { Vec2 } from "../../engine/types.js";
 import { Collidable } from "../../engine/physics/Collider.js";
 import { AnimationState, Animator } from "../../engine/Animator.js";
 import { Mountain } from "./mountain.js";
+import { Zombie } from "../zombies/Zombie.js";
+import { Player } from "./player.js";
+import { unwrap } from "../../engine/util.js";
 
 /**
  * @author JK
@@ -20,6 +23,7 @@ export class Bullet implements Entity, Collidable {
     physicsCollider = new BoxCollider(1, 1);
     sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
     removeFromWorld: boolean = false;
+    damage: number = 100; 
 
     speed: number = 100 // world units per second
 
@@ -80,6 +84,17 @@ export class Bullet implements Entity, Collidable {
             }
         }
 
+        // ---------- Collision with zombies ----------
+        const zombies: Entity[] = GameEngine.g_INSTANCE.getEnemies();
+        console.log(`zombies in world: ${zombies.length}`);
+            for (const zombie of zombies) {
+                if (this.physicsCollider.collides(this, zombie)) {
+                    this.onHit(zombie, deltaTime);
+                    this.removeFromWorld = true;
+                    console.log(`Bullet hit a zombie`);
+                }
+            }
+
         // Move the bullet
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
@@ -88,5 +103,13 @@ export class Bullet implements Entity, Collidable {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         this.animator.drawCurrentAnimFrameAtPos(ctx, this.position);
+    }
+
+    onHit(target: Entity, deltaTime: number): void {
+        if (target instanceof Zombie) {
+        target.takeDamage(this.damage, deltaTime);
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        player.killedEnemy(target);
+        }
     }
 }

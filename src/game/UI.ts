@@ -84,6 +84,12 @@ export class UILayer implements Entity {
         ctx.font = "30px Arial";
         ctx.fillText(`Ammo: ${player.ammo}/${player.maxAmmo}`, ctx.canvas.width - 200, 120);
         //console.log(`Player Ammo: ${player.ammo}`);
+
+        // draw currency below ammo
+        ctx.fillStyle = "gold";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Currency: ${player.currency}`, ctx.canvas.width - 200, 160);
+        //console.log(`Player Currency: ${player.currency}`);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
