@@ -8,11 +8,13 @@ import { ItemEntity } from "../Items/ItemEntity.js";
 import { Collidable } from "../../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
 import { AnimationState, Animator } from "../../engine/Animator.js";
-import { Bullet } from "./bullet.js";
+import { RifleBullet } from "./bullets/RifleBullet.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { Buff, BuffType, TempBuff } from "../Items/Buff.js";
 import { BuffEntity } from "../Items/BuffEntity.js";
 import { Zombie } from "../zombies/Zombie.js";
+import { RPGRocket } from "./bullets/RPGRocket.js";
+import { LazerBullet } from "./bullets/LazerBullet.js";
 
 /**
  * @author PG
@@ -183,7 +185,7 @@ export class Player implements Entity, Collidable {
                     const targetY = mouseWorldY ?? this.position.y;
 
                     // create bullet
-                    const bullet = new Bullet(this.position.x, this.position.y, targetX, targetY);
+                    const bullet = new LazerBullet(this.position.x, this.position.y, targetX, targetY);
                     GameEngine.g_INSTANCE.addEntity(bullet, DrawLayer.of(3));
                     //console.log(`ammo: ${this.ammo}`);
                 } else {

@@ -4,6 +4,8 @@ import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Vec2 } from "../../engine/types.js";
+import { Player } from "../worldEntities/player.js";
+import { unwrap } from "../../engine/util.js";
 
 export abstract class Zombie implements Entity {
     tag: string;
@@ -38,7 +40,11 @@ export abstract class Zombie implements Entity {
 
     abstract update(keys: { [key: string]: boolean; }, deltaTime: number): void;
 
-    takeDamage(amount: number, deltaTime: number): void {
+    takeDamage(amount: number): void {
         this.health -= amount;
+        if (this.health <= 0) {
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        player.killedEnemy(this);
+        }
     }
 }
