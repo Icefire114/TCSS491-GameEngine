@@ -33,7 +33,9 @@ export class SafeZone implements Entity {
                 new Vec2(1, this.size.y),
                 ["player"],
                 true,
-                this.onPlayerEnterSafeZone as (e: Entity) => void
+                (e: Entity) => {
+                    this.onPlayerEnterSafeZone(e as Player);
+                }
             ), DrawLayer.DEFAULT
         );
 
@@ -56,6 +58,13 @@ export class SafeZone implements Entity {
 
     }
 
+    private cleanupEntByTag(tag: string) {
+        for (let ent of GameEngine.g_INSTANCE.getEntitiesByTag(tag)) {
+            if (ent.position.x < this.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT)
+                ent.removeFromWorld = true
+        }
+    }
+
     private onPlayerEnterSafeZone(ent: Player) {
         console.log("Player entered the SafeZone!");
 
@@ -70,12 +79,7 @@ export class SafeZone implements Entity {
         this.cleanupEntByTag("ChristmasTree")
         this.cleanupEntByTag("rock");
         this.cleanupEntByTag("Tree");
-    }
-
-    private cleanupEntByTag(tag: string) {
-        for (let ent of GameEngine.g_INSTANCE.getEntitiesByTag(tag)) {
-            if (ent.position.x < this.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT)
-                ent.removeFromWorld = true
-        }
+        this.cleanupEntByTag("ItemEntity");
+        this.cleanupEntByTag("BuffEntity");
     }
 }
