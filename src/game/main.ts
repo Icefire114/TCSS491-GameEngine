@@ -25,6 +25,7 @@ import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
 import { WorldSpawner } from "./WorldSpawner.js";
 import { DecorationSpawner } from "./DecorationSpanwer.js";
+import { unwrap } from "../engine/util.js";
 
 
 
@@ -131,6 +132,7 @@ function main() {
 
     try {
         gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
+        gameEngine.positionScreenOnEnt(unwrap(gameEngine.getUniqueEntityByTag("player")), 0.15, 0.5);
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);

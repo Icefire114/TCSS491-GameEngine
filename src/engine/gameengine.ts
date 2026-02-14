@@ -38,6 +38,9 @@ export class GameEngine {
     private rightclick: { x: number, y: number };
     private clockTick: number;
     private assetManager: AssetManager;
+    private m_followingEnt: Entity | null = null;
+    private m_followPercenageX: number = 0.1;
+    private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
 
     public get renderer(): Renderer {
@@ -276,7 +279,8 @@ export class GameEngine {
             }
         }
 
-        this.followPlayerByScreenRatioX(0.15);
+        this.followEntByScreenRatioX(unwrap(this.m_followingEnt), this.m_followPercenageX);
+        this.followEntByScreenRatioY(unwrap(this.m_followingEnt), this.m_followPercentageY);
 
 
         for (const set of this.ents.values()) {
@@ -289,22 +293,40 @@ export class GameEngine {
         }
     };
 
+    positionScreenOnEnt(e: Entity, percentageX: number, percentageY: number): void {
+        this.m_followingEnt = e;
+        this.m_followPercenageX = percentageX;
+        this.m_followPercentageY = percentageY;
+    }
+
+    repositionScreenOnCurrentFollowedEnt(percentageX: number, percentageY: number): void {
+        this.m_followPercenageX = percentageX;
+        this.m_followPercenageX = percentageY;
+    }
+
     /**
      * Sets the viewport to follow the player horizontally by a percentage of the viewport.
      *
      * @param x The percentage offset within the viewport the player should be at, must be in range `0-1`.
      */
-    private followPlayerByScreenRatioX(x: number): void {
-        const player = this.getUniqueEntityByTag('player');
-        if (player && this.ctx) {
-            /* 1. Horizontal follow */                   // 15 % from left edge
+    private followEntByScreenRatioX(e: Entity, x: number): void {
+        if (e.physicsCollider !== null && e.physicsCollider instanceof BoxCollider) {
             const playerWorldOffsetX = x * GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            this.viewportX = player.position.x - playerWorldOffsetX;
-
-            /* 2. Vertical follow – centre the player */
-            const worldUnitsH = this.ctx.canvas.height / (this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT);
-            this.viewportY = player.position.y - worldUnitsH / 2;
+            this.viewportX = e.position.x - playerWorldOffsetX + e.physicsCollider.width / 2;
+        } else {
+            const playerWorldOffsetX = x * GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            this.viewportX = e.position.x - playerWorldOffsetX;
         }
+    }
+
+    /**
+     * Sets the viewport to follow the player vertically by a percentage of the viewport.
+     *
+     * @param y The percentage offset within the viewport the player should be at, must be in range `0-1`.
+     */
+    private followEntByScreenRatioY(e: Entity, y: number): void {
+        const worldUnitsH = this.ctx.canvas.height / (this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT);
+        this.viewportY = e.position.y - worldUnitsH * y;
     }
 
 

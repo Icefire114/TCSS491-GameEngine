@@ -100,6 +100,16 @@ export namespace Vec2 {
     }
 
     /**
+     * Subtracts two vectors component-wise
+     * @param v1 Vector 1
+     * @param v2 Vector 2
+     * @returns Vector `v1` - `v2`
+     */
+    export function compSub(v1: Vec2, v2: Vec2): Vec2 {
+        return new Vec2(v1.x - v2.x, v1.y - v2.y);
+    }
+
+    /**
      * Multiplies two vectors component-wise
      * @param v1 Vector 1
      * @param v2 Vector 2

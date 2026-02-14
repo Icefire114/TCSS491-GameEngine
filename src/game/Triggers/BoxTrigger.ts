@@ -40,7 +40,7 @@ export class BoxTrigger implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         for (const tag of this.triggerOnTags) {
-            const ents = GameEngine.g_INSTANCE.getEntitiesByTag(tag);
+            const ents: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag(tag);
             for (const ent of ents) {
                 if (this.physicsCollider.collides(this, ent)) {
                     this.onTrigger(ent);

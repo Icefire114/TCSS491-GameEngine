@@ -2,13 +2,15 @@ import { Animator } from "../../../engine/Animator.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
+import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Collider } from "../../../engine/physics/Collider.js";
 import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
+import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
+import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
-import { Spike } from "../spike.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 
 export class SafeZone implements Entity {
@@ -16,25 +18,37 @@ export class SafeZone implements Entity {
     tag: string = "SafeZone";
     position: Vec2;
     velocity: Vec2 = new Vec2();
-    physicsCollider: Collider | null = null;
+    physicsCollider: BoxCollider = new BoxCollider(150, 50);
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
     // List of the shops/ things we will draw in the safe zone
     animators: Animator[] = [];
-
-    readonly size: Vec2 = new Vec2(150, 50);
+    centerPoint: Vec2;
 
     constructor(pos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = pos;
+        this.centerPoint = Vec2.compDiv(new Vec2(this.physicsCollider.width, this.physicsCollider.height), new Vec2(2, 1));
+
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
                 Vec2.compAdd(this.position, new Vec2(5, 0)),
-                new Vec2(1, this.size.y),
+                new Vec2(1, this.physicsCollider.height),
                 ["player"],
                 true,
                 (e: Entity) => {
                     this.onPlayerEnterSafeZone(e as Player);
+                }
+            ), DrawLayer.DEFAULT
+        );
+        GameEngine.g_INSTANCE.addEntity(
+            new BoxTrigger(
+                Vec2.compAdd(this.position, new Vec2(this.physicsCollider.width - 5, 0)),
+                new Vec2(1, this.physicsCollider.height),
+                ["player"],
+                true,
+                (e: Entity) => {
+                    this.onPlayerExitSafeZone(e as Player);
                 }
             ), DrawLayer.DEFAULT
         );
@@ -44,11 +58,23 @@ export class SafeZone implements Entity {
                 Vec2.compAdd(this.position, new Vec2(5, 0))
             ), DrawLayer.WORLD_DECORATION
         );
+
+        GameEngine.g_INSTANCE.addEntity(
+            new ChristmasTree(
+                Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.physicsCollider.width, this.physicsCollider.height), new Vec2(2, 1)))
+            ), DrawLayer.WORLD_DECORATION
+        );
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         if (G_CONFIG.DRAW_SAFEZONE_BB) {
-            GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(this.position, this.size, "rgba(0,0,0,0)", "#FF0000", 2);
+            GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
+                this.position,
+                new Vec2(this.physicsCollider.width, this.physicsCollider.height),
+                "rgba(0,0,0,0)",
+                "#FF0000",
+                2
+            );
         }
     }
 
@@ -65,8 +91,15 @@ export class SafeZone implements Entity {
         }
     }
 
+    private onPlayerExitSafeZone(ent: Player) {
+        console.log("Player exited the SafeZone!");
+        // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
+    }
+
     private onPlayerEnterSafeZone(ent: Player) {
         console.log("Player entered the SafeZone!");
+        // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
+        // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
 
         // Cleanup zombies
         for (let ent of GameEngine.g_INSTANCE.getAllZombies()) {
@@ -81,5 +114,9 @@ export class SafeZone implements Entity {
         this.cleanupEntByTag("Tree");
         this.cleanupEntByTag("ItemEntity");
         this.cleanupEntByTag("BuffEntity");
+        // Old safe zone things
+        this.cleanupEntByTag("SafeZone");
+        this.cleanupEntByTag("SafeZoneCenterPoint");
+        this.cleanupEntByTag("SafeZoneTurretWall");
     }
 }

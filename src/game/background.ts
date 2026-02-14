@@ -59,7 +59,7 @@ export class Background {
         GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0.00001, //parallaxSpeed
-            100, //widthInWorldUnits
+            GameEngine.WORLD_UNITS_IN_VIEWPORT, //widthInWorldUnits
             0,  //startX
             30, //startY
             true //spawnRandom
@@ -78,7 +78,7 @@ export class Background {
         GameEngine.g_INSTANCE.addEntity(new BackgroundLayer(
             paths, //paths
             0.002, //parallaxSpeed
-            100, //widthInWorldUnits
+            GameEngine.WORLD_UNITS_IN_VIEWPORT, //widthInWorldUnits
             0,  //startX
             40, //startY
             true //spawnRandom
