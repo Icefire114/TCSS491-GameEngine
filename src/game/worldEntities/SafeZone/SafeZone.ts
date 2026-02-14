@@ -8,6 +8,7 @@ import { Vec2 } from "../../../engine/types.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { Player } from "../player.js";
+import { Spike } from "../spike.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 
 export class SafeZone implements Entity {
@@ -58,11 +59,23 @@ export class SafeZone implements Entity {
     private onPlayerEnterSafeZone(ent: Player) {
         console.log("Player entered the SafeZone!");
 
+        // Cleanup zombies
         for (let ent of GameEngine.g_INSTANCE.getAllZombies()) {
             // Kill all the zombies that are outsize of a range around the safe zone
-            if (Vec2.dist(ent.position, this.position) > GameEngine.WORLD_UNITS_IN_VIEWPORT) {
+            if (ent.position.x < this.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT)
                 ent.removeFromWorld = true
-            }
+        }
+        this.cleanupEntByTag("spike");
+        this.cleanupEntByTag("bush");
+        this.cleanupEntByTag("ChristmasTree")
+        this.cleanupEntByTag("rock");
+        this.cleanupEntByTag("Tree");
+    }
+
+    private cleanupEntByTag(tag: string) {
+        for (let ent of GameEngine.g_INSTANCE.getEntitiesByTag(tag)) {
+            if (ent.position.x < this.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT)
+                ent.removeFromWorld = true
         }
     }
 }
