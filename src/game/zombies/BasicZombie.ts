@@ -116,6 +116,32 @@ export class BasicZombie implements Entity {
         const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
 
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
+
+        //if player dead stop moving and do idle animation
+        if (player.dead) {
+            
+            this.velocity.x = 0;
+        
+            // Apply gravity to make zombie fall to ground
+            this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 4;
+        
+        // Check collision with terrain to stop falling
+        if (mountain && mountain.physicsCollider) {
+            if (this.physicsCollider.collides(this, mountain)) {
+                this.velocity.y = 0;
+            }
+        }
+        
+        // Update position 
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
+        
+        // Set animation to IDLE
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+        
+        return;
+    }
+
         const deltaX = player.position.x - this.position.x;
         const deltaY = player.position.y - this.position.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); //calculate distance
@@ -153,10 +179,10 @@ export class BasicZombie implements Entity {
             }
         }
 
-
         // ---------- Integrate ----------
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
+
 
         // Update animation based on what zombie is doing
         if (distance <= this.attack_range) {
