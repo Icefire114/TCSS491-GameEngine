@@ -141,16 +141,16 @@ function main() {
         // gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
         // gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
         // gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new FastZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new FastZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+        // gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
 
 
-        gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
+        // gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
+        // gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
+        // gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
         gameEngine.addEntity(new BuffEntity(
             new InfectionImmunityItem(),
             new Animator([

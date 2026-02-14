@@ -12,6 +12,7 @@ export class BasicZombie implements Entity {
     tag: string = "BasicZombie";
     id: EntityID;
     attack_range: number = 5;
+    stop_range: number = 7;
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 10; // distance at which zombie starts running
@@ -120,8 +121,8 @@ export class BasicZombie implements Entity {
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); //calculate distance
 
 
-        const walk_speed = 40; //zombie walk speed
-        const run_speed = walk_speed * 1.5; //run speed
+        const walk_speed = 35; //zombie walk speed
+        const run_speed = walk_speed * 1.2; //run speed
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
@@ -135,12 +136,6 @@ export class BasicZombie implements Entity {
             }
         }
 
-        //commented this for now so that the zombie attacks while moving and doesn't go idle
-        // } else {
-        //     // stop moving and attack when in rance
-        //     this.velocity.x = 0;
-
-        // attack if cooldown is done
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                 this.lastAttackTime = currentTime;
@@ -185,6 +180,12 @@ export class BasicZombie implements Entity {
             } else {
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
             }
+        }
+        
+        //despawn zombie if it is behind player
+        if (this.position.x < player.position.x - 20) {
+            this.removeFromWorld = true;
+            return;
         }
     }
 }
