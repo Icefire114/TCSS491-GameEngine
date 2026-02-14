@@ -25,8 +25,9 @@ export class GameEngine {
     private audioUnlock = false;
 
     private ctx: CanvasRenderingContext2D;
-    private entities: [Entity, DrawLayer][];
-    private uniqueEntities: Record<string, [Entity, DrawLayer]> = {};
+    // a mapping of entity tags to a list of entities with that tag.
+    private ents: Map<string, Set<[Entity, DrawLayer]>>;
+    private uniqueEnts: Map<string, [Entity, DrawLayer]>;
     private click: { x: number, y: number } | null;
     private mouse: { x: number, y: number } | null;
     private wheel: { x: number, y: number } | null;
@@ -53,8 +54,8 @@ export class GameEngine {
             throw new Error("GameEngine has already been initialized!");
         }
 
-        // Everything that will be updated and drawn each frame
-        this.entities = [];
+        this.ents = new Map<string, Set<[Entity, DrawLayer]>>();
+        this.uniqueEnts = new Map<string, [Entity, DrawLayer]>();
 
         // Information on the input
         this.click = null;
@@ -180,7 +181,12 @@ export class GameEngine {
      * lower numbers = drawn earlier, bigger numbers = drawn later.
      */
     addEntity(entity: Entity, drawPriority: DrawLayer) {
-        this.entities.push([entity, drawPriority]);
+        let ents = this.ents.get(entity.tag);
+        if (!ents) {
+            ents = new Set<[Entity, DrawLayer]>();
+            this.ents.set(entity.tag, ents);
+        }
+        ents.add([entity, drawPriority]);
     };
 
     /**
@@ -194,7 +200,7 @@ export class GameEngine {
     */
     addUniqueEntity(entity: Entity, drawPriority: DrawLayer) {
         this.addEntity(entity, drawPriority);
-        this.uniqueEntities[entity.tag] = [entity, drawPriority];
+        this.uniqueEnts.set(entity.tag, [entity, drawPriority]);
     };
 
     draw() {
@@ -206,8 +212,11 @@ export class GameEngine {
 
         // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
         // And then draw them, no garuntee of order when their draw priority is the same.
-        this.entities.sort((a, b) => b[1] - a[1])
-        for (const [ent] of this.entities) {
+
+        const ents = Array.from(this.ents.values())
+            .flatMap(set => Array.from(set));
+        ents.sort((a, b) => b[1] - a[1])
+        for (const [ent] of ents) {
             this.ctx.save();
             const t0 = performance.now();
             ent.draw(this.ctx, this);
@@ -221,7 +230,7 @@ export class GameEngine {
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
             const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const meterInPixelsY = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            for (const ent of this.entities) {
+            for (const ent of ents) {
                 if (ent[0].physicsCollider !== null && ent[0].physicsCollider instanceof BoxCollider) {
                     const collider = ent[0].physicsCollider;
 
@@ -253,37 +262,50 @@ export class GameEngine {
     };
 
     update(dt: number) {
-        for (const [entity] of this.entities) {
-            if (!entity.removeFromWorld) {
-                const t0 = performance.now();
-                entity.update(this.keys, dt, this.rightclick);
-                const t = t0 - performance.now();
-                if (t > 10) {
-                    console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
-                }
+        for (const set of this.ents.values()) {
+            for (const [entity] of set) {
+                if (!entity.removeFromWorld) {
+                    const t0 = performance.now();
+                    entity.update(this.keys, dt, this.rightclick);
+                    const t = t0 - performance.now();
+                    if (t > 10) {
+                        console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
+                    }
 
+                }
             }
         }
 
+        this.followPlayerByScreenRatioX(0.15);
+
+
+        for (const set of this.ents.values()) {
+            for (const ent of set) {
+                if (ent[0].removeFromWorld) {
+                    this.uniqueEnts.delete(ent[0].tag);
+                    set.delete(ent);
+                }
+            }
+        }
+    };
+
+    /**
+     * Sets the viewport to follow the player horizontally by a percentage of the viewport.
+     *
+     * @param x The percentage offset within the viewport the player should be at, must be in range `0-1`.
+     */
+    private followPlayerByScreenRatioX(x: number): void {
         const player = this.getUniqueEntityByTag('player');
         if (player && this.ctx) {
-            /* 1. Horizontal follow */
-            const playerScreenRatioX = 0.15;                       // 15 % from left edge
-            const playerWorldOffsetX = playerScreenRatioX * GameEngine.WORLD_UNITS_IN_VIEWPORT;
+            /* 1. Horizontal follow */                   // 15 % from left edge
+            const playerWorldOffsetX = x * GameEngine.WORLD_UNITS_IN_VIEWPORT;
             this.viewportX = player.position.x - playerWorldOffsetX;
 
             /* 2. Vertical follow – centre the player */
             const worldUnitsH = this.ctx.canvas.height / (this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT);
             this.viewportY = player.position.y - worldUnitsH / 2;
         }
-
-        for (let i = this.entities.length - 1; i >= 0; --i) {
-            if (this.entities[i][0].removeFromWorld) {
-                delete this.uniqueEntities[this.entities[i][0].tag];
-                this.entities.splice(i, 1);
-            }
-        }
-    };
+    }
 
 
     loop() {
@@ -306,9 +328,7 @@ export class GameEngine {
      * @returns The entity with the given tag or undefined if no such entity could be found.
      */
     getEntitiesByTag(tag: string): Entity[] {
-        return this.entities
-            .filter(ent => ent[0].tag === tag)
-            .map(ent => ent[0]);
+        return [...this.ents.get(tag)?.values() ?? []].map(ent => ent[0]);
     };
 
     /**
@@ -316,33 +336,16 @@ export class GameEngine {
      * @returns The entity with the given tag or undefined if no such entity could be found.
      */
     getUniqueEntityByTag(tag: string): Entity | undefined {
-        return this.uniqueEntities[tag]?.[0];
-    };
-
-    /**
-     * @param id The unique ID of the entity to get
-     * @returns The entity with the given ID or undefined if no such entity could be found.
-     */
-    getEntityByID(id: EntityID): Entity | undefined {
-        return this.entities.find(ent => ent[0].id === id)?.[0];
-    }
-
-    /**
-     * @returns A list of all entities with physics.
-     */
-    getEntitiesWithPhysics(): Entity[] {
-        return this.entities
-            .filter(ent => ent[0].physicsCollider !== null)
-            .map(ent => ent[0]);
+        return this.uniqueEnts.get(tag)?.[0];
     };
 
     /**
      * @returns A list of all the zombie enteties.
      */
     getAllZombies(): Entity[] {
-        return this.entities
-            .filter(ent => ent[0].tag.includes("Zombie"))
-            .map(ent => ent[0]);
+        return [...this.ents.entries()]
+            .filter(([k]) => k.includes("Zombie"))
+            .flatMap(([, v]) => [...v.values()].map(([ent]) => ent));
     };
 
     startMusic(): void {
