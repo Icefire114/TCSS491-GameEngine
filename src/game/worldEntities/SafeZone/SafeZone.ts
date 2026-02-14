@@ -18,22 +18,23 @@ export class SafeZone implements Entity {
     tag: string = "SafeZone";
     position: Vec2;
     velocity: Vec2 = new Vec2();
-    physicsCollider: BoxCollider = new BoxCollider(150, 50);
+    physicsCollider: null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
     // List of the shops/ things we will draw in the safe zone
     animators: Animator[] = [];
     centerPoint: Vec2;
+    readonly size: Vec2 = new Vec2(150, 50);
 
     constructor(pos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = pos;
-        this.centerPoint = Vec2.compDiv(new Vec2(this.physicsCollider.width, this.physicsCollider.height), new Vec2(2, 1));
+        this.centerPoint = Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1));
 
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
                 Vec2.compAdd(this.position, new Vec2(5, 0)),
-                new Vec2(1, this.physicsCollider.height),
+                new Vec2(1, this.size.x),
                 ["player"],
                 true,
                 (e: Entity) => {
@@ -43,8 +44,8 @@ export class SafeZone implements Entity {
         );
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
-                Vec2.compAdd(this.position, new Vec2(this.physicsCollider.width - 5, 0)),
-                new Vec2(1, this.physicsCollider.height),
+                Vec2.compAdd(this.position, new Vec2(this.size.x - 5, 0)),
+                new Vec2(1, this.size.y),
                 ["player"],
                 true,
                 (e: Entity) => {
@@ -61,7 +62,7 @@ export class SafeZone implements Entity {
 
         GameEngine.g_INSTANCE.addEntity(
             new ChristmasTree(
-                Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.physicsCollider.width, this.physicsCollider.height), new Vec2(2, 1)))
+                Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1)))
             ), DrawLayer.WORLD_DECORATION
         );
     }
@@ -70,7 +71,7 @@ export class SafeZone implements Entity {
         if (G_CONFIG.DRAW_SAFEZONE_BB) {
             GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
                 this.position,
-                new Vec2(this.physicsCollider.width, this.physicsCollider.height),
+                new Vec2(this.size.x, this.size.y),
                 "rgba(0,0,0,0)",
                 "#FF0000",
                 2
