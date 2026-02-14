@@ -26,6 +26,8 @@ import { Tree } from "./worldDeco/Tree.js";
 import { WorldSpawner } from "./WorldSpawner.js";
 import { DecorationSpawner } from "./DecorationSpanwer.js";
 import { ShopUI } from "./ShopUI.js"; 
+import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
+import { JumpBoostItem } from "./Items/JumpBoostItem.js";
 
 
 
@@ -71,6 +73,8 @@ ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity_UI.png");
 ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
+ASSET_MANAGER.queueDownload("res/img/items/bomb.png");
+ASSET_MANAGER.queueDownload("res/img/items/boots.png");
 
 // === Bullet Assets ===
 ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
@@ -238,7 +242,50 @@ function main() {
             ),
             DrawLayer.ITEM
         )
-
+        gameEngine.addEntity(
+            new BuffEntity(
+                new ShockwaveBombItem(),
+                new Animator(
+                    [
+                        [
+                            { 
+                                frameCount: 1, 
+                                frameHeight: 16, 
+                                frameWidth: 14, 
+                                sprite: new ImagePath("res/img/items/bomb.png") 
+                            }, 
+                            AnimationState.IDLE
+                        ]
+                    ], 
+                    { x: 4, y: 4}
+                ),
+                new Vec2(4, 4),
+                { x: 100, y: 4}
+            ),
+            DrawLayer.ITEM
+        );
+        gameEngine.addEntity(
+            new BuffEntity(
+                new JumpBoostItem(),
+                new Animator(
+                    [
+                        [
+                            { 
+                                frameCount: 1, 
+                                frameHeight: 16, 
+                                frameWidth: 16, 
+                                sprite: new ImagePath("res/img/items/boots.png") 
+                            }, 
+                            AnimationState.IDLE
+                        ]
+                    ], 
+                    { x: 4, y: 4 } 
+                ),
+                new Vec2(5, 5),   
+                { x: 120, y: 5 }   
+            ),
+            DrawLayer.ITEM
+        );
         gameEngine.addEntity(
             new Tree(
                 new Vec2(
