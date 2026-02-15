@@ -75,7 +75,7 @@ export class WorldSpawner implements Entity {
         if (mountain.isNearSafeZone(x, 50)) {
             return;
         }
-        
+
         // If the x position given, has a y above 1000, its in ravine, so don't spawn
         const y = mountain.getHeightAt(x);
         if (y > playerY + 1000) {
@@ -89,12 +89,12 @@ export class WorldSpawner implements Entity {
         if (roll < 0.3) {
             // 30% chance for Zombie
             const zombieTypes = [
-                            BasicZombie,
-                            ExplodingZombie,
-                            FastZombie,
-                            GiantZombie,
-                            ThrowerZombie
-                        ];
+                BasicZombie,
+                ExplodingZombie,
+                FastZombie,
+                GiantZombie,
+                ThrowerZombie
+            ];
             // Randomly choose between those zombies and then spawning that choosen random spawn
             const RandomZombieClass = zombieTypes[Math.floor(this.rng.next() * zombieTypes.length)];
             GameEngine.g_INSTANCE.addEntity(new RandomZombieClass({ x, y: y - 5 }), DrawLayer.ZOMBIE);
@@ -126,7 +126,7 @@ export class WorldSpawner implements Entity {
                     ItemFactory.createGun(pos),
                     ItemFactory.createImmunity(pos)
                 ]),
-                 DrawLayer.ITEM);
+                DrawLayer.ITEM);
         }
     }
 

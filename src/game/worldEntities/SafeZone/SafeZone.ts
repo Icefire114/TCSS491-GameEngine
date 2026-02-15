@@ -2,11 +2,8 @@ import { Animator } from "../../../engine/Animator.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
-import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
-import { Collider } from "../../../engine/physics/Collider.js";
 import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
-import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
@@ -21,8 +18,6 @@ export class SafeZone implements Entity {
     physicsCollider: null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
-    // List of the shops/ things we will draw in the safe zone
-    animators: Animator[] = [];
     readonly size: Vec2 = new Vec2(140, 50);
 
     constructor(pos: Vec2, endX: number) {

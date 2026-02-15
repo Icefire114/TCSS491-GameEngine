@@ -7,14 +7,14 @@ import { Buff, BuffType } from "./Buff.js";
 export class JumpBoostItem implements Buff {
     type: BuffType = BuffType.INSTANT_APPLY;
     tag: string = "JumpBoostApple";
-    sprite: ImagePath = new ImagePath("res/img/items/Apple.png"); 
+    sprite: ImagePath = new ImagePath("res/img/items/Apple.png");
 
     onApply(): void {
         const player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
-        
+
         // Apply the multiplier
         player.jumpMultiplier = 1.5;
-        
+
         // Back to normal after after 10 (1.0) seconds
         setTimeout(() => {
             player.jumpMultiplier = 1.0;

@@ -182,14 +182,16 @@ export class GameEngine {
      * @param entity The entity to add.
      * @param drawPriority The priority in which entites should be drawn, 
      * lower numbers = drawn earlier, bigger numbers = drawn later.
+     * @returns The entity that was added.
      */
-    addEntity(entity: Entity, drawPriority: DrawLayer) {
+    addEntity(entity: Entity, drawPriority: DrawLayer): Entity {
         let ents = this.ents.get(entity.tag);
         if (!ents) {
             ents = new Set<[Entity, DrawLayer]>();
             this.ents.set(entity.tag, ents);
         }
         ents.add([entity, drawPriority]);
+        return entity;
     };
 
     /**
@@ -367,7 +369,10 @@ export class GameEngine {
     getAllZombies(): Entity[] {
         return [...this.ents.entries()]
             .filter(([k]) => k.includes("Zombie"))
-            .flatMap(([, v]) => [...v.values()].map(([ent]) => ent));
+            .flatMap(
+                ([, v]) => [...v.values()]
+                    .map(([ent]) => ent)
+            );
     };
 
     startMusic(): void {

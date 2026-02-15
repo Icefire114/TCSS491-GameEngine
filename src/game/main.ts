@@ -112,6 +112,10 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 
+// === Safe Zone Assets ===
+ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
+
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
         console.error(`Error loading assets ${errorCount} of them failed to load!`);

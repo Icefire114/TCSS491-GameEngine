@@ -30,10 +30,10 @@ export class ShaderPass {
         ]);
 
         const texCoords = new Float32Array([
-  0, 0,  // Changed from 0, 1
-  1, 0,  // Changed from 1, 1
-  0, 1,  // Changed from 0, 0
-  1, 1   // Changed from 1, 0
+            0, 0,
+            1, 0,
+            0, 1,
+            1, 1
         ]);
 
         this.positionBuffer = this.gl.createBuffer()!;

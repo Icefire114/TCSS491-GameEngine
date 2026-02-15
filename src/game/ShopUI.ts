@@ -8,10 +8,10 @@ interface ShopItem {
     name: string;
     description: string;
     cost: number;
-    spritePath?: string;  
-    frameWidth?: number; 
-    frameHeight?: number; 
-    rect?: { x: number, y: number, w: number, h: number }; 
+    spritePath?: string;
+    frameWidth?: number;
+    frameHeight?: number;
+    rect?: { x: number, y: number, w: number, h: number };
     buttonRect?: { x: number, y: number, w: number, h: number };
 }
 
@@ -21,39 +21,39 @@ interface ShopItem {
 export class ShopUI implements Entity {
     tag: string = "shop_ui";
     id: EntityID;
-    position: Vec2 = new Vec2(0,0);
-    velocity: Vec2 = new Vec2(0,0);
+    position: Vec2 = new Vec2(0, 0);
+    velocity: Vec2 = new Vec2(0, 0);
     physicsCollider = null;
     sprite = null;
     removeFromWorld: boolean = false;
     public isOpen: boolean = false;
-    
+
     // List of all items
     private items: ShopItem[] = [
-        { 
-            id: "ammo", 
-            name: "AMMO REFILL", 
+        {
+            id: "ammo",
+            name: "AMMO REFILL",
             description: "RESTORES YOUR\nAMMUNITION TO\nFULL CAPACITY.",
             cost: 50,
             spritePath: "res/img/items/rifle.png",
             frameWidth: 43,
             frameHeight: 24,
         },
-        { 
-            id: "health", 
-            name: "HEALTH PACK", 
+        {
+            id: "health",
+            name: "HEALTH PACK",
             description: "INSTANTLY HEALS\nYOU BACK TO\nFULL HEALTH.",
             cost: 100,
             spritePath: "res/img/items/instant_health_pickup.png",
             frameWidth: 42,
             frameHeight: 40,
         },
-        { 
-            id: "shield", 
-            name: "SHIELD BOOST", 
+        {
+            id: "shield",
+            name: "SHIELD BOOST",
             description: "GRANTS A\nPROTECTIVE SHIELD\nFOR 30 SECONDS.",
             cost: 150,
-            spritePath: "res/img/items/shield_pickup.png",  
+            spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
             frameHeight: 64,
         }
@@ -63,8 +63,8 @@ export class ShopUI implements Entity {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {        
-    
+    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine) {
@@ -74,16 +74,16 @@ export class ShopUI implements Entity {
         const h = ctx.canvas.height;
 
         // Color scheme of the UI
-        const borderDark = "#5C3A2E";      
-        const borderLight = "#C9A87C";    
-        const bgMain = "#D4A574";          
-        const cardBg = "#A67C52";        
-        const cardDark = "#8B5E3C";       
-        const textWhite = "#FFFFFF";  
-        const goldColor = "#F4D03F";     
+        const borderDark = "#5C3A2E";
+        const borderLight = "#C9A87C";
+        const bgMain = "#D4A574";
+        const cardBg = "#A67C52";
+        const cardDark = "#8B5E3C";
+        const textWhite = "#FFFFFF";
+        const goldColor = "#F4D03F";
 
         // Panel Dimesions
-        const cardH = h * 0.45; 
+        const cardH = h * 0.45;
         const panelH = 10 + 50 + 20 + cardH + 20;
         const panelW = w * 0.7;
         const panelX = (w - panelW) / 2;
@@ -96,7 +96,7 @@ export class ShopUI implements Entity {
         const titleBarH = 50;
         const titleBarY = panelY + 10;
         this.drawPixelPanel(ctx, panelX + 20, titleBarY, panelW - 40, titleBarH, cardDark, borderLight, cardBg);
-        
+
         ctx.fillStyle = textWhite;
         ctx.font = "bold 28px monospace";
         ctx.textAlign = "center";
@@ -125,12 +125,12 @@ export class ShopUI implements Entity {
      * Private method to draw each indvidual card 
      */
     private drawItemCard(
-        ctx: CanvasRenderingContext2D, 
+        ctx: CanvasRenderingContext2D,
         game: GameEngine,
         item: ShopItem,
-        x: number, 
-        y: number, 
-        w: number, 
+        x: number,
+        y: number,
+        w: number,
         h: number,
         cardBg: string,
         cardDark: string,
@@ -146,16 +146,16 @@ export class ShopUI implements Entity {
         const iconY = y + 10;
         this.drawPixelPanel(ctx, x + 10, iconY, w - 20, iconAreaH, cardDark, borderLight, "#9B6F47");
         if (item.spritePath && item.frameWidth && item.frameHeight) {
-            const sprite = game.getSprite(new ImagePath(item.spritePath));            
-            
+            const sprite = game.getSprite(new ImagePath(item.spritePath));
+
             const maxSize = Math.min(w - 40, iconAreaH - 20);
             const scale = Math.min(maxSize / item.frameWidth, maxSize / item.frameHeight);
-            
+
             const spriteW = item.frameWidth * scale;
             const spriteH = item.frameHeight * scale;
             const spriteX = x + w / 2 - spriteW / 2;
             const spriteY = iconY + iconAreaH / 2 - spriteH / 2;
-            
+
             // Draw first frame of the sprite (0, 0, frameWidth, frameHeight from sprite sheet)
             ctx.drawImage(
                 sprite,
@@ -214,17 +214,17 @@ export class ShopUI implements Entity {
         ctx.fillStyle = textWhite;
         ctx.font = "bold 18px monospace";
         ctx.fillText("BUY", x + w / 2, btnY + 23);
-        ctx.textAlign = "left"; 
+        ctx.textAlign = "left";
     }
 
-    
+
     /**
      * Private helper to draw the card format itself
      */
     private drawPixelPanel(
         ctx: CanvasRenderingContext2D,
         x: number,
-        y: number, 
+        y: number,
         w: number,
         h: number,
         borderDark: string,
@@ -240,18 +240,18 @@ export class ShopUI implements Entity {
         // Dark Outer border
         ctx.fillStyle = borderDark;
         ctx.fillRect(x + w - borderSize, y, borderSize, h);
-        ctx.fillRect(x, y + h - borderSize, w, borderSize); 
+        ctx.fillRect(x, y + h - borderSize, w, borderSize);
 
         // Light Outer border 
         ctx.fillStyle = borderLight;
         ctx.fillRect(x, y, w - borderSize, borderSize);
-        ctx.fillRect(x, y, borderSize, h - borderSize); 
+        ctx.fillRect(x, y, borderSize, h - borderSize);
 
         // Inner darker border
         const innerBorder = 2;
         ctx.fillStyle = borderDark;
-        ctx.fillRect(x + borderSize, y + borderSize, w - borderSize * 2, innerBorder); 
-        ctx.fillRect(x + borderSize, y + borderSize, innerBorder, h - borderSize * 2); 
+        ctx.fillRect(x + borderSize, y + borderSize, w - borderSize * 2, innerBorder);
+        ctx.fillRect(x + borderSize, y + borderSize, innerBorder, h - borderSize * 2);
     }
 
     /**
@@ -266,7 +266,8 @@ export class ShopUI implements Entity {
         borderDark: string,
         borderLight: string,
         bgColor: string
-    ) { const borderSize = 3;
+    ) {
+        const borderSize = 3;
 
         // Background
         ctx.fillStyle = bgColor;
@@ -274,11 +275,11 @@ export class ShopUI implements Entity {
 
         // Border Top and Left
         ctx.fillStyle = borderLight;
-        ctx.fillRect(x, y, w, borderSize); 
-        ctx.fillRect(x, y, borderSize, h); 
+        ctx.fillRect(x, y, w, borderSize);
+        ctx.fillRect(x, y, borderSize, h);
         // Border right and bottom
         ctx.fillStyle = borderDark;
-        ctx.fillRect(x + w - borderSize, y, borderSize, h); 
-        ctx.fillRect(x, y + h - borderSize, w, borderSize); 
+        ctx.fillRect(x + w - borderSize, y, borderSize, h);
+        ctx.fillRect(x, y + h - borderSize, w, borderSize);
     }
 }

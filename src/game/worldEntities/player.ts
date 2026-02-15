@@ -66,13 +66,13 @@ export class Player implements Entity, Collidable {
 
     // Movement tuning constants
     MIN_SPEED = 15;
-    MAX_SPEED = 150;
+    MAX_SPEED = 250;
     SLIDE_FORCE = 50;
-    ACCELERATION = 60;
+    ACCELERATION = 90;
     BRAKE_FORCE = 200;
     FRICTION = 0.01;
     GROUND_STICK_FORCE = 500;
-    JUMP_FORCE = -25;
+    JUMP_FORCE = -35;
     SLOPE_GRAVITY_MULT = 1.2;
 
     isInSafeZone(): boolean {
@@ -203,7 +203,7 @@ export class Player implements Entity, Collidable {
             const inSafeZone = this.isInSafeZone();
             if (inSafeZone) {
                 // Reset velocity when entering safe zone to avoid carrying momentum
-                const SAFE_ZONE_SPEED = this.MAX_SPEED * 0.5;
+                const SAFE_ZONE_SPEED = this.MAX_SPEED * 0.85;
                 const SAFE_ZONE_ACCEL = 120;
 
                 // Horizontal movement
@@ -288,13 +288,17 @@ export class Player implements Entity, Collidable {
 
             this.velocity.x = Math.min(this.MAX_SPEED, this.velocity.x);
 
-            // ---------- Integrate ----------
-            this.position.x += this.velocity.x * deltaTime;
-            this.position.y += this.velocity.y * deltaTime;
+            const safeZoneWalls: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("SafeZoneTurretWall");
+            for (const wall of safeZoneWalls) {
+                if (this.physicsCollider.collides(this, wall)) {
+                    this.velocity.x = this.velocity.x * -1;
+                }
+            }
 
             // ---------- Integrate ----------
             this.position.x += this.velocity.x * deltaTime;
             this.position.y += this.velocity.y * deltaTime;
+
 
             // ---------- Collision with terrain ----------
             if (mountain && mountain.physicsCollider) {
@@ -328,10 +332,12 @@ export class Player implements Entity, Collidable {
                 }
             }
 
+
+
             if (!inSafeZone) {
                 // -- Collision with spikes --
-                const spike: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
-                for (const spikeEntity of spike) {
+                const spikes: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
+                for (const spikeEntity of spikes) {
                     if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
                         this.damagePlayer(5);
                         this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
