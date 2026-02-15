@@ -18,21 +18,23 @@ export class UILayer implements Entity {
     physicsCollider: Collider | null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
-    drawInteractPrompt: boolean = false;
+    drawEnterSZPrompt: boolean = false;
+    drawOpenShopPrompt: boolean = false;
 
     // Shop UI Properties
-    private shop: ShopUI = new ShopUI();
+    private shop: ShopUI;
     private lWasPressed: boolean = false;
 
 
-    constructor() {
+    constructor(shop: ShopUI) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        this.shop = shop;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const player: Player = unwrap(game.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
-
+        ctx.save();
         // Collect TEMP_BUFFS
         const tempBuffs: (Buff & TempBuff)[] = player.buffs.filter(
             (item) => item.type === BuffType.TEMP_BUFF
@@ -96,10 +98,14 @@ export class UILayer implements Entity {
             this.shop.draw(ctx, game);
         }
 
-        if (this.drawInteractPrompt) {
+        if (this.drawEnterSZPrompt) {
             ctx.fillStyle = "black"
-            ctx.fillText(`Press E to enter the Safe Zone`, ctx.canvas.width / 2, ctx.canvas.height - 30);
+            ctx.fillText("Press E to enter the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
+        } else if (this.drawOpenShopPrompt) {
+            ctx.fillStyle = "black"
+            ctx.fillText("Press E to open the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
+        ctx.restore();
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {

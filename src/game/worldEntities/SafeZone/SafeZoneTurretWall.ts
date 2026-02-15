@@ -69,8 +69,8 @@ export class SafeZoneTurretWall implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const ui: UILayer = GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER") as UILayer;
-        ui.drawInteractPrompt = this.enterSafeZoneTrigger.contains(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")));
-        if (ui.drawInteractPrompt && keys['e'] && !this.hasPlayerEntered) {
+        ui.drawEnterSZPrompt = this.enterSafeZoneTrigger.contains(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")));
+        if (ui.drawEnterSZPrompt && keys['e'] && !this.hasPlayerEntered) {
             this.hasPlayerEntered = true;
             unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position = Vec2.compAdd(this.position, new Vec2(15, 0));
             this.parentSafeZone.onPlayerEnterSafeZone();

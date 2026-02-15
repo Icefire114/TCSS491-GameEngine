@@ -115,6 +115,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 // === Safe Zone Assets ===
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -145,8 +146,8 @@ function main() {
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
-        gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER);
-        gameEngine.addUniqueEntity(new UILayer(), DrawLayer.UI_LAYER);
+        const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
+        gameEngine.addUniqueEntity(new UILayer(shopUI), DrawLayer.UI_LAYER);
         gameEngine.addEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         // gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);

@@ -204,9 +204,10 @@ export class GameEngine {
     * @param drawPriority The priority in which entites should be drawn, 
     * lower numbers = drawn earlier, bigger numbers = drawn later.
     */
-    addUniqueEntity(entity: Entity, drawPriority: DrawLayer) {
+    addUniqueEntity(entity: Entity, drawPriority: DrawLayer): Entity {
         this.addEntity(entity, drawPriority);
         this.uniqueEnts.set(entity.tag, [entity, drawPriority]);
+        return entity;
     };
 
     draw() {
