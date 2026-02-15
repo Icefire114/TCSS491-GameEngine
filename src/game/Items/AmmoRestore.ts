@@ -11,7 +11,6 @@ export class AmmoRestore implements Buff {
 
     onApply(): void {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Could not find player entity!") as Player
-
-        player.ammo = player.maxAmmo;
+        player.weapon.ammoOnHand += player.weapon.magSize;
     }
 }
