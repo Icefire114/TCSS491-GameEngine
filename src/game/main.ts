@@ -41,7 +41,7 @@ ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Shot_2.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
-ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/idleRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
 
 
@@ -76,6 +76,7 @@ ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
+ASSET_MANAGER.queueDownload("res/img/guns/RPG/Shot.png");
 ASSET_MANAGER.queueDownload("res/img/guns/IdleGun.png");
 
 // === Bullet Assets ===

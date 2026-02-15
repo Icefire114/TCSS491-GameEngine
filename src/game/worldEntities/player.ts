@@ -84,7 +84,7 @@ export class Player implements Entity, Collidable {
         [
             [ 
                 {
-                    sprite: new ImagePath("res/img/soldiers/Soldier_1/shotRPG.png"),
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Shot_2.png"),
                     frameCount: 4,
                     frameHeight: 128,
                     frameWidth: 128,
@@ -94,8 +94,8 @@ export class Player implements Entity, Collidable {
             ],
             [ 
                 {
-                    sprite: new ImagePath("res/img/soldiers/Soldier_1/idleRPG.png"),
-                    frameCount: 1,
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/IdleRPG.png"),
+                    frameCount: 7,
                     frameHeight: 128,
                     frameWidth: 128,
                 },
@@ -176,13 +176,14 @@ export class Player implements Entity, Collidable {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.weapon = new AssultRifle(this.position);
+        //this.weapon = new AssultRifle(this.position);
+        this.weapon = new RPG(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
         
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
 
-        this.animator = this.rifleAnimator;
+        this.animator = this.rpgAnimator;
 
         this.synchroizeAttackFrames();
     }
