@@ -102,6 +102,10 @@ export class Player implements Entity, Collidable {
 
     hitMultiplier: number = 1;
 
+    // For Jump multipler
+    jumpMultiplier: number = 1;
+
+
     // player gun states (player spawns with a gun)
     ammo: number = 30;
     maxAmmo: number = 30;
@@ -250,7 +254,7 @@ export class Player implements Entity, Collidable {
                     }
                     // ---------- Jump ----------
                     if ((keys["w"] || keys[" "]) && onGround) {
-                        this.velocity.y = this.JUMP_FORCE;
+                        this.velocity.y = this.JUMP_FORCE * this.jumpMultiplier;
                     }
 
                     // Stick player to terrain

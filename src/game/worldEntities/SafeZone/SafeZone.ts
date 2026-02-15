@@ -26,7 +26,7 @@ export class SafeZone implements Entity {
     centerPoint: Vec2;
     readonly size: Vec2 = new Vec2(150, 50);
 
-    constructor(pos: Vec2) {
+    constructor(pos: Vec2, endX: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = pos;
         this.centerPoint = Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1));

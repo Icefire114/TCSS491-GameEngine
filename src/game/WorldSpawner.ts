@@ -8,6 +8,10 @@ import { ItemFactory } from "./Items/ItemFactory.js";
 import Rand from 'rand-seed';
 import { Player } from "./worldEntities/player.js";
 import { randomOf } from "../engine/util.js";
+import { ExplodingZombie } from "./zombies/ExplodingZombie.js";
+import { FastZombie } from "./zombies/FastZombie.js";
+import { GiantZombie } from "./zombies/GiantZombie.js";
+import { ThrowerZombie } from "./zombies/ThrowerZombie.js";
 
 export class WorldSpawner implements Entity {
     // Required info
@@ -30,12 +34,23 @@ export class WorldSpawner implements Entity {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        const engine = GameEngine.g_INSTANCE;
+
         // Ensures that player and mountain is created before updating
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player;
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         if (!player || !mountain) {
             return;
         }
+
+        const viewportRight = engine.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const isPitAhead = mountain.isRavineInView(player.position.x, viewportRight, player.position.y);
+
+        if (isPitAhead) {
+            // Pit is ahead, then dont spawn anything until it passed the player x
+            return;
+        }
+
 
         // Check 300 game units ahead of the player
         const spawnX = player.position.x + 300;
@@ -56,6 +71,11 @@ export class WorldSpawner implements Entity {
      * @returns only if the x position given, has a y above 1000.
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
+        // Not spawning anything in or near safe zones 
+        if (mountain.isNearSafeZone(x, 50)) {
+            return;
+        }
+        
         // If the x position given, has a y above 1000, its in ravine, so don't spawn
         const y = mountain.getHeightAt(x);
         if (y > playerY + 1000) {
@@ -68,9 +88,18 @@ export class WorldSpawner implements Entity {
         // Probaiblty for the spawn 
         if (roll < 0.3) {
             // 30% chance for Zombie
-            GameEngine.g_INSTANCE.addEntity(new BasicZombie({ x, y: y - 5 }), DrawLayer.ZOMBIE);
-        }
-        else if (roll < 0.45) {
+            const zombieTypes = [
+                            BasicZombie,
+                            ExplodingZombie,
+                            FastZombie,
+                            GiantZombie,
+                            ThrowerZombie
+                        ];
+            // Randomly choose between those zombies and then spawning that choosen random spawn
+            const RandomZombieClass = zombieTypes[Math.floor(this.rng.next() * zombieTypes.length)];
+            GameEngine.g_INSTANCE.addEntity(new RandomZombieClass({ x, y: y - 5 }), DrawLayer.ZOMBIE);
+
+        } else if (roll < 0.45) {
             // 15% chance for Spike
             // How many spikes to generate from 2 to 4
             const clusterSize = Math.floor(this.rng.next() * 4) + 2;
@@ -87,8 +116,7 @@ export class WorldSpawner implements Entity {
                 const spike = new Spike({ x: currentX, y: currentY }, rotation);
                 GameEngine.g_INSTANCE.addEntity(spike, DrawLayer.SPIKE);
             }
-        }
-        else if (roll < 0.65) {
+        } else if (roll < 0.65) {
             // Each item has a even shot at being spawned
             const pos = new Vec2(x, y - 2);
             GameEngine.g_INSTANCE.addEntity(

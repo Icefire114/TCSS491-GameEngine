@@ -7,13 +7,14 @@ import { G_CONFIG } from "../CONSTANTS.js";
 import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
 
-export interface SafeZoneData {
+export interface SafeZoneInfo {
     index: number;
     startX: number;
     endX: number;
 }
 
 export class Mountain implements Entity {
+    [x: string]: any;
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
     id: EntityID;
@@ -52,7 +53,7 @@ export class Mountain implements Entity {
     private flatEndX: number = 0;
 
     // "Safezone" tracking
-    private safeZones: SafeZoneData[] = [];
+    private safeZones: SafeZoneInfo[] = [];
     private tempSafeZoneStartX: number = 0;
     private minDistanceBetweenZones = 2000;
     private maxDistanceBetweenZones = 3500;
@@ -192,7 +193,25 @@ export class Mountain implements Entity {
 
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        // Unused.
+        // USED TO DEBUG AND SEE THE SAFE ZONE
+        if (keys["T"]) {
+            const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player");
+
+            if (player) {
+                const newX = 3400;
+                const newY = this.getHeightAt(newX);
+
+                player.position.x = newX;
+                player.position.y = newY - 50;
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+
+                GameEngine.g_INSTANCE.viewportX = newX - 300;
+                console.log(`Teleported to X: ${newX.toFixed(0)}, Y: ${newY.toFixed(0)}`);
+
+                keys["T"] = false;
+            }
+        }
     }
 
 
@@ -245,7 +264,6 @@ export class Mountain implements Entity {
         if (shouldSpawnFlat) {
             this.startFlatSequence();
             console.log(`Spawning SafeZone at x: ${currentX}`);
-            GameEngine.g_INSTANCE.addEntity(new SafeZone(new Vec2(currentX, this.getHeightAt(currentX))), DrawLayer.WORLD_DECORATION);
         }
         // We can only spawn a ravine if we're not in a safe zone
         else if (pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
@@ -353,6 +371,10 @@ export class Mountain implements Entity {
             this.flatSequenceOn = false;
             this.flatEndX = x;
 
+            // Drawing the safezone here
+            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX)), this.flatEndX);
+            GameEngine.g_INSTANCE.addEntity(safeZoneEntity, DrawLayer.WORLD_DECORATION);
+
             // updating our safezone tracking with specific info
             this.safeZones.push({
                 index: this.safeZones.length,
@@ -445,7 +467,7 @@ export class Mountain implements Entity {
     }
 
     // When given 
-    getSafeZone(index: number): SafeZoneData | null {
+    getSafeZone(index: number): SafeZoneInfo | null {
         if (index < 0 || index >= this.safeZones.length) {
             return null;
         }
@@ -479,4 +501,38 @@ export class Mountain implements Entity {
         return status;
     }
 
+    /**
+     * Checks if a ravine is within a range when a given x
+     * 
+     * @param startX the begining of the range
+     * @param endX the end of the range
+     * @returns true if pit is within our player view
+     */
+    public isRavineInView(startX: number, endX: number, playerY: number): boolean {
+        // Checking 20 steps at a time
+        const step = 20;
+
+        // Checking If ground is 1000 units below player then its a pit 
+        for (let x = startX; x <= endX; x += step) {
+            if (this.getHeightAt(x) > playerY + 1000) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given x position is within or near a safe zone
+     * @param x position to check
+     * @param buffer is the distance from safe zone edge
+     * @returns true if x is in or near a safe zone
+     */
+    isNearSafeZone(x: number, buffer: number = 0): boolean {
+        for (const zone of this.safeZones) {
+            if (x >= zone.startX - buffer && x <= zone.endX + buffer) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
