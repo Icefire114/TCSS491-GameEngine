@@ -23,13 +23,14 @@ export class SafeZone implements Entity {
     removeFromWorld: boolean = false;
     // List of the shops/ things we will draw in the safe zone
     animators: Animator[] = [];
-    centerPoint: Vec2;
-    readonly size: Vec2 = new Vec2(150, 50);
+    readonly size: Vec2 = new Vec2(140, 50);
 
     constructor(pos: Vec2, endX: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.position = pos;
-        this.centerPoint = Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1));
+        this.position = Vec2.compAdd(pos, new Vec2(5, 0));
+        this.size = new Vec2(endX - pos.x - 5, this.size.y);
+        console.log(`Created SafeZone with size ${this.size}`);
+
 
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(

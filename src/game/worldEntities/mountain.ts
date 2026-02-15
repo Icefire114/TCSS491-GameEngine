@@ -372,7 +372,7 @@ export class Mountain implements Entity {
             this.flatEndX = x;
 
             // Drawing the safezone here
-            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX)), this.flatEndX);
+            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX + 5)), this.flatEndX);
             GameEngine.g_INSTANCE.addEntity(safeZoneEntity, DrawLayer.WORLD_DECORATION);
 
             // updating our safezone tracking with specific info
