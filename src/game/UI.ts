@@ -87,11 +87,23 @@ export class UILayer implements Entity {
         ctx.fillText(`Shield: ${player.shield}%`, ctx.canvas.width - 200, 80);
         //console.log(`Player Shield: ${player.shield}`);
 
-        // draw ammo count below shield
+        // draw total player weapon ammo below shield
         ctx.fillStyle = "black";
         ctx.font = "30px Arial";
-        ctx.fillText(`Ammo: ${player.ammo}/${player.maxAmmo}`, ctx.canvas.width - 200, 120);
+        ctx.fillText(`Ammo: ${player.weapon.ammoOnHand}`, ctx.canvas.width - 200, 120);
+        //console.log(`Player Total Ammo: ${player.ammoOnHand}`);
+
+        // draw mag count below shield
+        ctx.fillStyle = "black";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Mag: ${player.weapon.ammoInGun}/${player.weapon.magSize}`, ctx.canvas.width - 200, 160);
         //console.log(`Player Ammo: ${player.ammo}`);
+
+        // draw currency below ammo
+        ctx.fillStyle = "gold";
+        ctx.font = "30px Arial";
+        ctx.fillText(`Currency: ${player.currency}`, ctx.canvas.width - 200, 200);
+        //console.log(`Player Currency: ${player.currency}`);
 
         // Shop UI Drawing
         if (this.shop.isOpen) {

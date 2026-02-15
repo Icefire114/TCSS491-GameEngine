@@ -7,14 +7,16 @@ import { Player } from "../worldEntities/player.js";
 import { unwrap } from "../../engine/util.js";
 import { Vec2 } from "../../engine/types.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { Zombie } from "./Zombie.js";
 
-export class FastZombie implements Entity {
+export class FastZombie extends Zombie {
     tag: string = "FastZombie";
-    id: EntityID;
     attack_range: number = 3;
     attack_cooldown: number = 0.5; // fast attacks
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 5;
+    health: number = 60; // less health for fast zombie
+    reward: number = 15; // reward for killing this zombie
 
 
     velocity: Vec2 = new Vec2();
@@ -100,10 +102,7 @@ export class FastZombie implements Entity {
     ], new Vec2(7, 9));
 
     constructor(pos?: Vec2) {
-        this.id = `${this.tag}#${crypto.randomUUID()}`;
-        if (pos) {
-            this.position = pos;
-        }
+        super("FastZombie", pos);
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -112,6 +111,12 @@ export class FastZombie implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+        // checking for death
+         if (this.health <= 0) {
+            // death animation
+            this.animator.updateAnimState(AnimationState.DEATH, deltaTime);
+            return; // skip rest of update logic if dead
+        }
         const currentTime = Date.now() / 1000; // current time in seconds
 
         const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;

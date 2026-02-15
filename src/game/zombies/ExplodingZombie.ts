@@ -7,14 +7,16 @@ import { Player } from "../worldEntities/player.js";
 import { unwrap } from "../../engine/util.js";
 import { Vec2 } from "../../engine/types.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { Zombie } from "./Zombie.js";
 
-export class ExplodingZombie implements Entity {
+export class ExplodingZombie extends Zombie {
     tag: string = "ExplodingZombie";
-    id: EntityID;
     attack_range: number = 4;
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 5; // Runs until very close
+    health: number = 200;
+    reward: number = 20; // reward for killing this zombie
 
     //Explosion properties
     explosion_radius: number = 8; // how far it reaches
@@ -104,10 +106,7 @@ export class ExplodingZombie implements Entity {
     ]);
 
     constructor(pos?: Vec2) {
-        this.id = `${this.tag}#${crypto.randomUUID()}`;
-        if (pos) {
-            this.position = pos;
-        }
+        super("ExplodingZombie", pos);
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -116,6 +115,12 @@ export class ExplodingZombie implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+        // checking for death
+         if (this.health <= 0) {
+            // death animation
+            this.animator.updateAnimState(AnimationState.DEATH, deltaTime);
+            return; // skip rest of update logic if dead
+        }
         const currentTime = Date.now() / 1000; // current time in seconds
 
         const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;

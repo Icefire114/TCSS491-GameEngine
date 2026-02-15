@@ -1,20 +1,22 @@
 import { AnimationState, Animator } from "../../engine/Animator.js";
 import { ImagePath } from "../../engine/assetmanager.js";
-import { Entity, EntityID } from "../../engine/Entity.js";
+import { EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Player } from "../worldEntities/player.js";
 import { unwrap } from "../../engine/util.js";
 import { Vec2 } from "../../engine/types.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { Zombie } from "./Zombie.js";
 
-export class BasicZombie implements Entity {
+export class BasicZombie extends Zombie {
     tag: string = "BasicZombie";
-    id: EntityID;
     attack_range: number = 5;
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 10; // distance at which zombie starts running
+    health: number = 100; // health of the zombie
+    reward: number = 10; // reward for killing this zombie
 
     velocity: Vec2 = new Vec2();
     position: Vec2 = new Vec2();
@@ -97,10 +99,7 @@ export class BasicZombie implements Entity {
     ]);
 
     constructor(pos?: Vec2) {
-        this.id = `${this.tag}#${crypto.randomUUID()}`;
-        if (pos) {
-            this.position = pos;
-        }
+        super("BasicZombie", pos);
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -109,6 +108,12 @@ export class BasicZombie implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+        // checking for death
+         if (this.health <= 0) {
+            // death animation
+            this.animator.updateAnimState(AnimationState.DEATH, deltaTime);
+            return; // skip rest of update logic if dead
+        }
         const currentTime = Date.now() / 1000; // current time in seconds
 
         const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;

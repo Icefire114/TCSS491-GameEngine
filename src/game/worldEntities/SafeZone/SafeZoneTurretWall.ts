@@ -8,7 +8,7 @@ import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { UILayer } from "../../UI.js";
-import { Bullet } from "../bullet.js";
+import { RifleBullet } from "../bullets/RifleBullet.js";
 import { SafeZone } from "./SafeZone.js";
 
 export class SafeZoneTurretWall implements Entity, Collidable {
@@ -88,7 +88,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                 });
 
             for (const z of targets) {
-                GameEngine.g_INSTANCE.addEntity(new Bullet(turretTip.x, turretTip.y, z.position.x, z.position.y), DrawLayer.BULLET);
+                GameEngine.g_INSTANCE.addEntity(new RifleBullet(turretTip.x, turretTip.y, z.position.x, z.position.y), DrawLayer.BULLET);
             }
         }
     }
