@@ -78,6 +78,7 @@ export class GameEngine {
 
         const canvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+        this.ctx.imageSmoothingEnabled = false;
         this.m_Renderer = new Renderer(this.ctx);
         this.startInput();
         this.timer = new Timer();
