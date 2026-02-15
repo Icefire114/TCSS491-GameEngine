@@ -18,6 +18,7 @@ export class UILayer implements Entity {
     physicsCollider: Collider | null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
+    drawInteractPrompt: boolean = false;
 
     // Shop UI Properties
     private shop: ShopUI = new ShopUI();
@@ -93,6 +94,11 @@ export class UILayer implements Entity {
         // Shop UI Drawing
         if (this.shop.isOpen) {
             this.shop.draw(ctx, game);
+        }
+
+        if (this.drawInteractPrompt) {
+            ctx.fillStyle = "black"
+            ctx.fillText(`Press E to enter the Safe Zone`, ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
     }
 

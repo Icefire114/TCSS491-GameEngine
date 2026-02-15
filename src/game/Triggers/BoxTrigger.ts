@@ -38,6 +38,15 @@ export class BoxTrigger implements Entity, Collidable {
 
     }
 
+    /**
+     * Check if a specific entity is currently within this trigger
+     * @param entity The entity to check
+     * @returns `true` if the entity is within the trigger bounds
+     */
+    contains(entity: Entity): boolean {
+        return this.physicsCollider.collides(this, entity);
+    }
+
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         for (const tag of this.triggerOnTags) {
             const ents: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag(tag);

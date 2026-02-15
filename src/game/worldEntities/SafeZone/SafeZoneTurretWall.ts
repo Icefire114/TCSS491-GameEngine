@@ -3,8 +3,13 @@ import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Collidable, Collider } from "../../../engine/physics/Collider.js";
-import { Vec2 } from "../../../engine/types.js";
+import { DrawLayer, Vec2 } from "../../../engine/types.js";
+import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
+import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
+import { UILayer } from "../../UI.js";
+import { Bullet } from "../bullet.js";
+import { SafeZone } from "./SafeZone.js";
 
 export class SafeZoneTurretWall implements Entity, Collidable {
     tag: string = "SafeZoneTurretWall";
@@ -17,10 +22,25 @@ export class SafeZoneTurretWall implements Entity, Collidable {
     removeFromWorld: boolean = false;
 
     size: Vec2 = new Vec2(25, 50);
+    private lastShot: number = 0;
+    private readonly shootCoolDownMS: number = 75;
+    private hasPlayerEntered: boolean = false;
+    private enterSafeZoneTrigger: BoxTrigger;
+    private parentSafeZone: SafeZone;
 
-    constructor(pos: Vec2) {
+    constructor(pos: Vec2, parentSafeZone: SafeZone) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = Vec2.compAdd(pos, new Vec2(this.size.x / 2, 0));
+        this.enterSafeZoneTrigger = GameEngine.g_INSTANCE.addEntity(
+            new BoxTrigger(
+                Vec2.compSub(this.position, new Vec2(this.size.x / 2 + 2.5, 0)),
+                new Vec2(5, this.size.y),
+                ["player"],
+                false,
+                (e: Entity) => { }
+            ), DrawLayer.DEFAULT
+        ) as BoxTrigger;
+        this.parentSafeZone = parentSafeZone;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -30,11 +50,10 @@ export class SafeZoneTurretWall implements Entity, Collidable {
             this.size
         );
         GameEngine.g_INSTANCE.renderer.drawRawSpriteAtWorldPos(
-            Vec2.compAdd(this.position, new Vec2(0, -10)),
+            Vec2.compAdd(this.position, new Vec2(0, -50)),
             GameEngine.g_INSTANCE.getSprite(this.turretSprite),
-            new Vec2(5 * 37 / 24, 5 * 37 / 24)
-        )
-
+            new Vec2(0.35 * 37, 0.35 * 24)
+        );
 
         if (G_CONFIG.DRAW_SAFEZONE_BB) {
             GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
@@ -47,8 +66,31 @@ export class SafeZoneTurretWall implements Entity, Collidable {
         }
     }
 
+
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
-        // TODO: Kill all zombies that get in range of the turret
+        const ui: UILayer = GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER") as UILayer;
+        ui.drawInteractPrompt = this.enterSafeZoneTrigger.contains(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")));
+        if (ui.drawInteractPrompt && keys['e'] && !this.hasPlayerEntered) {
+            this.hasPlayerEntered = true;
+            unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")).position = Vec2.compAdd(this.position, new Vec2(15, 0));
+            this.parentSafeZone.onPlayerEnterSafeZone();
+        }
+
+
+        if (this.hasPlayerEntered && this.lastShot <= performance.now() - this.shootCoolDownMS) {
+            this.lastShot = performance.now();
+            const turretTip = Vec2.compAdd(this.position, new Vec2(2.5, -50));
+
+            // Get all zombies that are before the safe zone
+            const targets: Entity[] = GameEngine.g_INSTANCE.getAllZombies()
+                .filter(e => {
+                    return e.position.x < turretTip.x + 10;
+                });
+
+            for (const z of targets) {
+                GameEngine.g_INSTANCE.addEntity(new Bullet(turretTip.x, turretTip.y, z.position.x, z.position.y), DrawLayer.BULLET);
+            }
+        }
     }
 
 }

@@ -26,18 +26,6 @@ export class SafeZone implements Entity {
         this.size = new Vec2(endX - pos.x - 5, this.size.y);
         console.log(`Created SafeZone with size ${this.size}`);
 
-
-        GameEngine.g_INSTANCE.addEntity(
-            new BoxTrigger(
-                Vec2.compAdd(this.position, new Vec2(5, 0)),
-                new Vec2(1, this.size.x),
-                ["player"],
-                true,
-                (e: Entity) => {
-                    this.onPlayerEnterSafeZone(e as Player);
-                }
-            ), DrawLayer.DEFAULT
-        );
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
                 Vec2.compAdd(this.position, new Vec2(this.size.x - 5, 0)),
@@ -52,7 +40,8 @@ export class SafeZone implements Entity {
 
         GameEngine.g_INSTANCE.addEntity(
             new SafeZoneTurretWall(
-                Vec2.compAdd(this.position, new Vec2(5, 0))
+                Vec2.compAdd(this.position, new Vec2(5, 0)),
+                this
             ), DrawLayer.WORLD_DECORATION
         );
 
@@ -88,12 +77,12 @@ export class SafeZone implements Entity {
         }
     }
 
-    private onPlayerExitSafeZone(ent: Player) {
+    private onPlayerExitSafeZone(ent: Player): void {
         console.log("Player exited the SafeZone!");
         // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
     }
 
-    private onPlayerEnterSafeZone(ent: Player) {
+    onPlayerEnterSafeZone(): void {
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
@@ -113,7 +102,6 @@ export class SafeZone implements Entity {
         this.cleanupEntByTag("BuffEntity");
         // Old safe zone things
         this.cleanupEntByTag("SafeZone");
-        this.cleanupEntByTag("SafeZoneCenterPoint");
         this.cleanupEntByTag("SafeZoneTurretWall");
     }
 }
