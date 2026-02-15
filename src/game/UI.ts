@@ -95,7 +95,9 @@ export class UILayer implements Entity {
 
         // Shop UI Drawing
         if (this.shop.isOpen) {
+            ctx.save();
             this.shop.draw(ctx, game);
+            ctx.restore();
         }
 
         if (this.drawEnterSZPrompt) {
@@ -103,7 +105,7 @@ export class UILayer implements Entity {
             ctx.fillText("Press E to enter the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
         } else if (this.drawOpenShopPrompt) {
             ctx.fillStyle = "black"
-            ctx.fillText("Press E to open the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
+            ctx.fillText("Press E to open/ close the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
         ctx.restore();
     }
