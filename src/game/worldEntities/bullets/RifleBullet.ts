@@ -18,8 +18,8 @@ import { Bullet } from "./Bullet.js";
 export class RifleBullet extends Bullet {
     tag: string = "RifleBullet";
 
-    physicsCollider = new BoxCollider(1, 1);
-    sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
+    physicsCollider = new BoxCollider(1, 0.5);
+    sprite: ImagePath = new ImagePath("res/img/ammo/RifleBullet.png");
     removeFromWorld: boolean = false;
     damage: number = 30; 
 
@@ -29,7 +29,7 @@ export class RifleBullet extends Bullet {
         [
             [
                 {
-                    sprite: new ImagePath("res/img/ammo/test_bullet.png"),
+                    sprite: new ImagePath("res/img/ammo/RifleBullet.png"),
                     frameCount: 1,
                     frameHeight: 28,
                     frameWidth: 36,
@@ -38,7 +38,7 @@ export class RifleBullet extends Bullet {
                 AnimationState.IDLE
             ]
         ],
-        { x: 1, y: 1 }
+        { x: 1, y: 0.5 }
     );
 
 

@@ -7,7 +7,7 @@ import { Item } from "../Items/Item.js";
 import { ItemEntity } from "../Items/ItemEntity.js";
 import { Collidable } from "../../engine/physics/Collider.js";
 import { Mountain } from "./mountain.js";
-import { AnimationState, Animator } from "../../engine/Animator.js";
+import { AnimationState, Animator, AnimationEvent } from "../../engine/Animator.js";
 import { RifleBullet } from "./bullets/RifleBullet.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { Buff, BuffType, TempBuff } from "../Items/Buff.js";
@@ -15,6 +15,9 @@ import { BuffEntity } from "../Items/BuffEntity.js";
 import { Zombie } from "../zombies/Zombie.js";
 import { RPGRocket } from "./bullets/RPGRocket.js";
 import { LazerBullet } from "./bullets/LazerBullet.js";
+import { Gun } from "../Items/guns/Gun.js";
+import { AssultRifle } from "../Items/guns/AssultRifle.js";
+import { RPG } from "../Items/guns/RPG.js";
 
 /**
  * @author PG
@@ -32,7 +35,9 @@ export class Player implements Entity, Collidable {
     dead: boolean = false;
 
     snowBoardSprite: ImagePath = new ImagePath("res/img/snowboard.png");
-    animator: Animator = new Animator(
+    animator: Animator;
+    
+    private rifleAnimator = new Animator(
         [
             [
                 {
@@ -50,6 +55,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 4,
                     frameHeight: 128,
                     frameWidth: 128,
+                    fireOnFrame: 2
                 },
                 AnimationState.ATTACK
             ],
@@ -61,6 +67,48 @@ export class Player implements Entity, Collidable {
                     frameWidth: 128,
                 },
                 AnimationState.DEATH
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Recharge.png"),
+                    frameCount: 13,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.RELOAD
+            ],
+        ]
+    );
+
+    private rpgAnimator = new Animator(
+        [
+            [ 
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/shotRPG.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                    fireOnFrame: 2
+                },
+                AnimationState.ATTACK
+            ],
+            [ 
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/idleRPG.png"),
+                    frameCount: 1,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Recharge.png"),
+                    frameCount: 1,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.RELOAD
             ]
         ]
     );
@@ -99,8 +147,12 @@ export class Player implements Entity, Collidable {
     hitMultiplier: number = 1;
 
     // player gun states (player spawns with a gun)
-    ammo: number = 30;
-    maxAmmo: number = 30;
+    weapon: Gun;
+    wantsToReload: boolean = false;
+    isReloading: boolean = false;
+    isShooting: boolean = false;
+    wantsToShoot: boolean = false;
+    queuedShotTarget: Vec2 | null = null;
 
     // for animation locking
     inAnimation: boolean = false;
@@ -124,6 +176,57 @@ export class Player implements Entity, Collidable {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        this.weapon = new AssultRifle(this.position);
+        GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
+        
+        this.setUpAnimatorEvents(this.rpgAnimator);
+        this.setUpAnimatorEvents(this.rifleAnimator);
+
+        this.animator = this.rifleAnimator;
+
+        this.synchroizeAttackFrames();
+    }
+
+    private setUpAnimatorEvents(animator: Animator): void {
+
+        animator.onEvent(AnimationEvent.ATTACK_FIRE, () => {
+            this.fireWeapon();
+            console.log(`Attack animation fired`);
+        });
+
+        animator.onEvent(AnimationEvent.ATTACK_END, () => {
+            this.isShooting = false;
+            this.weapon.isShooting = false;
+            // if (this.wantsToShoot) 
+            //     this.animator.updateAnimState(AnimationState.IDLE, 0); 
+            console.log(`Attack animation ended`);
+        });
+
+        animator.onEvent(AnimationEvent.RELOAD_END, () => {
+            this.isReloading = false;
+            this.weapon.isReloading = false;
+            this.weapon.reload();
+        });
+    }
+
+    synchroizeAttackFrames(): void {
+        // Get the attack animation info
+        const attackAnimInfo = this.animator['spriteSheet'][AnimationState.ATTACK];
+        if (!attackAnimInfo) return;
+        
+        // Calculate desired animation duration based on fire rate
+        const shotCooldownSeconds = this.weapon.getShotCooldown() / 1000; // convert ms to seconds
+        
+        // Calculate how long the animation naturally takes at base speed
+        const baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
+        
+        // Calculate speed multiplier needed
+        const speedMultiplier = baseAnimDuration / shotCooldownSeconds;
+        
+        // Update the animation speed
+        attackAnimInfo.animationSpeed = speedMultiplier;
+        
+        console.log(`Synced animation: Fire rate=${this.weapon.fireRate}/s, Cooldown=${shotCooldownSeconds}s, Speed multiplier=${speedMultiplier.toFixed(2)}x`);
     }
 
 
@@ -164,34 +267,37 @@ export class Player implements Entity, Collidable {
                 }
             }
 
-            this.animationLock();
-            if (this.inAnimation || (keys["Mouse0"] && this.ammo > 0)) {
+            // store the target for when the animation fires
+            if (mouseWorldX !== null && mouseWorldY !== null) {
+                this.queuedShotTarget = new Vec2(mouseWorldX, mouseWorldY);
+            }
+
+            const currentTime = Date.now();
+            this.wantsToShoot = keys["Mouse0"] && this.weapon.canShoot(currentTime);
+            this.weapon.wantsToShoot = this.wantsToShoot;
+            this.wantsToReload = keys["r"] && this.weapon.canReload();
+            this.weapon.wantsToReload = this.wantsToReload;
+
+            // ---------- Animation Logic ----------
+            if (this.isShooting) {
+                // continue playing attack animation
                 this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
+            } else if (this.wantsToShoot) {
+                // start attack animation
+                this.isShooting = true;
+                this.weapon.isShooting = true;
+                this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
+            } else if (this.isReloading) {
+                this.animator.updateAnimState(AnimationState.RELOAD, deltaTime);
+            } else if (this.wantsToReload) {
+                this.isReloading = true;
+                this.weapon.isReloading = true;
+                this.animator.updateAnimState(AnimationState.RELOAD, deltaTime);
+            } else {
+                // Idle animation state
+                this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
             }
 
-            if (!this.inAnimation) {
-                // -- Shooting guns --
-                if (keys["Mouse0"] && this.ammo > 0) {
-                    this.ammo -= 1;
-                    this.endTime = 666.667; // duration of attack animation in ms
-                    this.inAnimation = true;
-                    this.timer = Date.now();
-
-                    // Create bullet entity
-                    console.log(`Click Coords: (${clickCoords.x.toFixed(2)}, ${clickCoords.y.toFixed(2)})`);
-
-                    // Only use converted world coords; fallback to a small offset if conversion failed.
-                    const targetX = mouseWorldX ?? (this.position.x + 1);
-                    const targetY = mouseWorldY ?? this.position.y;
-
-                    // create bullet
-                    const bullet = new LazerBullet(this.position.x, this.position.y, targetX, targetY);
-                    GameEngine.g_INSTANCE.addEntity(bullet, DrawLayer.of(3));
-                    //console.log(`ammo: ${this.ammo}`);
-                } else {
-                    this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-                }
-            }
 
 
             const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
@@ -276,7 +382,7 @@ export class Player implements Entity, Collidable {
             const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
             for (const itemEnt of items) {
                 if (this.physicsCollider.collides(this, itemEnt)) {
-                    console.log(`We hit item ${itemEnt.id}`);
+                    //console.log(`We hit item ${itemEnt.id}`);
                     const item: Item = itemEnt.pickup();
                     this.items.push(item);
 
@@ -288,7 +394,7 @@ export class Player implements Entity, Collidable {
             const buffs = GameEngine.g_INSTANCE.getEntitiesByTag("BuffEntity") as BuffEntity[];
             for (const buffEnt of buffs) {
                 if (this.physicsCollider.collides(this, buffEnt)) {
-                    console.log(`We hit buff ${buffEnt.id}`);
+                    //console.log(`We hit buff ${buffEnt.id}`);
                     // no need to apply the buff, it is applied when `pickup` is called.
                     const buff: Buff = buffEnt.pickup();
                     // We only care about tracking temp buffs.
@@ -303,12 +409,12 @@ export class Player implements Entity, Collidable {
             const spike: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
             for (const spikeEntity of spike) {
                 if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
-                    console.log(`Player hit a spike!`);
+                    //console.log(`Player hit a spike!`);
                     this.damagePlayer(5);
                     this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
                     this.velocity.y = -10; // bounce player up a bit on spike hit
                     this.iTime = this.iDuration; // start invulnerability time
-                    console.log('Player hit a spike');
+                    //console.log('Player hit a spike');
                 }
             }
 
@@ -318,7 +424,7 @@ export class Player implements Entity, Collidable {
                 if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
                     this.damagePlayer(10);
                     this.iTime = this.iDuration; // start invulnerability time
-                    console.log(`Player hit by a zombie`);
+                    //console.log(`Player hit by a zombie`);
                 }
             }
         } else {
@@ -327,11 +433,26 @@ export class Player implements Entity, Collidable {
 
     }
 
-    animationLock(): void {
-        if (this.endTime <= Date.now() - this.timer) {
-            this.endTime = 0;
-            this.inAnimation = false;
-            //console.log(`exited animation lock`);
+    fireWeapon(): void {
+            console.log(`queuedTarget: ${this.queuedShotTarget}, wantsToShoot: ${this.wantsToShoot}`);
+
+        if (!this.queuedShotTarget || !this.wantsToShoot) {
+            console.log(`skipping fireWeapon.`);
+            return;
+        }
+
+        const currentTime = Date.now();
+        const bullet = this.weapon.shoot(this.position.x, this.position.y, this.queuedShotTarget.x, this.queuedShotTarget.y, currentTime);
+
+        console.log(`${bullet ? "Shot fired" : "Failed to fire"} at (${this.queuedShotTarget.x.toFixed(2)}, ${this.queuedShotTarget.y.toFixed(2)}) with weapon ${this.weapon.tag}`);
+
+        if (bullet) {
+            console.log(`Bullet type: ${bullet.constructor.name}`);
+            GameEngine.g_INSTANCE.addEntity(bullet, DrawLayer.of(3));
+            console.log(`Fired weapon, ammo left in gun: ${this.weapon.ammoInGun}`);
+        } else {
+                    console.log(`Bullet is null! Check weapon.shoot() implementation`);
+
         }
     }
 
@@ -392,12 +513,12 @@ export class Player implements Entity, Collidable {
             if (this.shield <= 0) { //damage shield first
                 this.health += ScaledDamage;
                 var death = Math.random() * this.health;
-                console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
+                //console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
                 death *= this.hitMultiplier;
                 console.log(`Adjusted death chance: ${death.toFixed(2)}`);
 
                 if (death >= 150) { // chance of death increases with health%
-                    console.log(`Player has died!`);
+                    //console.log(`Player has died!`);
                     this.dead = true;
                 }
 

@@ -2,7 +2,7 @@ import { ImagePath } from "../../../engine/assetmanager.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
-import { Vec2 } from "../../../engine/types.js";
+import { DrawLayer, Vec2 } from "../../../engine/types.js";
 import { Collidable } from "../../../engine/physics/Collider.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Mountain } from "../mountain.js";
@@ -10,6 +10,7 @@ import { Zombie } from "../../zombies/Zombie.js";
 import { Player } from "../player.js";
 import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "./Bullet.js";
+import { Explosion } from "./Explosion.js";
 
 /**
  * @author JK
@@ -18,8 +19,8 @@ import { Bullet } from "./Bullet.js";
 export class RPGRocket extends Bullet {
     tag: string = "RPGRocket";
 
-    physicsCollider = new BoxCollider(2, 1);
-    sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
+    physicsCollider = new BoxCollider(6, 2);
+    sprite: ImagePath = new ImagePath("res/img/ammo/RPGRocket.png");
     removeFromWorld: boolean = false;
     damage: number = 100; 
     explosionRadius: number = 20; // world units
@@ -30,16 +31,16 @@ export class RPGRocket extends Bullet {
         [
             [
                 {
-                    sprite: new ImagePath("res/img/ammo/test_bullet.png"),
+                    sprite: new ImagePath("res/img/ammo/RPGRocket.png"),
                     frameCount: 1,
-                    frameHeight: 28,
-                    frameWidth: 36,
+                    frameHeight: 8,
+                    frameWidth: 42,
                     offestX: 0
                 },
                 AnimationState.IDLE
-            ]
+            ],
         ],
-        { x: 1, y: 1 }
+        { x: 6, y: 1 }
     );
 
 
@@ -48,41 +49,29 @@ export class RPGRocket extends Bullet {
         
         //this.position.x += this.velocity.x * 0.04;
         //this.position.y += this.velocity.y * 0.5;
+        console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
     }
 
     protected onEnemyHit(target: Entity, allEnemies: Entity[]): void {
-        this.explode(allEnemies);
+        const explosion =  new Explosion(this.position.x, this.position.y, this.damage);
+        GameEngine.g_INSTANCE.addEntity(explosion, DrawLayer.of(3));
+        
         if (this.shouldRemoveOnHit()) {
             this.removeFromWorld = true;
         }
     }
 
     onTerrainHit(mountain: Entity): void {
-        const zombies: Entity[] = GameEngine.g_INSTANCE.getEnemies();
-        this.explode(zombies);
+        const explosion =  new Explosion(this.position.x, this.position.y, this.damage);
+        GameEngine.g_INSTANCE.addEntity(explosion, DrawLayer.of(3));
+        
         this.removeFromWorld = true;
+        if (this.shouldRemoveOnHit()) {
+            this.removeFromWorld = true;
+        }
     }
 
     shouldRemoveOnHit(): boolean {
         return true;
-     }
-
-     explode(allEnemies: Entity[]): void {
-        // damage all enemies in explosion radius 
-        for (const enemy of allEnemies) {
-            const dx = enemy.position.x - this.position.x;
-            const dy = enemy.position.y - this.position.y;
-            const distance = Math.hypot(dx, dy);
-
-            // check if other enemies are within explosion radius and apply damage falloff based on distance
-            if (distance <= this.explosionRadius) {
-                if (enemy instanceof Zombie) {
-                    const damage = this.damage * (1 - distance / this.explosionRadius);
-                    enemy.takeDamage(damage);
-                }
-            }
-        }
-
-        //todo : add explosion animation and sound effect
      }
 }

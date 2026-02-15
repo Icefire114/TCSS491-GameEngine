@@ -1,14 +1,53 @@
 import { Gun } from "./Gun.js";
 import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { LazerBullet } from "../../worldEntities/bullets/LazerBullet.js";
+import { ImagePath } from "../../../engine/assetmanager.js";
+import { AnimationState, Animator } from "../../../engine/Animator.js";
+import { Vec2 } from "../../../engine/types.js";
 
 export class RayGun extends Gun {
-    constructor() {
+
+    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+
+    animator = new Animator(
+            [
+                [ 
+                    {
+                        sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
+                        frameCount: 4,
+                        frameHeight: 20,
+                        frameWidth: 64,
+                    },
+                    AnimationState.ATTACK
+                ],
+                [ 
+                    {
+                        sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
+                        frameCount: 1,
+                        frameHeight: 128,
+                        frameWidth: 128,
+                    },
+                    AnimationState.IDLE
+                ],
+                [
+                    {
+                        sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
+                        frameCount: 1,
+                        frameHeight: 128,
+                        frameWidth: 128,
+                    },
+                    AnimationState.RELOAD
+                ]
+            ]
+        );
+    
+    constructor(position: Vec2) {
         super("RayGun", //tag
             100, //ammo
             30, //magSize
             20, //fireRate
-            3 //reloadTime
+            3, //reloadTime
+            position
         );
     }
 

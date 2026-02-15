@@ -40,6 +40,9 @@ ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Shot_2.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/idleRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
 
 
 // === Zombie Assets ===
@@ -71,8 +74,16 @@ ASSET_MANAGER.queueDownload("res/img/items/infection_immunity.png");
 ASSET_MANAGER.queueDownload("res/img/items/infection_immunity_UI.png");
 ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 
+// === Guns Assets ===
+ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
+ASSET_MANAGER.queueDownload("res/img/guns/IdleGun.png");
+
 // === Bullet Assets ===
+ASSET_MANAGER.queueDownload("res/img/ammo/RifleBullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/RPGRocket.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/RPGExplode.png");
+
 
 // === SKY Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/background/background/day.png");
