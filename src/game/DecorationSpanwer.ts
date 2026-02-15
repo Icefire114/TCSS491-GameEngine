@@ -78,8 +78,7 @@ export class DecorationSpawner implements Entity {
      * @returns only return if were trying to spawn in the ravines
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
-        const zoneStatus = mountain.getSafeZoneStatus(x);
-        if (zoneStatus.currentZoneIndex !== -1) {
+        if (mountain.isNearSafeZone(x, 25)) {
             return;
         }
 

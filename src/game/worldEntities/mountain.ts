@@ -514,6 +514,21 @@ export class Mountain implements Entity {
                 return true;
             }
         }
-    return false;
+        return false;
+    }
+
+    /**
+     * Checks if the given x position is within or near a safe zone
+     * @param x position to check
+     * @param buffer is the distance from safe zone edge
+     * @returns true if x is in or near a safe zone
+     */
+    isNearSafeZone(x: number, buffer: number = 0): boolean {
+        for (const zone of this.safeZones) {
+            if (x >= zone.startX - buffer && x <= zone.endX + buffer) {
+                return true;
+            }
+        }
+        return false;
     }
 }
