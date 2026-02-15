@@ -6,6 +6,7 @@ import { unwrap } from "./util.js";
 import { G_CONFIG } from "../game/CONSTANTS.js";
 import { BoxCollider } from "./physics/BoxCollider.js";
 import { Renderer } from "./Renderer.js";
+import { Zombie } from "../game/zombies/Zombie.js";
 
 export class GameEngine {
     /**
@@ -368,13 +369,13 @@ export class GameEngine {
     /**
      * @returns A list of all the zombie enteties.
      */
-    getAllZombies(): Entity[] {
+    getAllZombies(): Zombie[] {
         return [...this.ents.entries()]
             .filter(([k]) => k.includes("Zombie"))
             .flatMap(
                 ([, v]) => [...v.values()]
                     .map(([ent]) => ent)
-            );
+            ) as Zombie[];
     };
 
     startMusic(): void {

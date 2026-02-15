@@ -110,5 +110,6 @@ export class SafeZone implements Entity {
         // Old safe zone things
         this.cleanupEntByTag("SafeZone");
         this.cleanupEntByTag("SafeZoneTurretWall");
+        this.cleanupEntByTag("Shop");
     }
 }

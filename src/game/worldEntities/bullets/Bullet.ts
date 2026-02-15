@@ -104,8 +104,12 @@ export abstract class Bullet implements Entity, Collidable {
             this.position.y += this.velocity.y * deltaTime;
         }
 
-        if (this.position.x < GameEngine.g_INSTANCE.viewportX - 10 || this.position.x > GameEngine.g_INSTANCE.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT + 10 ||
-            this.position.y < GameEngine.g_INSTANCE.viewportY - 10 || this.position.y > GameEngine.g_INSTANCE.viewportY + GameEngine.WORLD_UNITS_IN_VIEWPORT + 10) {
+        if (
+            this.position.x < GameEngine.g_INSTANCE.viewportX - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
+            this.position.x > GameEngine.g_INSTANCE.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT ||
+            this.position.y < GameEngine.g_INSTANCE.viewportY - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
+            this.position.y > GameEngine.g_INSTANCE.viewportY + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT
+        ) {
 
             this.removeFromWorld = true;
         }

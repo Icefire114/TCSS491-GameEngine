@@ -8,6 +8,7 @@ import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { UILayer } from "../../UI.js";
+import { Zombie } from "../../zombies/Zombie.js";
 import { RifleBullet } from "../bullets/RifleBullet.js";
 import { SafeZone } from "./SafeZone.js";
 
@@ -82,9 +83,9 @@ export class SafeZoneTurretWall implements Entity, Collidable {
             const turretTip = Vec2.compAdd(this.position, new Vec2(2.5, -50));
 
             // Get all zombies that are before the safe zone
-            const targets: Entity[] = GameEngine.g_INSTANCE.getAllZombies()
+            const targets: Zombie[] = GameEngine.g_INSTANCE.getAllZombies()
                 .filter(e => {
-                    return e.position.x < turretTip.x + 10;
+                    return e.position.x < turretTip.x + 10 && e.health > 0;
                 });
 
             for (const z of targets) {
