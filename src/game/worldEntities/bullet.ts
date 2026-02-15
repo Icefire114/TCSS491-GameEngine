@@ -62,11 +62,6 @@ export class Bullet implements Entity, Collidable {
 
         this.velocity.x = dir.x * this.speed;
         this.velocity.y = dir.y * this.speed;
-
-        //this.position.x += this.velocity.x * 0.04;
-        //this.position.y += this.velocity.y * 0.5;
-
-        console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
     }
 
 
