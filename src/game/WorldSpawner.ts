@@ -71,6 +71,11 @@ export class WorldSpawner implements Entity {
      * @returns only if the x position given, has a y above 1000.
      */
     private executeSpawn(x: number, playerY: number, mountain: Mountain) {
+        // Not spawning anything in or near safe zones 
+        if (mountain.isNearSafeZone(x, 50)) {
+            return;
+        }
+        
         // If the x position given, has a y above 1000, its in ravine, so don't spawn
         const y = mountain.getHeightAt(x);
         if (y > playerY + 1000) {
