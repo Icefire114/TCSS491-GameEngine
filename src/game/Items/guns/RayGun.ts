@@ -6,8 +6,9 @@ import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Vec2 } from "../../../engine/types.js";
 
 export class RayGun extends Gun {
-
+    // todo: make sprites for this
     sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    ammoBox = 100;
 
     animator = new Animator(
             [

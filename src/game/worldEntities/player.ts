@@ -103,8 +103,8 @@ export class Player implements Entity, Collidable {
             ],
             [
                 {
-                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Recharge.png"),
-                    frameCount: 1,
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/ReloadRPG.png"),
+                    frameCount: 9,
                     frameHeight: 128,
                     frameWidth: 128,
                 },
@@ -116,7 +116,7 @@ export class Player implements Entity, Collidable {
     prevGroundSpeed: number = 0;
 
     // Movement tuning constants
-    MIN_SPEED = 15;
+    MIN_SPEED = 0;
     MAX_SPEED = 150;
     SLIDE_FORCE = 50;
     ACCELERATION = 60;
@@ -176,14 +176,16 @@ export class Player implements Entity, Collidable {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        //this.weapon = new AssultRifle(this.position);
         this.weapon = new RPG(this.position);
+        // this.weapon = new AssultRifle(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
         
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
 
         this.animator = this.rpgAnimator;
+        // this.animator = this.rifleAnimator;
+
 
         this.synchroizeAttackFrames();
     }
@@ -219,15 +221,33 @@ export class Player implements Entity, Collidable {
         const shotCooldownSeconds = this.weapon.getShotCooldown() / 1000; // convert ms to seconds
         
         // Calculate how long the animation naturally takes at base speed
-        const baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
+        let baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
         
         // Calculate speed multiplier needed
-        const speedMultiplier = baseAnimDuration / shotCooldownSeconds;
+        let speedMultiplier = baseAnimDuration / shotCooldownSeconds;
         
         // Update the animation speed
         attackAnimInfo.animationSpeed = speedMultiplier;
         
         console.log(`Synced animation: Fire rate=${this.weapon.fireRate}/s, Cooldown=${shotCooldownSeconds}s, Speed multiplier=${speedMultiplier.toFixed(2)}x`);
+
+        // Get the reload animation info
+        const reloadAnimInfo = this.animator['spriteSheet'][AnimationState.RELOAD];
+        if (!reloadAnimInfo) return;
+        
+        // Calculate desired animation duration based on fire rate
+        const reloadCooldownSeconds = this.weapon.getReloadCooldown() / 1000; // convert ms to seconds
+        
+        // Calculate how long the animation naturally takes at base speed
+        baseAnimDuration = reloadAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
+        
+        // Calculate speed multiplier needed
+        speedMultiplier = baseAnimDuration / reloadCooldownSeconds;
+        
+        // Update the animation speed
+        reloadAnimInfo.animationSpeed = speedMultiplier;
+        
+        console.log(`Synced animation: Fire rate=${this.weapon.fireRate}/s, Cooldown=${reloadCooldownSeconds}s, Speed multiplier=${speedMultiplier.toFixed(2)}x`);
     }
 
 
@@ -437,7 +457,7 @@ export class Player implements Entity, Collidable {
     fireWeapon(): void {
             console.log(`queuedTarget: ${this.queuedShotTarget}, wantsToShoot: ${this.wantsToShoot}`);
 
-        if (!this.queuedShotTarget || !this.wantsToShoot) {
+        if (!this.queuedShotTarget) {
             console.log(`skipping fireWeapon.`);
             return;
         }

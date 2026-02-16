@@ -7,10 +7,8 @@ import { Vec2 } from "../../../engine/types.js";
 
 export class AssultRifle extends Gun {
 
-    private static muzzleXOffset: number = 2; // distance from player center to muzzle in the direction of shooting
-    private static muzzleYOffset: number = 4; // vertical offset from player center to muzzle
-
     sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    ammoBox = 60;
 
     animator = new Animator(
         [
@@ -49,7 +47,7 @@ export class AssultRifle extends Gun {
         super("AssultRifle", //tag
             120, //ammo
             30, //magSize
-            5, //fireRate
+            10, //fireRate
             2, //reloadTime
             position
         );
@@ -76,10 +74,13 @@ export class AssultRifle extends Gun {
     }
 
     protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-        return new RifleBullet(
-            startX + AssultRifle.muzzleXOffset, 
-            startY - AssultRifle.muzzleYOffset, 
-            targetX, 
-            targetY);
+    
+        const muzzleDistance = 3.5;
+        const verticleOffset = 0.8; 
+        
+        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
+        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
+        return new RifleBullet(muzzleX, muzzleY, targetX, targetY);
     }
+
 }
