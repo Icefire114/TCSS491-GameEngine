@@ -2,16 +2,17 @@ import { ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { Vec2 } from "../engine/types.js";
+import { unwrap } from "../engine/util.js";
 
 /**
  * @author JK
  * @description The background layer class.
  */
 export class BackgroundLayer implements Entity {
-    velocity: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].velocity;
     position: Vec2 = new Vec2();
+    velocity: Vec2 = new Vec2();
     position2: Vec2 = new Vec2();
-    playerPosition: Vec2 = GameEngine.g_INSTANCE.getEntitiesByTag("player")![0].position;
+    playerPosition: Vec2 = new Vec2();
 
     physicsCollider = null;
     spriteType: string;
@@ -146,6 +147,10 @@ export class BackgroundLayer implements Entity {
         if (this.dayNightCycleTime > this.cycleDuration) {
             this.dayNightCycleTime = 0;
         }
+
+        const player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"));
+        this.playerPosition = player.position;
+        this.velocity = player.velocity;
 
         const cycleProgress = this.dayNightCycleTime / this.cycleDuration;
         this.timeOfDayAlpha = (Math.sin(cycleProgress * Math.PI * 2 - Math.PI / 2) + 1) / 2;
