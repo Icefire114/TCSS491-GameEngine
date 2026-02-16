@@ -1,3 +1,7 @@
+import Rand from "rand-seed";
+
+export const g_RNG = new Rand("my-cool-seed");
+
 /**
  * Clamps the given number between the given bounds.
  * 
@@ -42,6 +46,61 @@ export function DtoR(d: number): number {
     return d * (Math.PI / 180);
 }
 
+
+/**
+ * Picks a random element from the given options with their weights.
+ *
+ * @param options  The possible options to choose from with their weights.
+ * @param rng      Optional RNG to use, else defaults to `g_RNG`.
+ */
+export function randomOfWeighted<T>(
+    options: readonly { obj: T; weight: number }[],
+    rng?: Rand
+): T | undefined;
+
+/**
+ * Picks a random element from the given options with their weights.
+ *
+ * @param options  The possible options to choose from with their weights.
+ * @param fallback The element to return if the array is empty or total weight is 0.
+ * @param rng      Optional RNG to use, else defaults to `g_RNG`.
+ */
+export function randomOfWeighted<T>(
+    options: readonly { obj: T; weight: number }[],
+    fallback: T,
+    rng?: Rand
+): T;
+
+export function randomOfWeighted<T>(
+    options: readonly { obj: T; weight: number }[],
+    fallbackOrRng?: T | Rand,
+    maybeRng?: Rand
+): T | undefined {
+    const rng: Rand = maybeRng ?? (fallbackOrRng instanceof Rand ? fallbackOrRng : g_RNG);
+
+    const fallback: T | undefined = fallbackOrRng instanceof Rand ? undefined : fallbackOrRng;
+
+    let totalWeight = 0;
+    for (const opt of options) {
+        const w = Math.max(0, opt.weight);
+        if (w !== opt.weight) {
+            console.warn('Negative weight encountered:', opt);
+        }
+        totalWeight += w;
+    }
+
+    if (totalWeight <= 0) return fallback;
+
+    let roll = rng.next() * totalWeight;
+    for (const opt of options) {
+        roll -= Math.max(0, opt.weight);
+        if (roll <= 0) return opt.obj;
+    }
+
+    return fallback;
+}
+
+
 /**
  * Samples a random element from the given array.
  * @param arr The array to sample a random element from.
@@ -72,5 +131,5 @@ export function randomOf<T>(arr: readonly T[], fallback: T): T;
  */
 export function randomOf<T>(arr: readonly T[], fallback?: T): T | undefined {
     if (arr.length === 0) return fallback;
-    return arr[Math.floor(Math.random() * arr.length)];
+    return arr[Math.floor(g_RNG.next() * arr.length)];
 }
