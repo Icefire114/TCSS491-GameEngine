@@ -17,7 +17,8 @@ export class AssultRifle extends Gun {
                     sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
                     frameCount: 4,
                     frameHeight: 20,
-                    frameWidth: 64,
+                    frameWidth: 66,
+                    offestX: 4,
                     fireOnFrame: 2
                 },
                 AnimationState.ATTACK
@@ -46,7 +47,7 @@ export class AssultRifle extends Gun {
     constructor(position: Vec2) {
         super("AssultRifle", //tag
             120, //ammo
-            30, //magSize
+            300, //magSize
             10, //fireRate
             2, //reloadTime
             position
@@ -73,14 +74,14 @@ export class AssultRifle extends Gun {
         attackAnimInfo.animationSpeed = speedMultiplier;
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
+    protected createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet {
     
         const muzzleDistance = 3.5;
-        const verticleOffset = 0.8; 
+        const verticleOffset = 0.2; 
         
         const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
         const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RifleBullet(muzzleX, muzzleY, targetX, targetY);
+        return new RifleBullet(muzzleX, muzzleY, targetX, targetY, playerVelocity);
     }
 
 }

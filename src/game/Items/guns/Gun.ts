@@ -10,8 +10,8 @@ import { Player } from "../../worldEntities/player.js";
 
 export abstract class Gun implements Entity {
 
-    private readonly DEFAULT_XOFFSET: number = -1;
-    private readonly DEFAULT_YOFFSET: number = 5.5;
+    private readonly SHOULDER_OFFSET_X: number = -0.7;
+    private readonly SHOULDER_OFFSET_Y: number = -3.8;
     private readonly GUN_LENGTH: number = 1;
     protected travelAngle = 0;
 
@@ -77,7 +77,10 @@ export abstract class Gun implements Entity {
         this.ammoInGun--;
         this.lastShotTime = currentTime;
 
-        return this.createBullet(this.position.x, this.position.y, targetX, targetY);
+        const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player;
+        const playerVelocity = player.velocity;
+
+        return this.createBullet(this.position.x, this.position.y, targetX, targetY, playerVelocity);
     }
 
     canReload(): boolean {
@@ -110,18 +113,24 @@ export abstract class Gun implements Entity {
         ctx.translate(screenX, screenY);
         ctx.rotate(this.travelAngle);
 
-        this.animator.drawCurrentAnimFrameAtOrigin(ctx, 0.1, 0.1);
+        this.animator.drawCurrentAnimFrameAtOrigin(ctx, 0.3, 0.5);
 
         ctx.restore();
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
 
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
+        const shoulderY = player.position.y + this.SHOULDER_OFFSET_Y;
+        
+
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
         let mouseWorldY: number | null = null;
         const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
+
         if (canvas && clickCoords) {
             const rect = canvas.getBoundingClientRect();
             // canvas pixel coords (account for CSS scaling)
@@ -133,62 +142,16 @@ export abstract class Gun implements Entity {
             mouseWorldX = (canvasPxX * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportX;
             mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
 
-            // ---------- track mouse movement ----------
-        
-            // direction
-            const dir = new Vec2(mouseWorldX - this.position.x, mouseWorldY - this.position.y);
-            
-            // normalize (guard against zero length)
-            const length = Math.hypot(dir.x, dir.y);
-            if (length <= 1e-6) {
-                dir.x = 1;
-                dir.y = 0;
-            } else {
-                dir.x /= length;
-                dir.y /= length;
+            if (mouseWorldX !== null && mouseWorldY !== null) {
+                const dx = mouseWorldX - shoulderX;
+                const dy = mouseWorldY - shoulderY;
+                this.travelAngle = Math.atan2(dy, dx);
             }
 
-            this.travelAngle = Math.atan2(dir.y, dir.x);
-
+            this.position.x = shoulderX + Math.cos(this.travelAngle) * this.GUN_LENGTH;
+            this.position.y = shoulderY + Math.sin(this.travelAngle) * this.GUN_LENGTH;
         }
         
-        
-
-        // Update gun position to player's position
-        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
-
-        // Calculate shoulder position (pivot point)
-        // const shoulderX = player.position.x + this.DEFAULT_XOFFSET;
-        // const shoulderY = player.position.y + this.DEFAULT_YOFFSET;
-
-        // if (mouseWorldX !== null && mouseWorldY !== null) {
-        //     // Calculate angle from shoulder to mouse
-        //     const dx = mouseWorldX - shoulderX;
-        //     const dy = mouseWorldY - shoulderY;
-        //     this.travelAngle = Math.atan2(dy, dx);
-
-            //  console.log(`${this.travelAngle.toFixed(2)} radians, ${(this.travelAngle * (180 / Math.PI)).toFixed(1)} degrees`);
-        // }
-
-        // this.position.x = shoulderX + Math.cos(this.travelAngle) * this.GUN_LENGTH;
-        // this.position.y = shoulderY + Math.sin(this.travelAngle) * this.GUN_LENGTH;
-        let offX: number;
-        let offY: number;
-        if (this.travelAngle > 0) {
-            offX = this.DEFAULT_XOFFSET + this.travelAngle / 2;
-            offY = this.DEFAULT_YOFFSET - this.travelAngle / 2;
-        } else if (this.travelAngle < 0) {
-            offX = this.DEFAULT_XOFFSET + this.travelAngle / 2;
-            offY = this.DEFAULT_YOFFSET + this.travelAngle / 2;
-        } else { 
-            offX = this.DEFAULT_XOFFSET;
-            offY = this.DEFAULT_YOFFSET;
-        }
-
-        this.position.x = player.position.x + offX;
-        this.position.y = player.position.y - offY;
-
-
         // ---------- Animation Logic ----------
         if (this.isShooting) {
             // continue playing attack animation
@@ -207,5 +170,5 @@ export abstract class Gun implements Entity {
         
     }
 
-    protected abstract createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet;
+    protected abstract createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet;
 }

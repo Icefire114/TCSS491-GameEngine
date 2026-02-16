@@ -185,15 +185,15 @@ export class Player implements Entity, Collidable {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.weapon = new AssultRifle(this.position);
-        // this.weapon = new RPG(this.position);
+        // this.weapon = new AssultRifle(this.position);
+        this.weapon = new RPG(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
 
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
 
-        this.animator = this.rifleAnimator;
-        // this.animator = this.rpgAnimator;
+        // this.animator = this.rifleAnimator;
+        this.animator = this.rpgAnimator;
 
         this.synchroizeAttackFrames();
     }
@@ -325,31 +325,6 @@ export class Player implements Entity, Collidable {
             } else {
                 // Idle animation state
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-            }
-
-            if (!this.inAnimation) {
-                // -- Shooting guns --
-                if (keys["Mouse0"] && this.weapon.ammoInGun > 0) {
-                    this.weapon.ammoInGun -= 1;
-                    this.endTime = 666.667; // duration of attack animation in ms
-                    this.inAnimation = true;
-                    this.timer = Date.now();
-
-                    // Create bullet entity
-                    console.log(`Click Coords: (${clickCoords.x.toFixed(2)}, ${clickCoords.y.toFixed(2)})`);
-
-                    // Only use converted world coords; fallback to a small offset if conversion failed.
-                    const targetX = mouseWorldX ?? (this.position.x + 1);
-                    const targetY = mouseWorldY ?? this.position.y;
-
-                    // create bullet
-                    GameEngine.g_INSTANCE.addEntity(
-                        new RifleBullet(this.position.x, this.position.y, targetX, targetY),
-                        DrawLayer.BULLET);
-                    //console.log(`ammo: ${this.ammo}`);
-                } else {
-                    this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-                }
             }
 
 

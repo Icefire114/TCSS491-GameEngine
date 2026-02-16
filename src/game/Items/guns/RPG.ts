@@ -73,12 +73,12 @@ export class RPG extends Gun {
         attackAnimInfo.animationSpeed = speedMultiplier;
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
+    protected createBullet(startX: number, startY: number, targetX: number, targetY: number,  playerVelocity: Vec2): Bullet {
         const muzzleDistance = 3;
         const verticleOffset = 0.8; 
                 
         const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
         const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RPGRocket(muzzleX, muzzleY, targetX, targetY);
+        return new RPGRocket(muzzleX, muzzleY, targetX, targetY, playerVelocity);
     }
 }

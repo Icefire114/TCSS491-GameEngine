@@ -25,7 +25,7 @@ export abstract class Bullet implements Entity, Collidable {
     speed: number; // world units per second
     abstract animator: Animator;
 
-    constructor(tag: string, startX: number, startY: number, endX: number, endY: number, speed: number, damage: number) {
+    constructor(tag: string, startX: number, startY: number, endX: number, endY: number, speed: number, damage: number, playerVelocity?: Vec2) {
         this.tag = tag;
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.speed = speed;
@@ -51,7 +51,12 @@ export abstract class Bullet implements Entity, Collidable {
         this.velocity.x = dir.x * this.speed;
         this.velocity.y = dir.y * this.speed;
 
-        this.travelAngle = Math.atan2(dir.y, dir.x);
+        if (playerVelocity) {
+            this.velocity.x += playerVelocity.x;
+            this.velocity.y += playerVelocity.y;
+        }
+
+        this.travelAngle = Math.atan2(this.velocity.y, this.velocity.x);
         console.log(`${this.tag} created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
 
     }
@@ -73,7 +78,7 @@ export abstract class Bullet implements Entity, Collidable {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        //const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
         // ---------- Collision with terrain ----------
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
@@ -94,24 +99,27 @@ export abstract class Bullet implements Entity, Collidable {
             }
         }
 
+        // move the bullet
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
         // Move the bullet
 
-        const playerVelocity = player.velocity;
-        if (playerVelocity.x > 15) {
-            this.position.x += this.velocity.x * deltaTime * playerVelocity.x / 20;
-            this.position.y += this.velocity.y * deltaTime * playerVelocity.x / 20;
-        } else {
-            this.position.x += this.velocity.x * deltaTime;
-            this.position.y += this.velocity.y * deltaTime;
-        }
+        // const playerVelocity = player.velocity;
+        // if (playerVelocity.x > 15) {
+        //     this.position.x += this.velocity.x * deltaTime * playerVelocity.x / 30;
+        //     this.position.y += this.velocity.y * deltaTime * playerVelocity.x / 30;
+        // } else {
+        //     this.position.x += this.velocity.x * deltaTime;
+        //     this.position.y += this.velocity.y * deltaTime;
+        // }
 
+        // remove if offscreen
         if (
             this.position.x < GameEngine.g_INSTANCE.viewportX - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.x > GameEngine.g_INSTANCE.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.y < GameEngine.g_INSTANCE.viewportY - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.y > GameEngine.g_INSTANCE.viewportY + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT
         ) {
-
             this.removeFromWorld = true;
         }
     }
