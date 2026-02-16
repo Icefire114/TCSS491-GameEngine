@@ -1,14 +1,8 @@
 import { ImagePath } from "../../../engine/assetmanager.js";
-import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
-import { Vec2 } from "../../../engine/types.js";
-import { Collidable } from "../../../engine/physics/Collider.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Mountain } from "../mountain.js";
 import { Zombie } from "../../zombies/Zombie.js";
-import { Player } from "../player.js";
-import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "./Bullet.js";
 
 /**
@@ -21,7 +15,7 @@ export class LazerBullet extends Bullet {
     physicsCollider = new BoxCollider(2, 1);
     sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
     removeFromWorld: boolean = false;
-    damage: number = 20; 
+    damage: number = 20;
     explosionRadius: number = 20; // world units
     speed: number = 100 // world units per second
     hitEnemies: Set<EntityID> = new Set(); // track which enemies have already been hit to prevent multiple hits
@@ -45,7 +39,7 @@ export class LazerBullet extends Bullet {
 
     constructor(startX: number, startY: number, endX: number, endY: number) {
         super("LazerBullet", startX, startY, endX, endY, 100, 30);
-        
+
         //this.position.x += this.velocity.x * 0.04;
         //this.position.y += this.velocity.y * 0.5;
     }
@@ -55,7 +49,7 @@ export class LazerBullet extends Bullet {
         if (!this.hitEnemies.has(target.id) && target instanceof Zombie) {
             this.hitEnemies.add(target.id);
             target.takeDamage(this.damage);
-            
+
         }
         if (this.shouldRemoveOnHit()) {
             this.removeFromWorld = true;
@@ -68,6 +62,6 @@ export class LazerBullet extends Bullet {
 
     shouldRemoveOnHit(): boolean {
         return false;
-     }
+    }
 
 }

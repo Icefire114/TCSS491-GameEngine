@@ -1,14 +1,8 @@
 import { ImagePath } from "../../../engine/assetmanager.js";
-import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
-import { Entity, EntityID } from "../../../engine/Entity.js";
-import { Vec2 } from "../../../engine/types.js";
-import { Collidable } from "../../../engine/physics/Collider.js";
+import { Entity } from "../../../engine/Entity.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Mountain } from "../mountain.js";
 import { Zombie } from "../../zombies/Zombie.js";
-import { Player } from "../player.js";
-import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "./Bullet.js";
 
 /**
@@ -21,7 +15,7 @@ export class RifleBullet extends Bullet {
     physicsCollider = new BoxCollider(1, 0.5);
     sprite: ImagePath = new ImagePath("res/img/ammo/RifleBullet.png");
     removeFromWorld: boolean = false;
-    damage: number = 30; 
+    damage: number = 30;
 
     speed: number = 100 // world units per second
 
@@ -44,7 +38,7 @@ export class RifleBullet extends Bullet {
 
     constructor(startX: number, startY: number, endX: number, endY: number) {
         super("RifleBullet", startX, startY, endX, endY, 100, 30);
-        
+
         //this.position.x += this.velocity.x * 0.04;
         //this.position.y += this.velocity.y * 0.5;
 
@@ -53,7 +47,7 @@ export class RifleBullet extends Bullet {
 
     onEnemyHit(target: Entity, allEnemies: Entity[]): void {
         if (target instanceof Zombie) {
-        target.takeDamage(this.damage);
+            target.takeDamage(this.damage);
         }
         if (this.shouldRemoveOnHit()) {
             this.removeFromWorld = true;
@@ -66,5 +60,5 @@ export class RifleBullet extends Bullet {
 
     shouldRemoveOnHit(): boolean {
         return true;
-     }
+    }
 }

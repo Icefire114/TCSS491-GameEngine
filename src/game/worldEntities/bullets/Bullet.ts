@@ -8,6 +8,7 @@ import { GameEngine } from "../../../engine/gameengine.js";
 import { Mountain } from "../mountain.js";
 import { Player } from "../player.js";
 import { unwrap } from "../../../engine/util.js";
+import { Zombie } from "../../zombies/Zombie.js";
 
 export abstract class Bullet implements Entity, Collidable {
     protected travelAngle: number;
@@ -84,10 +85,10 @@ export abstract class Bullet implements Entity, Collidable {
         }
 
         // ---------- Collision with zombies ----------
-        const zombies: Entity[] = GameEngine.g_INSTANCE.getAllZombies();
+        const zombies: Zombie[] = GameEngine.g_INSTANCE.getAllZombies();
         //console.log(`zombies in world: ${zombies.length}`);
         for (const zombie of zombies) {
-            if (this.physicsCollider.collides(this, zombie)) {
+            if (this.physicsCollider.collides(this, zombie) && zombie.health > 0) {
                 this.onEnemyHit(zombie, zombies);
                 // console.log(`${this.tag} hit a zombie`);
             }
