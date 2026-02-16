@@ -12,6 +12,7 @@ import { Zombie } from "./Zombie.js";
 export class BasicZombie extends Zombie {
     tag: string = "BasicZombie";
     attack_range: number = 5;
+    stop_range: number = 7;
     attack_cooldown: number = 1.0; // 1 second cooldown
     lastAttackTime: number = 0; // tracks when last attacked
     run_range: number = 10; // distance at which zombie starts running
@@ -109,7 +110,7 @@ export class BasicZombie extends Zombie {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
         // checking for death
-         if (this.health <= 0) {
+        if (this.health <= 0) {
             // death animation
             this.animator.updateAnimState(AnimationState.DEATH, deltaTime);
             return; // skip rest of update logic if dead
@@ -120,13 +121,39 @@ export class BasicZombie extends Zombie {
         const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
 
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
+
+        //if player dead stop moving and do idle animation
+        if (player.dead) {
+
+            this.velocity.x = 0;
+
+            // Apply gravity to make zombie fall to ground
+            this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 4;
+
+            // Check collision with terrain to stop falling
+            if (mountain && mountain.physicsCollider) {
+                if (this.physicsCollider.collides(this, mountain)) {
+                    this.velocity.y = 0;
+                }
+            }
+
+            // Update position 
+            this.position.x += this.velocity.x * deltaTime;
+            this.position.y += this.velocity.y * deltaTime;
+
+            // Set animation to IDLE
+            this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+
+            return;
+        }
+
         const deltaX = player.position.x - this.position.x;
         const deltaY = player.position.y - this.position.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); //calculate distance
 
 
-        const walk_speed = 40; //zombie walk speed
-        const run_speed = walk_speed * 1.5; //run speed
+        const walk_speed = 35; //zombie walk speed
+        const run_speed = walk_speed * 1.2; //run speed
 
         if (distance > this.attack_range) {
             const MOVE_SPEED = distance > this.run_range ? run_speed : walk_speed;
@@ -140,12 +167,6 @@ export class BasicZombie extends Zombie {
             }
         }
 
-        //commented this for now so that the zombie attacks while moving and doesn't go idle
-        // } else {
-        //     // stop moving and attack when in rance
-        //     this.velocity.x = 0;
-
-        // attack if cooldown is done
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                 this.lastAttackTime = currentTime;
@@ -163,10 +184,10 @@ export class BasicZombie extends Zombie {
             }
         }
 
-
         // ---------- Integrate ----------
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
+
 
         // Update animation based on what zombie is doing
         if (distance <= this.attack_range) {
@@ -190,6 +211,12 @@ export class BasicZombie extends Zombie {
             } else {
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
             }
+        }
+
+        //despawn zombie if it is behind player
+        if (this.position.x < player.position.x - 20) {
+            this.removeFromWorld = true;
+            return;
         }
     }
 }
