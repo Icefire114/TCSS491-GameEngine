@@ -116,7 +116,7 @@ export class Player implements Entity, Collidable {
     prevGroundSpeed: number = 0;
 
     // Movement tuning constants
-    MIN_SPEED = 0;
+    MIN_SPEED = 15;
     MAX_SPEED = 150;
     SLIDE_FORCE = 50;
     ACCELERATION = 60;
