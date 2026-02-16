@@ -22,7 +22,7 @@
         script.type = 'module';
 
         const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
+
         script.src = isDev ? './build/game/main.js' : './bundle.js';
         document.body.appendChild(script);
     </script>
