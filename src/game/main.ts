@@ -124,6 +124,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/fire_barrel.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/crate.png");
 
 // === Safe Zone Assets ===
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
@@ -163,42 +164,39 @@ function main() {
         gameEngine.addUniqueEntity(new UILayer(shopUI), DrawLayer.UI_LAYER);
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
-        // gameEngine.addEntity(new BasicZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        // gameEngine.addEntity(new BasicZombie({ x: 10, y: 0 }), DrawLayer.ZOMBIE);
-        // gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
-        // gameEngine.addEntity(new ThrowerZombie({ x: 30, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new FastZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
-        gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
+
+        if (G_CONFIG.CREATE_TESTING_ENTS) {
+            gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
+            gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+            gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+            gameEngine.addEntity(new FastZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
+            gameEngine.addEntity(new BasicZombie({ x: 20, y: 0 }), DrawLayer.ZOMBIE);
 
 
-        gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
-        gameEngine.addEntity(new BuffEntity(
-            new InfectionImmunityItem(),
-            new Animator([
-                [
-                    {
-                        frameCount: 15,
-                        frameHeight: 51,
-                        frameWidth: 39,
-                        sprite: new ImagePath("res/img/items/infection_immunity.png")
-                    },
-                    AnimationState.IDLE
-                ]
-            ],
-                { x: 3, y: 3 }
-            ),
-            new Vec2(3, 3),
-            { x: 90, y: 0 })
-            , DrawLayer.ITEM);
+            gameEngine.addEntity(new Spike({ x: 80, y: 0 }), DrawLayer.SPIKE);
+            gameEngine.addEntity(new Spike({ x: 82, y: 0 }), DrawLayer.SPIKE);
+            gameEngine.addEntity(new Spike({ x: 84, y: 0 }), DrawLayer.SPIKE);
+            gameEngine.addEntity(new BuffEntity(
+                new InfectionImmunityItem(),
+                new Animator([
+                    [
+                        {
+                            frameCount: 15,
+                            frameHeight: 51,
+                            frameWidth: 39,
+                            sprite: new ImagePath("res/img/items/infection_immunity.png")
+                        },
+                        AnimationState.IDLE
+                    ]
+                ],
+                    { x: 3, y: 3 }
+                ),
+                new Vec2(3, 3),
+                { x: 90, y: 0 })
+                , DrawLayer.ITEM);
 
 
-        gameEngine.addEntity(
-            new BuffEntity(
+            gameEngine.addEntity(new BuffEntity(
                 new InstantHealthItem(),
                 new Animator(
                     [
@@ -216,9 +214,8 @@ function main() {
                 ),
                 new Vec2(3, 3),
                 { x: 60, y: 0 })
-            , DrawLayer.ITEM);
-        gameEngine.addEntity(
-            new BuffEntity(
+                , DrawLayer.ITEM);
+            gameEngine.addEntity(new BuffEntity(
                 new ShieldRestorePickupItem(),
                 new Animator(
                     [
@@ -237,10 +234,9 @@ function main() {
                 new Vec2(3, 3),
                 { x: 70, y: 0 }
             ),
-            DrawLayer.ITEM
-        )
-        gameEngine.addEntity(
-            new BuffEntity(
+                DrawLayer.ITEM
+            )
+            gameEngine.addEntity(new BuffEntity(
                 new AmmoRestore(),
                 new Animator(
                     [
@@ -260,10 +256,9 @@ function main() {
                 new Vec2(6, 3),
                 { x: 13, y: 0 }
             ),
-            DrawLayer.ITEM
-        )
-        gameEngine.addEntity(
-            new BuffEntity(
+                DrawLayer.ITEM
+            )
+            gameEngine.addEntity(new BuffEntity(
                 new ShockwaveBombItem(),
                 new Animator(
                     [
@@ -282,10 +277,9 @@ function main() {
                 new Vec2(4, 4),
                 { x: 100, y: 4 }
             ),
-            DrawLayer.ITEM
-        );
-        gameEngine.addEntity(
-            new BuffEntity(
+                DrawLayer.ITEM
+            );
+            gameEngine.addEntity(new BuffEntity(
                 new JumpBoostItem(),
                 new Animator(
                     [
@@ -304,76 +298,54 @@ function main() {
                 new Vec2(5, 5),
                 { x: 120, y: 5 }
             ),
-            DrawLayer.ITEM
-        );
-        gameEngine.addEntity(
-            new Tree(
+                DrawLayer.ITEM
+            );
+            gameEngine.addEntity(new Tree(
                 new Vec2(
                     132,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Bush(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Bush(
                 new Vec2(
                     149,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Bush(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Bush(
                 new Vec2(
                     168,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Bush(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Bush(
                 new Vec2(
                     184,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Bush(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Bush(
                 new Vec2(
                     200,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Bush(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Bush(
                 new Vec2(
                     218,
                     0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new Rock(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new Rock(
                 new Vec2(230, 0)
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
-        gameEngine.addEntity(
-            new ChristmasTree(
+            ), DrawLayer.WORLD_DECORATION);
+            gameEngine.addEntity(new ChristmasTree(
                 new Vec2(
                     300, 0
                 )
-            ),
-            DrawLayer.WORLD_DECORATION
-        );
+            ), DrawLayer.WORLD_DECORATION);
+        }
+
         gameEngine.start();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);

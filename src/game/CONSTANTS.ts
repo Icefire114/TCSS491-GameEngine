@@ -13,5 +13,6 @@ export const G_CONFIG = {
     // If true, use the new renderer, else use the old renderer
     NEW_RENDERER: false,
     // If true, draw the safezone bounding boxes
-    DRAW_SAFEZONE_BB: true
+    DRAW_SAFEZONE_BB: true,
+    CREATE_TESTING_ENTS: false
 }
