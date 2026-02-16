@@ -123,6 +123,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_1.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/berry_bush_2.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/rock_1.png");
+ASSET_MANAGER.queueDownload("res/img/world_deco/fire_barrel.png");
 
 // === Safe Zone Assets ===
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");

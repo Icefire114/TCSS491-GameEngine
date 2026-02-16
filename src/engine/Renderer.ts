@@ -149,4 +149,28 @@ export class Renderer {
 
         return { screenPos, screenSize };
     }
+
+    /**
+     * Convert a size given in **screen pixels** into the equivalent size in
+     * **world units** (metres) for the current viewport / zoom level.
+     *
+     * @param pxSize  Width or height in screen pixels.
+     * @returns       The same length expressed in world units.
+     */
+    public pixelsToWorldUnits(pxSize: number): number {
+        const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        return pxSize / (mInPx / GameEngine.g_INSTANCE.zoom);
+    }
+
+    /**
+     * Convert a size given in **screen pixels** into the equivalent size in
+     * **world units** (metres) for the current viewport / zoom level.
+     *
+     * @param pxSize  Width or height in screen pixels.
+     * @returns       The same length expressed in world units.
+     */
+    public pixelsToWorldUnitsVec2(pxSize: Vec2): Vec2 {
+        const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        return Vec2.compDivScalar(pxSize, mInPx / GameEngine.g_INSTANCE.zoom);
+    }
 }

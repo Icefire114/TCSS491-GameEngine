@@ -28,7 +28,7 @@ export class FireBarrel implements Entity {
      * 
      * @param position 
      * @param variant An optional override to force a certain sprite to be rendered.
-     *  Must be a valid index of {@link Rock.SPRITE_PATHS}.
+     *  Must be a valid index of {@link FireBarrel.SPRITE_PATHS}.
      */
     constructor(position: Vec2, scale: number = 1, variant?: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -45,8 +45,8 @@ export class FireBarrel implements Entity {
                 [
                     {
                         frameCount: 4,
-                        frameHeight: 36,
-                        frameWidth: 80,
+                        frameWidth: 36,
+                        frameHeight: 80,
                         sprite: this.sprite
                     },
                     AnimationState.IDLE

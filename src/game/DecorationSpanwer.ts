@@ -6,6 +6,9 @@ import { Tree } from "./worldDeco/Tree.js";
 import { Bush } from "./worldDeco/Bush.js";
 import { Rock } from "./worldDeco/Rock.js";
 import Rand from 'rand-seed';
+import { randomOfWeighted } from "../engine/util.js";
+import { FireBarrel } from "./worldDeco/FireBarrel.js";
+import { DecoFactory } from "./worldDeco/DecorationFactory.js";
 
 export class DecorationSpawner implements Entity {
     id: EntityID;
@@ -23,8 +26,6 @@ export class DecorationSpawner implements Entity {
     private rng: Rand;
     private activeDecorations: Entity[] = [];
     private lastSafeZoneIndex: number = -1;
-
-
 
     constructor(seed: string) {
         this.id = `deco_spawner#${crypto.randomUUID()}`;
@@ -61,11 +62,11 @@ export class DecorationSpawner implements Entity {
         // When to spawn logic
         while (this.lastSpawnX < spawnX) {
             this.lastSpawnX += this.spawnInterval;
-            
-             // Rnadomzing the space to make it more "natural"
+
+            // Rnadomzing the space to make it more "natural"
             const randomSpace = (this.rng.next() * 20);
             const actualX = this.lastSpawnX + randomSpace;
-            
+
             this.executeSpawn(actualX, player.position.y, mountain);
         }
     }
@@ -86,7 +87,7 @@ export class DecorationSpawner implements Entity {
         const yCenter = mountain.getHeightAt(x);
 
         // Safety constraints to sure decorations doesn't spawn or near ravines
-        const safetyBuffer = 60; 
+        const safetyBuffer = 60;
         const yCheckLeft = mountain.getHeightAt(x - safetyBuffer);
         const yCheckRight = mountain.getHeightAt(x + safetyBuffer);
 
@@ -99,7 +100,7 @@ export class DecorationSpawner implements Entity {
 
         // Calculate slope for the center point
         const sampleDistance = 20;
-        const yLeft = mountain.getHeightAt(x - sampleDistance); 
+        const yLeft = mountain.getHeightAt(x - sampleDistance);
         const yRight = mountain.getHeightAt(x + sampleDistance);
         const maxSlope = Math.max(
             Math.abs(Math.atan2(yCenter - yLeft, sampleDistance) * (180 / Math.PI)),
@@ -108,25 +109,42 @@ export class DecorationSpawner implements Entity {
 
         if (maxSlope > 25) return;
 
-        let decoration: Entity | null = null;
+        let decoration: Entity | undefined = randomOfWeighted(
+            [
+                {
+                    obj: DecoFactory.createBush(new Vec2(x, yCenter)) as Entity,
+                    weight: 0.2
+                },
+                {
+                    obj: DecoFactory.createTree(new Vec2(x, yCenter)) as Entity,
+                    weight: 0.3
+                },
+                {
+                    obj: DecoFactory.createRock(new Vec2(x, yCenter)) as Entity,
+                    weight: 0.2
+                },
+                {
+                    obj: DecoFactory.createFireBarrel(new Vec2(x, yCenter)) as Entity,
+                    weight: 0.1
+                },
+                {
+                    obj: undefined,
+                    weight: 0.2
+                }
+            ],
+            this.rng
+        );
         let yAdjustment = 0;
 
-
-        // Heres all the spawn rate for all decorations
-        if (roll < 0.4) {
-            // 30% Bush
-            decoration = new Bush(new Vec2(x, yCenter));
-            yAdjustment = 30; 
-        } else if (roll < 0.7) {
-            // 20% Tree
-            decoration = new Tree(new Vec2(x, yCenter));
-            yAdjustment = -100; 
-        } else if (roll < 0.85) {
-            // 10% Rock
-            decoration = new Rock(new Vec2(x, yCenter));
-            yAdjustment = 42; 
+        if (decoration !== undefined) {
+            if (decoration instanceof Bush) {
+                yAdjustment = 30;
+            } else if (decoration instanceof Tree) {
+                yAdjustment = -100;
+            } else if (decoration instanceof Rock) {
+                yAdjustment = 42;
+            }
         }
-        // 20% Empty space (clearing)
 
         if (decoration) {
             // Working to get that decoration sink in ground

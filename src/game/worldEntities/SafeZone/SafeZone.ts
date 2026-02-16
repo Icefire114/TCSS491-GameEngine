@@ -4,7 +4,9 @@ import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
+import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
+import { DecorationSpawner } from "../../DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
@@ -100,6 +102,7 @@ export class SafeZone implements Entity {
             if (ent.position.x < this.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT)
                 ent.removeFromWorld = true
         }
+        // May not be totally needed as `DecorationSpawner` will cleanup the decorations (assuming I read the code correctly)
         this.cleanupEntByTag("spike");
         this.cleanupEntByTag("bush");
         this.cleanupEntByTag("ChristmasTree")

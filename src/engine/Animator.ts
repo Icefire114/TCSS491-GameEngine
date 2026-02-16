@@ -109,7 +109,6 @@ export class Animator {
 
     updateAnimState(newState: AnimationState, deltaTime: number): void {
         if (this.currentState !== newState) {
-            ``
             this.currentState = newState;
             this.elapsed = 0;
             this.lastFrameIndex = -1;
