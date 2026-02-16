@@ -128,6 +128,10 @@ export class DecorationSpawner implements Entity {
                     weight: 0.1
                 },
                 {
+                    obj: DecoFactory.createCrate(new Vec2(x, yCenter)) as Entity,
+                    weight: 0.1
+                },
+                {
                     obj: undefined,
                     weight: 0.2
                 }

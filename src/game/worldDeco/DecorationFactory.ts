@@ -1,6 +1,7 @@
 import { GameEngine } from "../../engine/gameengine.js";
 import { Vec2 } from "../../engine/types.js";
 import { Bush } from "./Bush.js";
+import { Crate } from "./Crate.js";
 import { FireBarrel } from "./FireBarrel.js";
 import { Rock } from "./Rock.js";
 import { Tree } from "./Tree.js";
@@ -20,5 +21,9 @@ export namespace DecoFactory {
 
     export function createFireBarrel(pos: Vec2): FireBarrel {
         return new FireBarrel(pos, 0.075);
+    }
+
+    export function createCrate(pos: Vec2): Crate {
+        return new Crate(pos);
     }
 }
