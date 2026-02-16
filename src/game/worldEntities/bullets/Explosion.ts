@@ -16,6 +16,8 @@ export class Explosion implements Entity, Collidable {
     sprite: ImagePath = new ImagePath("res/img/ammo/RPGExplode.png");
     removeFromWorld: boolean = false;
     damage: number;
+    hitEnemies: Set<EntityID> = new Set(); // track which enemies have already been hit to prevent multiple hits
+
 
     private readonly YOFFSET = 7.5; // half of collider height
 
@@ -40,6 +42,8 @@ export class Explosion implements Entity, Collidable {
         this.position.x = x;
         this.position.y = y + this.YOFFSET; // adjust so explosion is centered on impact point
         this.damage = damage;
+
+        this.damageEnemy();
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -59,24 +63,23 @@ export class Explosion implements Entity, Collidable {
 
         if (elapsed >= totalAnimationDuration) {
             this.removeFromWorld = true;
-        } else {
-            // ------------ Collision with Enemies ------------
-            const zombies: Entity[] = GameEngine.g_INSTANCE.getAllZombies();
-            //console.log(`zombies in world: ${zombies.length}`);
-            for (const zombie of zombies) {
-                if (this.physicsCollider.collides(this, zombie)) {
-                    this.damageEnemy(zombie);
-                    // console.log(`${this.tag} hit a zombie`);
-                }
+        }
+    }
+
+    damageEnemy(): void {
+        // ------------ Collision with Enemies ------------
+        const zombies: Entity[] = GameEngine.g_INSTANCE.getAllZombies();
+        let hitCount = 0;
+        //console.log(`zombies in world: ${zombies.length}`);
+        for (const zombie of zombies) {
+            if (this.physicsCollider.collides(this, zombie) && zombie instanceof Zombie) {
+                //console.log(`Explosion hitting zombie ${zombie.id}, health: ${zombie.health}, reward: ${zombie.reward}`);
+                hitCount++;
+                zombie.takeDamage(this.damage);
+                console.log(zombie.reward);
+                // console.log(`${this.tag} hit a zombie`);
             }
         }
+        //console.log(`Explosion ${this.id} hit ${hitCount} zombies with ${this.damage} damage`);
     }
-
-    damageEnemy(target: Entity): void {
-        if (target instanceof Zombie) {
-            target.takeDamage(this.damage);
-        }
-    }
-
-
 }

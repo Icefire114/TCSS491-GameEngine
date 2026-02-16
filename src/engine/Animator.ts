@@ -49,7 +49,7 @@ export type AnimationData = {
 };
 
 export class Animator {
-    private readonly ANIMATION_FPS = 6;
+    public readonly ANIMATION_FPS = 6;
 
     private currentState: AnimationState = AnimationState.IDLE;
     private elapsed = 0; // seconds

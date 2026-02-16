@@ -56,15 +56,13 @@ export class ItemFactory {
             new AmmoRestore(),
             new Animator([
                 [{
-                    frameCount: 7,
-                    frameHeight: 24,
-                    frameWidth: 43,
-                    offestX: 0.1,
-                    sprite: new ImagePath("res/img/items/rifle.png")
+                    frameCount: 8,
+                    frameHeight: 22,
+                    frameWidth: 30,
+                    sprite: new ImagePath("res/img/items/AmmoBox.png")
                 }, AnimationState.IDLE]
-            ], { x: 6, y: 3 }),
-            new Vec2(6, 3),
-            pos
+            ], { x: 6, y: 4 }),
+            new Vec2(6, 4), pos
         );
     }
 

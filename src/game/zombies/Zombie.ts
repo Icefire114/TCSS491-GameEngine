@@ -23,6 +23,7 @@ export abstract class Zombie implements Entity {
     abstract sprite: ImagePath;
     removeFromWorld: boolean = false;
     abstract reward: number; // currency reward for killing this zombie
+    rewardGiven: boolean = false; // track if reward has been given to player
 
     abstract animator: Animator;
 
@@ -42,7 +43,8 @@ export abstract class Zombie implements Entity {
 
     takeDamage(amount: number): void {
         this.health -= amount;
-        if (this.health <= 0) {
+        if (this.health <= 0 && !this.rewardGiven) {
+            this.rewardGiven = true;
             const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
             player.killedEnemy(this);
         }

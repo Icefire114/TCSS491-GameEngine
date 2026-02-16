@@ -8,6 +8,7 @@ import { Vec2 } from "../../../engine/types.js";
 export class RPG extends Gun {
 
     sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    ammoBox = 10;
 
     animator = new Animator(
             [
@@ -46,8 +47,8 @@ export class RPG extends Gun {
         super("RPG", //tag
             10, //ammo
             1, //magSize
-            1, //fireRate
-            2, //reloadTime
+            2, //fireRate
+            3, //reloadTime
             position
         );
 
@@ -73,6 +74,11 @@ export class RPG extends Gun {
     }
 
     protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-        return new RPGRocket(startX, startY, targetX, targetY);
+        const muzzleDistance = 3;
+        const verticleOffset = 0.8; 
+                
+        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
+        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
+        return new RPGRocket(muzzleX, muzzleY, targetX, targetY);
     }
 }

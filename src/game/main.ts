@@ -47,6 +47,8 @@ ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Shot_2.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRPG.png");
+
 
 
 // === Zombie Assets ===
@@ -69,8 +71,6 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
 
 
-
-
 // === Item Assets ===
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
 ASSET_MANAGER.queueDownload("res/img/items/shield_pickup.png");
@@ -79,6 +79,7 @@ ASSET_MANAGER.queueDownload("res/img/items/infection_immunity_UI.png");
 ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 ASSET_MANAGER.queueDownload("res/img/items/bomb.png");
 ASSET_MANAGER.queueDownload("res/img/items/boots.png");
+ASSET_MANAGER.queueDownload("res/img/items/AmmoBox.png");
 
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
@@ -242,19 +243,19 @@ function main() {
                     [
                         [
                             {
-                                frameCount: 7,
-                                frameHeight: 24,
-                                frameWidth: 43,
-                                offestX: 0.1,
-                                sprite: new ImagePath("res/img/items/rifle.png")
+                                frameCount: 8,
+                                frameHeight: 22,
+                                frameWidth: 30,
+
+                                sprite: new ImagePath("res/img/items/AmmoBox.png")
                             },
                             AnimationState.IDLE
                         ]
                     ],
-                    { x: 6, y: 3 }
+                    { x: 6, y: 4 }
                 ),
-                new Vec2(6, 3),
-                { x: 13, y: 0 }
+                new Vec2(6, 4),
+                { x: 20, y: 0 }
             ),
                 DrawLayer.ITEM
             )

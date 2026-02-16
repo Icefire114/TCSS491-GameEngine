@@ -25,7 +25,7 @@ export abstract class Gun implements Entity {
     removeFromWorld: boolean = false;
     abstract animator: any;
 
-
+    abstract ammoBox: number; // how much ammo this gun refills to when picking up an ammo restore item
     ammoOnHand: number; // total ammo the player has for this gun (not including what's currently loaded)
     ammoInGun: number; // current ammo in the gun
     magSize: number;
@@ -56,6 +56,10 @@ export abstract class Gun implements Entity {
         return 1000 / this.fireRate; // convert fire rate to milliseconds
     }
 
+    getReloadCooldown(): number {
+        return this.reloadTime * 1000; // convert seconds to milliseconds
+    }
+
     canShoot(currentTime: number): boolean {
         if (this.isReloading) return false;
         if (this.ammoInGun <= 0) return false;
@@ -73,7 +77,7 @@ export abstract class Gun implements Entity {
         this.ammoInGun--;
         this.lastShotTime = currentTime;
 
-        return this.createBullet(this.position.x + this.DEFAULT_XOFFSET, this.position.y + this.DEFAULT_YOFFSET, targetX, targetY);
+        return this.createBullet(this.position.x, this.position.y, targetX, targetY);
     }
 
     canReload(): boolean {
