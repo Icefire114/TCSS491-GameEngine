@@ -6,7 +6,7 @@ import { Collidable, Collider } from "../../../engine/physics/Collider.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { ShopUI } from "../../ShopUI.js";
+import { ShopUI } from "./ShopUI.js";
 import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
 

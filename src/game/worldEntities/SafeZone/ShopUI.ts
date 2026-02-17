@@ -1,7 +1,7 @@
-import { GameEngine } from "../engine/gameengine.js";
-import { Vec2 } from "../engine/types.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
+import { GameEngine } from "../../../engine/gameengine.js";
+import { Vec2 } from "../../../engine/types.js";
+import { ImagePath } from "../../../engine/assetmanager.js";
+import { Entity,  EntityID } from "../../../engine/Entity.js";
 
 interface ShopItem {
     id: string;

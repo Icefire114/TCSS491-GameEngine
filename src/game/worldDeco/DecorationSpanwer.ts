@@ -1,14 +1,13 @@
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { Vec2, DrawLayer } from "../engine/types.js";
-import { Mountain } from "./worldEntities/mountain.js";
-import { Tree } from "./worldDeco/Tree.js";
-import { Bush } from "./worldDeco/Bush.js";
-import { Rock } from "./worldDeco/Rock.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { Vec2, DrawLayer } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
+import { Tree } from "./Tree.js";
+import { Bush } from "./Bush.js";
+import { Rock } from "./Rock.js";
 import Rand from 'rand-seed';
-import { randomOfWeighted } from "../engine/util.js";
-import { FireBarrel } from "./worldDeco/FireBarrel.js";
-import { DecoFactory } from "./worldDeco/DecorationFactory.js";
+import { randomOfWeighted } from "../../engine/util.js";
+import { DecoFactory } from "./DecorationFactory.js";
 
 export class DecorationSpawner implements Entity {
     id: EntityID;

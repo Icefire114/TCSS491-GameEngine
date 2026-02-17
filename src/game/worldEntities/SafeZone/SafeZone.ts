@@ -6,7 +6,7 @@ import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { DecorationSpawner } from "../../DecorationSpanwer.js";
+import { DecorationSpawner } from "../../worldDeco/DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";

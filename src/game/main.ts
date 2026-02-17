@@ -23,10 +23,10 @@ import { Bush } from "./worldDeco/Bush.js";
 import { ChristmasTree } from "./worldDeco/ChristmasTree.js";
 import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
-import { WorldSpawner } from "./WorldSpawner.js";
-import { DecorationSpawner } from "./DecorationSpanwer.js";
+import { WorldSpawner } from "./worldEntities/WorldSpawner.js";
+import { DecorationSpawner } from "./worldDeco/DecorationSpanwer.js";
 import { unwrap } from "../engine/util.js";
-import { ShopUI } from "./ShopUI.js";
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
 
