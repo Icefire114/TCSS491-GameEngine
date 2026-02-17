@@ -412,4 +412,15 @@ export class GameEngine {
         audio.loop = true;
         audio.volume = 0.2;
     };
+    
+    /**
+     * Method that snaps the viewport to the followed entity
+     * Used before the loop starts, since thers a frame that camera does to jump to the player
+     */
+    snapViewportToFollowedEnt(): void {
+        if (this.m_followingEnt) {
+            this.followEntByScreenRatioX(this.m_followingEnt, this.m_followPercenageX);
+            this.followEntByScreenRatioY(this.m_followingEnt, this.m_followPercentageY);
+        }
+    }
 };
