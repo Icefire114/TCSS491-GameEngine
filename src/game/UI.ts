@@ -32,6 +32,9 @@ export class UILayer implements Entity {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        // Doesnt draw anything unless Intros creen is gone
+        if (game.getUniqueEntityByTag("intro_screen")) return;
+
         const player: Player = unwrap(game.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
         ctx.save();

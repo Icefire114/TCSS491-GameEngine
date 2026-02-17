@@ -29,7 +29,7 @@ import { unwrap } from "../engine/util.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
-
+import { IntroScreen } from "./IntroScreen.js";
 
 
 /**
@@ -347,7 +347,13 @@ function main() {
             ), DrawLayer.WORLD_DECORATION);
         }
 
-        gameEngine.start();
+        // Drawing our intro screen at the top, and will called gameengine start to start the geame
+        gameEngine.addUniqueEntity(new IntroScreen(() => {
+            gameEngine.start();
+        }), 999 as DrawLayer);
+
+        // Update loop is going, but intro is the one that calls the gameengine.start
+        gameEngine.loop();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
         alert(`Engine has encounted an uncaught error! ${e}`);
