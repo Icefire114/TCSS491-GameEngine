@@ -257,7 +257,7 @@ export class GameEngine {
         }
 
         // Shows Colliders only if the game is actually running 
-        if (G_CONFIG.DRAW_PHYSICS_COLLIDERS && this.running) {
+        if (G_CONFIG.DRAW_PHYSICS_COLLIDERS && this.running && !this.uniqueEnts.has("death_screen")) {
             const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const meterInPixelsY = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             for (const ent of normalEnts) {
