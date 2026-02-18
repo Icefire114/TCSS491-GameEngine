@@ -390,9 +390,12 @@ export class Mountain implements Entity {
         if (this.flatStep >= this.flatGenerationTick) {
             this.flatSequenceOn = false;
             this.flatEndX = x;
+            
+            // Keeping count the # that safezone is in and passing it to safezone itself
+            const zoneIndex = this.safeZones.length + 1;
 
             // Drawing the safezone here
-            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX + 5)), this.flatEndX);
+            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX + 5)), this.flatEndX, zoneIndex);
             GameEngine.g_INSTANCE.addEntity(safeZoneEntity, DrawLayer.WORLD_DECORATION);
 
             // updating our safezone tracking with specific info
