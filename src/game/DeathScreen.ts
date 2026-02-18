@@ -3,6 +3,8 @@ import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { Vec2 } from "../engine/types.js";
 
+export type DeathCause = "infection" | "ravine";
+
 export class DeathScreen implements Entity {
     // Required info
     readonly id: EntityID = `death_screen#${crypto.randomUUID()}` as EntityID;
@@ -29,10 +31,12 @@ export class DeathScreen implements Entity {
 
     private pulseTime: number = 0;
     private onRestart: () => void;
+    private cause: DeathCause;
 
-    constructor(playerWorldX: number, playerWorldY: number, onRestart: () => void) {
+    constructor(playerWorldX: number, playerWorldY: number, onRestart: () => void, cause: DeathCause = "infection") {
         this.position = new Vec2(playerWorldX, playerWorldY);
         this.onRestart = onRestart;
+        this.cause = cause;
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number, _click: Vec2): void {
@@ -54,6 +58,7 @@ export class DeathScreen implements Entity {
         }
     }
 
+    // Drawing out the animation itself 
     draw(ctx: CanvasRenderingContext2D, engine: GameEngine): void {
         const W = ctx.canvas.width;
         const H = ctx.canvas.height;
@@ -67,6 +72,15 @@ export class DeathScreen implements Entity {
             this.originY = ((this.position.y - 1.5) - engine.viewportY) * meterInPixels / engine.zoom;
         }
 
+        if (this.cause === "infection") {
+            this.drawInfection(ctx, W, H);
+        } else {
+            this.drawRavine(ctx, W, H);
+        }
+    }
+
+    // Method that helps in drawing the infection death screen
+    drawInfection(ctx: CanvasRenderingContext2D, W: number, H: number): void {
         ctx.save();
 
         // That Green blob expanding to fill the screen
@@ -114,6 +128,60 @@ export class DeathScreen implements Entity {
             ctx.font = `${W * 0.025}px monospace`;
             ctx.fillText("[ PRESS R OR ENTER TO RESTART ]", W / 2, H * 0.78);
 
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+            ctx.textAlign = "left";
+        }
+
+        ctx.restore();
+    }
+
+    // Method to draw when dying in the ravine
+    private drawRavine(ctx: CanvasRenderingContext2D, W: number, H: number): void {
+        ctx.save();
+
+        // Anmiatino to get the full screen covered
+        if (this.phase === "expanding") {
+            // Drawing the blue (black hole) expanding out
+            ctx.beginPath();
+            ctx.arc(this.originX, this.originY, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#111c49";
+            ctx.fill();
+        } else {
+            // Background of the death screen
+            ctx.fillStyle = "#072751";
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.globalAlpha = this.alpha;
+            ctx.textAlign = "center";
+
+            // Header
+            ctx.fillStyle = "#4a90d9";
+            ctx.shadowColor = "#6ab0ff";
+            ctx.shadowBlur = 18;
+            ctx.font = `bold ${W * 0.042}px monospace`;
+            ctx.fillText("[ THE MOUNTAIN HAS GOT YOU ]", W / 2, H * 0.32);
+            ctx.shadowBlur = 0;
+
+            // YOU DIED text
+            ctx.fillStyle = "#b0c8e8";
+            ctx.font = `bold ${W * 0.09}px monospace`;
+            ctx.fillText("YOU DIED", W / 2, H * 0.48);
+
+            // Descrption text
+            ctx.fillStyle = "#3a5a7a";
+            ctx.font = `${W * 0.021}px monospace`;
+            ctx.fillText("The ravine claims all who fall.", W / 2, H * 0.60);
+            ctx.fillText("The mountain never forgives.", W / 2, H * 0.645);
+
+            // The restart text
+            const pulse = Math.abs(Math.sin(performance.now() / 600));
+            ctx.globalAlpha = this.alpha * pulse;
+            ctx.fillStyle = "#4a90d9";
+            ctx.shadowColor = "#6ab0ff";
+            ctx.shadowBlur = 10;
+            ctx.font = `${W * 0.025}px monospace`;
+            ctx.fillText("[ PRESS R OR ENTER TO RESTART ]", W / 2, H * 0.78);
             ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
             ctx.textAlign = "left";

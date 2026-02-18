@@ -529,7 +529,7 @@ export class Player implements Entity, Collidable {
                             GameEngine.g_INSTANCE.addUniqueEntity(
                                 new DeathScreen(this.position.x, this.position.y, () => {
                                     window.location.reload();
-                                }),
+                                }, "ravine"),
                                 998 as DrawLayer
                             );
                         }
@@ -656,7 +656,7 @@ export class Player implements Entity, Collidable {
                         new DeathScreen(this.position.x, this.position.y, () => {
                             // in order to reset, refresh windows! 
                             window.location.reload();
-                        }),
+                        }, "infection"),
                         998 as DrawLayer  // just below intro screen layer
                     );
                 }
