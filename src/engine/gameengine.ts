@@ -43,6 +43,10 @@ export class GameEngine {
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
+    
+    // Reset Field
+    public resetCallback: (() => void) | null = null;
+
 
     public get renderer(): Renderer {
         return this.m_Renderer;

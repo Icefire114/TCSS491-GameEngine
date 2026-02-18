@@ -6,6 +6,7 @@ import { DrawLayer, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
+import { RavineDeathZone } from "./RavineZone.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -42,6 +43,8 @@ export class Mountain implements Entity {
     private lastRavineEndX = 0;
     private ravineCooldown = 150;
     private ravineStartShowing = 150;
+    private ravineLeftWallX: number = 0;
+    private ravineRightWallX: number = 0;
 
     // Plain Setup (Level Checkpoint)
     private flatSequenceOn = false;
@@ -315,6 +318,7 @@ export class Mountain implements Entity {
                 y += 0;
                 break;
             case 1: // The ravine drop
+                this.ravineLeftWallX = x;
                 x += 3;
                 y += 5000;
                 break;
@@ -323,6 +327,7 @@ export class Mountain implements Entity {
                 y += 0;
                 break;
             case 3: // Rising up from the ravine
+                this.ravineRightWallX = x;
                 x += 1;
                 y = this.ravineBaseY;
                 break;
@@ -331,6 +336,21 @@ export class Mountain implements Entity {
                 y = this.ravineBaseY + this.slopeBeforeRavine;
                 this.isRavineSequence = false;
                 this.lastRavineEndX = x;
+                
+                // Spawning the Ravine Death Zone Entity
+                const wallTopY    = this.ravineBaseY;
+                const wallBottomY = this.ravineBaseY + 5000;
+                GameEngine.g_INSTANCE.addEntity(
+                    new RavineDeathZone(
+                        this.ravineLeftWallX,   
+                        this.ravineRightWallX,  
+                        wallTopY,               
+                        wallBottomY,            
+                        1,                      
+                        15                      
+                    ),
+                    DrawLayer.BACKGROUND
+                );
                 break;
         }
 

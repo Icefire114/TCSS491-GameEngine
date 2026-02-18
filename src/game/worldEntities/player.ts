@@ -17,6 +17,8 @@ import { Gun } from "../Items/guns/Gun.js";
 import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
 import { DeathScreen } from "../DeathScreen.js";
+import { RavineDeathZone } from "./RavineZone.js";
+
 
 /**
  * @author PG
@@ -466,6 +468,7 @@ export class Player implements Entity, Collidable {
                 }
             }
 
+
             // -- Collision with items --
             const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
             for (const itemEnt of items) {
@@ -513,7 +516,47 @@ export class Player implements Entity, Collidable {
                         this.iTime = this.iDuration; // start invulnerability time
                     }
                 }
+
+                // -- Collision with ravines --
+                const ravineZones = GameEngine.g_INSTANCE.getEntitiesByTag("RavineDeathZone") as RavineDeathZone[];
+                for (const zone of ravineZones) {
+                    const contact = zone.checkContact(this.position.x, this.position.y);
+
+                    // Handles the death when hitting the ravine
+                    if (contact === "death") {
+                        if (!this.dead) {
+                            this.dead = true;
+                            GameEngine.g_INSTANCE.addUniqueEntity(
+                                new DeathScreen(this.position.x, this.position.y, () => {
+                                    window.location.reload();
+                                }),
+                                998 as DrawLayer
+                            );
+                        }
+                        break;
+                    } else if (contact === "bounce") { // Handling if in ravine, not dead, then bounce 
+                        // Figuring out which wall was hit so we know which direction to bounce
+                        const wall = zone.getNearestWall(this.position.x);
+
+                        // Handling that bounc
+                        if (wall === "left") {
+                            // if hit the left wall then bounce to the right and push player away from the wall
+                            this.velocity.x = Math.abs(this.velocity.x) * 0.6;
+                            this.position.x = zone.leftWallX + 1.5; // nudge away from wall
+                        } else {
+                            // if hit the right wall then bounce to the left and push player away from the wall
+                            this.velocity.x = -Math.abs(this.velocity.x) * 0.6;
+                            this.position.x = zone.rightWallX - 1.5; // nudge away from wall
+                        }
+
+                        // Ensures that the player is being bounch downward to death zones
+                        this.velocity.y = Math.abs(this.velocity.y) * 0.8 + 5;
+
+                        break;
+                    }
+                }
             }
+
         } else {
             this.animator.updateAnimState(AnimationState.DEATH, deltaTime)
         }
