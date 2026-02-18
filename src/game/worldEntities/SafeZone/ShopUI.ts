@@ -2,6 +2,11 @@ import { GameEngine } from "../../../engine/gameengine.js";
 import { Vec2 } from "../../../engine/types.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity,  EntityID } from "../../../engine/Entity.js";
+import { Player } from "../player.js";
+import { AmmoRestore } from "../../Items/AmmoRestore.js";
+import { InstantHealthItem } from "../../Items/InstantHealth.js";
+import { ShieldRestorePickupItem } from "../../Items/ShieldRestore.js";
+import { Buff } from "../../Items/Buff.js";
 
 interface ShopItem {
     id: string;
@@ -28,7 +33,12 @@ export class ShopUI implements Entity {
     removeFromWorld: boolean = false;
     public isOpen: boolean = false;
 
-    // List of all items
+    // Flash message when buying
+    private flashMessage: string | null = null;
+    private flashColor: string = "#FF4444";
+    private flashTimer: number = 0;
+    private readonly FLASH_DURATION = 1.5; 
+
     private items: ShopItem[] = [
         {
             id: "ammo",
@@ -51,7 +61,7 @@ export class ShopUI implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "GRANTS A\nPROTECTIVE SHIELD\nFOR 30 SECONDS.",
+            description: "RESTORES SHIELD\nBY 25 POINTS.",
             cost: 150,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
@@ -63,8 +73,72 @@ export class ShopUI implements Entity {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+    /**
+     * Mapping the shop item ID to its corresponding Buff instance.
+     */
+    private createBuff(itemId: string): Buff | null {
+        switch (itemId) {
+            case "ammo":   return new AmmoRestore();
+            case "health": return new InstantHealthItem();
+            case "shield": return new ShieldRestorePickupItem();
+            default:       return null;
+        }
+    }
 
+    /**
+     * Attempts to purchase an item, then it will returns true on success.
+     */
+    private tryPurchase(item: ShopItem): boolean {
+        const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
+        if (!player) return false;
+
+        if (player.currency < item.cost) {
+            this.showFlash(`NOT ENOUGH GOLD! (Need ${item.cost}, have ${player.currency})`, "#FF4444");
+            return false;
+        }
+
+        const buff = this.createBuff(item.id);
+        if (!buff) return false;
+
+        // Deduct currency and apply buff
+        player.currency -= item.cost;
+        buff.onApply();
+
+        this.showFlash(`BOUGHT ${item.name}!`, "#44FF88");
+        console.log(`Player bought ${item.name} for ${item.cost}. Remaining currency: ${player.currency}`);
+        return true;
+    }
+
+    private showFlash(message: string, color: string): void {
+        this.flashMessage = message;
+        this.flashColor = color;
+        this.flashTimer = this.FLASH_DURATION;
+    }
+
+    /**
+     * Handling the click logic (checks if any button was hit)
+     */
+    handleClick(canvasX: number, canvasY: number): void {
+        if (!this.isOpen) return;
+
+        for (const item of this.items) {
+            if (!item.buttonRect) continue;
+            const { x, y, w, h } = item.buttonRect;
+            if (canvasX >= x && canvasX <= x + w && canvasY >= y && canvasY <= y + h) {
+                this.tryPurchase(item);
+                return;
+            }
+        }
+    }
+
+    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+        // For the flash message
+        if (this.flashTimer > 0) {
+            this.flashTimer -= deltaTime;
+            if (this.flashTimer <= 0) {
+                this.flashMessage = null;
+            }
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine) {
@@ -116,11 +190,26 @@ export class ShopUI implements Entity {
             const y = cardsY;
 
             item.rect = { x, y, w: cardW, h: cardH };
-            // Drawing the card itself 
-            this.drawItemCard(ctx, game, item, x, y, cardW, cardH, cardBg, cardDark, borderLight, textWhite, goldColor);
+
+            // Determine if player can afford this item
+            const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
+            const canAfford = player ? player.currency >= item.cost : false;
+            this.drawItemCard(ctx, game, item, x, y, cardW, cardH, cardBg, cardDark, borderLight, textWhite, goldColor, canAfford);
         });
+
+        // Flash message overlay
+        if (this.flashMessage && this.flashTimer > 0) {
+            const alpha = Math.min(1, this.flashTimer / 0.3); //
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = this.flashColor;
+            ctx.font = "bold 22px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(this.flashMessage, w / 2, panelY - 15);
+            ctx.globalAlpha = 1;
+        }
     }
 
+    
     /**
      * Private method to draw each indvidual card 
      */
@@ -136,8 +225,11 @@ export class ShopUI implements Entity {
         cardDark: string,
         borderLight: string,
         textWhite: string,
-        goldColor: string
+        goldColor: string,
+        canAfford: boolean  
     ) {
+        // Dim card if can't afford
+        if (!canAfford) ctx.globalAlpha = 0.55;
         // Card background
         this.drawPixelPanel(ctx, x, y, w, h, cardDark, borderLight, cardBg);
 
@@ -193,14 +285,13 @@ export class ShopUI implements Entity {
 
         // Gold Cost 
         const costY = y + h - 80;
-        ctx.fillStyle = goldColor;
+        ctx.fillStyle = canAfford ? goldColor : "#AA8833";
         ctx.font = "bold 18px monospace";
 
         // Gold Coin
         const coinX = x + w / 2 - 25;
-        const coinY = costY;
         ctx.beginPath();
-        ctx.arc(coinX, coinY, 8, 0, Math.PI * 2);
+        ctx.arc(coinX, costY, 8, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillText(item.cost.toString(), coinX + 30, costY + 5);
 
@@ -210,11 +301,17 @@ export class ShopUI implements Entity {
         const btnX = x + 10;
         const btnY = y + h - btnH - 10;
         item.buttonRect = { x: btnX, y: btnY, w: btnW, h: btnH };
-        this.drawPixelButton(ctx, btnX, btnY, btnW, btnH, cardDark, borderLight, "#A67C52");
-        ctx.fillStyle = textWhite;
+
+        // Button color: greyed out if can't afford
+        const btnBg = canAfford ? "#A67C52" : "#5A4A3A";
+        this.drawPixelButton(ctx, btnX, btnY, btnW, btnH, cardDark, borderLight, btnBg);
+        ctx.fillStyle = canAfford ? textWhite : "#888888";
         ctx.font = "bold 18px monospace";
-        ctx.fillText("BUY", x + w / 2, btnY + 23);
+        ctx.fillText(canAfford ? "BUY" : "BROKE", x + w / 2, btnY + 23);
         ctx.textAlign = "left";
+
+        // Reset alpha
+        ctx.globalAlpha = 1;
     }
 
 
