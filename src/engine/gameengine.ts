@@ -220,9 +220,12 @@ export class GameEngine {
 
         const ents = Array.from(this.ents.values()).flatMap(set => Array.from(set));
 
-        // Filitering out the intro screen from normal entities so it always draws last aka on top
+        // Filitering out the intro and death screen from normal entities so it always draws last aka on top
         const introEnt = ents.find(([e]) => e.tag === "intro_screen");
-        const normalEnts = ents.filter(([e]) => e.tag !== "intro_screen");
+        const deathEnt = ents.find(([e]) => e.tag === "death_screen");
+        const normalEnts = ents.filter(([e]) => 
+            e.tag !== "intro_screen" && e.tag !== "death_screen"
+        );
 
         // Sort: higher draw layer number = drawn first (further back)
         // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
@@ -237,6 +240,13 @@ export class GameEngine {
             if (t > 10) {
                 console.warn(`Ent: ${ent.id} took ${t.toFixed(3)}ms to draw`);
             }
+        }
+
+        // Ensures the death screen is close to always last so it covers everything
+        if (deathEnt) {
+            this.ctx.save();
+            deathEnt[0].draw(this.ctx, this);
+            this.ctx.restore();
         }
 
         // Ensures that intro screen is always last so it covers everything 
@@ -284,6 +294,14 @@ export class GameEngine {
     update(dt: number) {
         // Ensure that intro screen is specfically only able to get update forinput and dismiss 
         const introEnt = this.uniqueEnts.get("intro_screen")?.[0];
+        const deathEnt = this.uniqueEnts.get("death_screen")?.[0];
+        
+        // Check for death screen udpates
+        if (deathEnt && !deathEnt.removeFromWorld) {
+           deathEnt.update(this.keys, dt, this.rightclick);
+        }
+
+        // Checks for intro screen 
         if (introEnt && !introEnt.removeFromWorld) {
             introEnt.update(this.keys, dt, this.rightclick);
             if (introEnt.removeFromWorld) {

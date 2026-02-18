@@ -16,6 +16,7 @@ import { Zombie } from "../zombies/Zombie.js";
 import { Gun } from "../Items/guns/Gun.js";
 import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
+import { DeathScreen } from "../DeathScreen.js";
 
 /**
  * @author PG
@@ -260,6 +261,9 @@ export class Player implements Entity, Collidable {
 
 
     update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2): void {
+        // DEBUG: Force death
+        this.debugForceDeath(keys);
+
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
@@ -603,6 +607,15 @@ export class Player implements Entity, Collidable {
                 if (death >= 150) { // chance of death increases with health%
                     //console.log(`Player has died!`);
                     this.dead = true;
+
+                    // The Check if we need a death screen
+                    GameEngine.g_INSTANCE.addUniqueEntity(
+                        new DeathScreen(this.position.x, this.position.y, () => {
+                            // in order to reset, refresh windows! 
+                            window.location.reload();
+                        }),
+                        998 as DrawLayer  // just below intro screen layer
+                    );
                 }
 
             } else {
@@ -618,4 +631,23 @@ export class Player implements Entity, Collidable {
     killedEnemy(enemy: Zombie): void {
         this.currency += enemy.reward;
     }
+
+    /**
+     * TEMP METHOD: USE to immedite debug and look at the death animation 
+     */
+    debugForceDeath(keys: { [key: string]: boolean}) {
+        if (keys["k"]) {
+            this.dead = true;
+            GameEngine.g_INSTANCE.addUniqueEntity(
+                new DeathScreen(this.position.x, this.position.y, () => {
+                    window.location.reload();
+                }),
+                998 as DrawLayer
+            );
+        }
+        
+    }
+
+
+
 }
