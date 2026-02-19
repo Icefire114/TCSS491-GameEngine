@@ -1,7 +1,7 @@
 import { GameEngine } from "../../../engine/gameengine.js";
 import { Vec2 } from "../../../engine/types.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
-import { Entity,  EntityID } from "../../../engine/Entity.js";
+import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Player } from "../player.js";
 import { AmmoRestore } from "../../Items/AmmoRestore.js";
 import { InstantHealthItem } from "../../Items/InstantHealth.js";
@@ -35,7 +35,7 @@ export class ShopUI implements Entity {
 
     // Flash message when buying
     private flashMessage: string | null = null;
-    private flashColor: string = "#FF4444";
+    private flashColor: string = "#FF5555";
     private flashTimer: number = 0;
     private readonly FLASH_DURATION = 1.5; 
 
@@ -43,7 +43,7 @@ export class ShopUI implements Entity {
         {
             id: "ammo",
             name: "AMMO REFILL",
-            description: "RESTORES YOUR\nAMMUNITION TO\nFULL CAPACITY.",
+            description: "Restores ammunition\nto full capacity.",
             cost: 50,
             spritePath: "res/img/items/rifle.png",
             frameWidth: 43,
@@ -52,7 +52,7 @@ export class ShopUI implements Entity {
         {
             id: "health",
             name: "HEALTH PACK",
-            description: "INSTANTLY HEALS\nYOU BACK TO\nFULL HEALTH.",
+            description: "Instantly heals you\nback to full health.",
             cost: 100,
             spritePath: "res/img/items/instant_health_pickup.png",
             frameWidth: 42,
@@ -61,12 +61,12 @@ export class ShopUI implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "RESTORES SHIELD\nBY 25 POINTS.",
+            description: "Restores shield\nby 25 points.",
             cost: 150,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
             frameHeight: 64,
-        }
+        },
     ];
 
     constructor() {
@@ -93,7 +93,7 @@ export class ShopUI implements Entity {
         if (!player) return false;
 
         if (player.currency < item.cost) {
-            this.showFlash(`NOT ENOUGH GOLD! (Need ${item.cost}, have ${player.currency})`, "#FF4444");
+            this.showFlash(`Not enough currency — need ${item.cost}`, "#FF5555");
             return false;
         }
 
@@ -104,8 +104,7 @@ export class ShopUI implements Entity {
         player.currency -= item.cost;
         buff.onApply();
 
-        this.showFlash(`BOUGHT ${item.name}!`, "#44FF88");
-        console.log(`Player bought ${item.name} for ${item.cost}. Remaining currency: ${player.currency}`);
+        this.showFlash(`Acquired: ${item.name}`, "#4DFFB4");
         return true;
     }
 
@@ -148,63 +147,93 @@ export class ShopUI implements Entity {
         const h = ctx.canvas.height;
 
         // Color scheme of the UI
-        const borderDark = "#5C3A2E";
-        const borderLight = "#C9A87C";
-        const bgMain = "#D4A574";
-        const cardBg = "#A67C52";
-        const cardDark = "#8B5E3C";
-        const textWhite = "#FFFFFF";
-        const goldColor = "#F4D03F";
+        const BG = "#1a2030";      
+        const SURFACE = "#212840";     
+        const BORDER = "#3a4e66";      
+        const ACCENT = "#5aafdf";    
+        const TEXT = "#eef4fa";     
+        const TEXT_DIM = "#7a96aa";      
+        const GOLD = "#f5c842";      
+        const GREEN = "#4deba0";     
+        const RED = "#f06060";
+        const SEP = "#2a3a50";
+
+        // UI Backdrop
+        ctx.fillStyle = "rgba(4, 7, 12, 0.52)";  
+        ctx.fillRect(0, 0, w, h);
 
         // Panel Dimesions
-        const cardH = h * 0.45;
-        const panelH = 10 + 50 + 20 + cardH + 20;
-        const panelW = w * 0.7;
+        const cardH = Math.min(h * 0.48, 280);
+        const panelW = Math.min(w * 0.70, 740);
+        const headerH = 56;
+        const panelH = headerH + 16 + cardH + 16;
         const panelX = (w - panelW) / 2;
         const panelY = (h - panelH) / 2;
 
-        // Drawing Main Panel
-        this.drawPixelPanel(ctx, panelX, panelY, panelW, panelH, borderDark, borderLight, bgMain);
+        // Panel background and border
+        ctx.fillStyle = BG;
+        ctx.fillRect(panelX, panelY, panelW, panelH);
+        ctx.strokeStyle = BORDER;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(panelX + 0.5, panelY + 0.5, panelW - 1, panelH - 1);
 
-        // Title Bar
-        const titleBarH = 50;
-        const titleBarY = panelY + 10;
-        this.drawPixelPanel(ctx, panelX + 20, titleBarY, panelW - 40, titleBarH, cardDark, borderLight, cardBg);
+        // A blue strip line on top 
+        ctx.fillStyle = ACCENT;
+        ctx.fillRect(panelX, panelY, panelW, 2);
 
-        ctx.fillStyle = textWhite;
-        ctx.font = "bold 28px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("BUY SOMETHING!", w / 2, titleBarY + 35);
+        // The header
+        ctx.fillStyle = SURFACE;
+        ctx.fillRect(panelX, panelY + 2, panelW, headerH - 2);
 
-        // Setup to draw the items
-        const itemsPerRow = 3;
-        const cardMargin = 20;
-        const cardSpacing = 15;
-        const cardW = (panelW - (cardMargin * 2) - (cardSpacing * (itemsPerRow - 1))) / itemsPerRow;
-        const cardsY = titleBarY + titleBarH + 20;
+        // A sepearte between  under header
+        ctx.fillStyle = SEP;
+        ctx.fillRect(panelX, panelY + headerH, panelW, 1);
 
-        // Setup to draw each item
-        this.items.forEach((item, idx) => {
-            const col = idx % itemsPerRow;
-            const x = panelX + cardMargin + (col * (cardW + cardSpacing));
-            const y = cardsY;
+        // The title
+        ctx.fillStyle = TEXT;
+        ctx.font = "bold 20px monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("SUPPLY SHOP", panelX + 20, panelY + 28);
 
-            item.rect = { x, y, w: cardW, h: cardH };
+        // The Shop Info 
+        ctx.fillStyle = ACCENT;
+        ctx.font = "13px monospace";
+        ctx.fillText("SAFE ZONE  ·  ZONE 1", panelX + 20, panelY + 47);
 
-            // Determine if player can afford this item
-            const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
+        // Player currency (top-right of header)
+        const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
+        const currency = player ? player.currency : 0;
+        ctx.textAlign = "right";
+        ctx.fillStyle = GOLD;
+        ctx.font = "bold 18px monospace";
+        ctx.fillText(`◆ ${currency}`, panelX + panelW - 20, panelY + 33);
+        ctx.fillStyle = TEXT_DIM;
+        ctx.font = "12px monospace";
+        ctx.fillText("CURRENCY", panelX + panelW - 20, panelY + 49);
+
+        // The Items cards
+        const GAP = 10;
+        const MARGIN = 16;
+        const COLS = 3;
+        const CARD_W = (panelW - MARGIN * 2 - GAP * (COLS - 1)) / COLS;
+        const cardsY = panelY + headerH + 16;
+
+        this.items.forEach((item, i) => {
+            const cx = panelX + MARGIN + i * (CARD_W + GAP);
+            item.rect = { x: cx, y: cardsY, w: CARD_W, h: cardH };
             const canAfford = player ? player.currency >= item.cost : false;
-            this.drawItemCard(ctx, game, item, x, y, cardW, cardH, cardBg, cardDark, borderLight, textWhite, goldColor, canAfford);
+            this.drawItemCard(ctx, game, item, cx, cardsY, CARD_W, cardH,
+                SURFACE, BORDER, SEP, ACCENT, TEXT, TEXT_DIM, GOLD, GREEN, RED, canAfford);
         });
 
-        // Flash message overlay
+        // The flash message to pop up 
         if (this.flashMessage && this.flashTimer > 0) {
-            const alpha = Math.min(1, this.flashTimer / 0.3); //
+            const alpha = Math.min(1, this.flashTimer / 0.4);
             ctx.globalAlpha = alpha;
-            ctx.fillStyle = this.flashColor;
-            ctx.font = "bold 22px monospace";
             ctx.textAlign = "center";
-            ctx.fillText(this.flashMessage, w / 2, panelY - 15);
+            ctx.font = "bold 15px monospace";
+            ctx.fillStyle = this.flashColor;
+            ctx.fillText(this.flashMessage, w / 2, panelY - 14);
             ctx.globalAlpha = 1;
         }
     }
@@ -217,166 +246,119 @@ export class ShopUI implements Entity {
         ctx: CanvasRenderingContext2D,
         game: GameEngine,
         item: ShopItem,
-        x: number,
-        y: number,
-        w: number,
+        x: number, 
+        y: number, 
+        w: number, 
         h: number,
-        cardBg: string,
-        cardDark: string,
-        borderLight: string,
-        textWhite: string,
-        goldColor: string,
-        canAfford: boolean  
+        bg: string, 
+        border: string, 
+        sep: string,
+        accent: string, 
+        textMain: string, 
+        textDim: string,
+        gold: string, 
+        green: string, 
+        red: string,
+        canAfford: boolean
     ) {
         // Dim card if can't afford
-        if (!canAfford) ctx.globalAlpha = 0.55;
-        // Card background
-        this.drawPixelPanel(ctx, x, y, w, h, cardDark, borderLight, cardBg);
+        ctx.globalAlpha = canAfford ? 1 : 0.5;
 
-        // TEMP: THis sis where the image of the sprite goes
-        const iconAreaH = h * 0.35;
-        const iconY = y + 10;
-        this.drawPixelPanel(ctx, x + 10, iconY, w - 20, iconAreaH, cardDark, borderLight, "#9B6F47");
+        // Card background + border
+        ctx.fillStyle = bg;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = canAfford ? border : sep;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+
+        // The left bar
+        ctx.fillStyle = canAfford ? accent : sep;
+        ctx.fillRect(x, y, 2, h);
+
+        // Icons
+        const iconH  = Math.floor(h * 0.40);
+        const iconY  = y + 12;
+        const iconPad = 10;
+
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillRect(x + iconPad, iconY, w - iconPad * 2, iconH);
+
         if (item.spritePath && item.frameWidth && item.frameHeight) {
-            const sprite = game.getSprite(new ImagePath(item.spritePath));
-
-            const maxSize = Math.min(w - 40, iconAreaH - 20);
-            const scale = Math.min(maxSize / item.frameWidth, maxSize / item.frameHeight);
-
-            const spriteW = item.frameWidth * scale;
-            const spriteH = item.frameHeight * scale;
-            const spriteX = x + w / 2 - spriteW / 2;
-            const spriteY = iconY + iconAreaH / 2 - spriteH / 2;
-
-            // Draw first frame of the sprite (0, 0, frameWidth, frameHeight from sprite sheet)
+            const sprite  = game.getSprite(new ImagePath(item.spritePath));
+            const maxSize = Math.min(w - iconPad * 2 - 16, iconH - 16);
+            const scale   = Math.min(maxSize / item.frameWidth, maxSize / item.frameHeight);
+            const sw = item.frameWidth  * scale;
+            const sh = item.frameHeight * scale;
             ctx.drawImage(
-                sprite,
-                0, 0,  // Source x, y (first frame)
-                item.frameWidth, item.frameHeight,  // Source width, height
-                spriteX, spriteY,  // Destination x, y
-                spriteW, spriteH   // Destination width, height (scaled)
+                sprite, 0, 0, item.frameWidth, item.frameHeight,
+                x + w / 2 - sw / 2,
+                iconY + iconH / 2 - sh / 2,
+                sw, sh
             );
         } else {
-            // Fallback to "?" if no sprite
-            ctx.fillStyle = textWhite;
-            ctx.font = "48px monospace";
+            ctx.fillStyle = textDim;
+            ctx.font = "28px monospace";
             ctx.textAlign = "center";
-            ctx.fillText("?", x + w / 2, iconY + iconAreaH / 2 + 15);
+            ctx.fillText("?", x + w / 2, iconY + iconH / 2 + 10);
         }
 
-
-        // Item Name
-        const nameY = iconY + iconAreaH + 5;
-        const nameBannerH = 35;
-        this.drawPixelPanel(ctx, x + 10, nameY, w - 20, nameBannerH, cardDark, borderLight, cardDark);
-        ctx.fillStyle = textWhite;
+        // Items name ttiel 
+        const nameY = iconY + iconH + 16;
+        ctx.fillStyle = textMain;
         ctx.font = "bold 14px monospace";
         ctx.textAlign = "center";
-        ctx.fillText(item.name, x + w / 2, nameY + 22);
+        ctx.fillText(item.name, x + w / 2, nameY);
 
-        // Item description 
-        const descY = nameY + nameBannerH + 25;
-        ctx.fillStyle = textWhite;
-        ctx.font = "12px monospace";
-        const lines = item.description.split('\n');
-        lines.forEach((line, i) => {
-            ctx.fillText(line, x + w / 2, descY + (i * 16));
+        // A sepearter (thin)
+        ctx.fillStyle = sep;
+        ctx.fillRect(x + iconPad, nameY + 8, w - iconPad * 2, 1);
+
+        // Item Info 
+        const descY = nameY + 22;
+        ctx.fillStyle = textDim;
+        ctx.font = "11px monospace";
+        item.description.split("\n").forEach((line, i) => {
+            ctx.fillText(line, x + w / 2, descY + i * 16);
         });
 
-        // Gold Cost 
-        const costY = y + h - 80;
-        ctx.fillStyle = canAfford ? goldColor : "#AA8833";
-        ctx.font = "bold 18px monospace";
+        // Cost of item
+        const costY = y + h - 50;
+        ctx.fillStyle = canAfford ? gold : "#7a6020";
+        ctx.font = "bold 16px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(`◆ ${item.cost}`, x + w / 2, costY);
 
-        // Gold Coin
-        const coinX = x + w / 2 - 25;
-        ctx.beginPath();
-        ctx.arc(coinX, costY, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillText(item.cost.toString(), coinX + 30, costY + 5);
-
-        // Buy Button
-        const btnW = w - 20;
-        const btnH = 35;
-        const btnX = x + 10;
-        const btnY = y + h - btnH - 10;
+        // The buy button
+        const btnH = 32;
+        const btnPad = 10;
+        const btnX = x + btnPad;
+        const btnY = y + h - btnH - 8;
+        const btnW = w - btnPad * 2;
         item.buttonRect = { x: btnX, y: btnY, w: btnW, h: btnH };
 
-        // Button color: greyed out if can't afford
-        const btnBg = canAfford ? "#A67C52" : "#5A4A3A";
-        this.drawPixelButton(ctx, btnX, btnY, btnW, btnH, cardDark, borderLight, btnBg);
-        ctx.fillStyle = canAfford ? textWhite : "#888888";
-        ctx.font = "bold 18px monospace";
-        ctx.fillText(canAfford ? "BUY" : "BROKE", x + w / 2, btnY + 23);
+        if (canAfford) {
+            ctx.fillStyle = "rgba(77, 235, 160, 0.15)";
+            ctx.fillRect(btnX, btnY, btnW, btnH);
+            ctx.strokeStyle = green;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(btnX + 0.5, btnY + 0.5, btnW - 1, btnH - 1);
+            ctx.fillStyle = green;
+            ctx.font = "bold 13px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText("BUY", x + w / 2, btnY + 21);
+        } else {
+            ctx.fillStyle = "rgba(240, 96, 96, 0.10)";
+            ctx.fillRect(btnX, btnY, btnW, btnH);
+            ctx.strokeStyle = "#5a2020";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(btnX + 0.5, btnY + 0.5, btnW - 1, btnH - 1);
+            ctx.fillStyle = red;
+            ctx.font = "bold 13px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText("BROKE", x + w / 2, btnY + 21);
+        }
+
         ctx.textAlign = "left";
-
-        // Reset alpha
         ctx.globalAlpha = 1;
-    }
-
-
-    /**
-     * Private helper to draw the card format itself
-     */
-    private drawPixelPanel(
-        ctx: CanvasRenderingContext2D,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        borderDark: string,
-        borderLight: string,
-        bgColor: string
-    ) {
-        const borderSize = 4;
-
-        // The background
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(x, y, w, h);
-
-        // Dark Outer border
-        ctx.fillStyle = borderDark;
-        ctx.fillRect(x + w - borderSize, y, borderSize, h);
-        ctx.fillRect(x, y + h - borderSize, w, borderSize);
-
-        // Light Outer border 
-        ctx.fillStyle = borderLight;
-        ctx.fillRect(x, y, w - borderSize, borderSize);
-        ctx.fillRect(x, y, borderSize, h - borderSize);
-
-        // Inner darker border
-        const innerBorder = 2;
-        ctx.fillStyle = borderDark;
-        ctx.fillRect(x + borderSize, y + borderSize, w - borderSize * 2, innerBorder);
-        ctx.fillRect(x + borderSize, y + borderSize, innerBorder, h - borderSize * 2);
-    }
-
-    /**
-     * Private helper to draw the buy button itself
-     */
-    private drawPixelButton(
-        ctx: CanvasRenderingContext2D,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        borderDark: string,
-        borderLight: string,
-        bgColor: string
-    ) {
-        const borderSize = 3;
-
-        // Background
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(x, y, w, h);
-
-        // Border Top and Left
-        ctx.fillStyle = borderLight;
-        ctx.fillRect(x, y, w, borderSize);
-        ctx.fillRect(x, y, borderSize, h);
-        // Border right and bottom
-        ctx.fillStyle = borderDark;
-        ctx.fillRect(x + w - borderSize, y, borderSize, h);
-        ctx.fillRect(x, y + h - borderSize, w, borderSize);
     }
 }
