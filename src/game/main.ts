@@ -156,7 +156,7 @@ function main() {
 
 
     try {
-        gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
+        GameEngine.g_INSTANCE.addUniqueEntity(new Player(new Vec2(55, 0)), DrawLayer.PLAYER);
         gameEngine.positionScreenOnEnt(unwrap(gameEngine.getUniqueEntityByTag("player")), 0.15, 0.65);
         gameEngine.snapViewportToFollowedEnt();
         background.start();

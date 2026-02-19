@@ -156,7 +156,13 @@ export class Player implements Entity, Collidable {
 
     // For Jump multipler
     jumpMultiplier: number = 1;
+    
+    // Flying cheat
+    isFlying: boolean = false;
+    private pressFKey: boolean = false;
 
+    // Used in intro animation to not show player
+    visible = false;
 
     // player gun states (player spawns with a gun)
     weapon: Gun;
@@ -186,8 +192,10 @@ export class Player implements Entity, Collidable {
      */
     currency: number = 0;
 
-    constructor() {
+    constructor(spawnPos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        this.position = new Vec2(spawnPos.x, mountain ? mountain.getHeightAt(spawnPos.x) : spawnPos.y);
         this.weapon = new AssultRifle(this.position);
         // this.weapon = new RPG(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
@@ -266,6 +274,9 @@ export class Player implements Entity, Collidable {
         // DEBUG: Force death
         this.debugForceDeath(keys);
 
+        // CHEATS: (Remove later) abilty for player to fly
+        this.flyKey(keys);
+        
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
@@ -362,7 +373,17 @@ export class Player implements Entity, Collidable {
             const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
             const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
             const inSafeZone = this.isInSafeZone();
-            if (inSafeZone) {
+
+            // Handles when we are flying cheats 
+            if (this.isFlying) {
+                const FLY_SPEED = 150;
+                this.velocity.x = 0;
+                this.velocity.y = 0;
+                if (keys["d"]) this.position.x += FLY_SPEED * deltaTime;
+                if (keys["a"]) this.position.x -= FLY_SPEED * deltaTime;
+                if (keys["w"] || keys[" "]) this.position.y -= FLY_SPEED * deltaTime;
+                if (keys["s"]) this.position.y += FLY_SPEED * deltaTime;
+            } else if (inSafeZone) {
                 // Reset velocity when entering safe zone to avoid carrying momentum
                 const SAFE_ZONE_SPEED = this.MAX_SPEED * 0.85;
                 const SAFE_ZONE_ACCEL = 120;
@@ -563,6 +584,18 @@ export class Player implements Entity, Collidable {
 
     }
 
+    /**
+     * Method when press F, it allows us to fly
+     * WILL DEELTE LATER, DEBUG since its a pain to die
+     */
+    flyKey(keys: { [key: string]: boolean }) {
+        if (keys["f"] && !this.pressFKey) {
+            this.isFlying = !this.isFlying;
+        }
+        this.pressFKey = keys["f"];
+    }
+
+
     fireWeapon(): void {
         console.log(`queuedTarget: ${this.queuedShotTarget}, wantsToShoot: ${this.wantsToShoot}`);
 
@@ -591,6 +624,9 @@ export class Player implements Entity, Collidable {
     //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        // Won't draw if visible is false 
+        if ((this as any).visible === false) return; 
+
         this.drawSnowboard(ctx, game);
         this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
