@@ -60,7 +60,7 @@ export class Background {
             paths, //paths
             0.00001, //parallaxSpeed
             GameEngine.WORLD_UNITS_IN_VIEWPORT, //widthInWorldUnits
-            0,  //startX
+            -7,  //startX
             30, //startY
             true //spawnRandom
         ), DrawLayer.BACKGROUND);
