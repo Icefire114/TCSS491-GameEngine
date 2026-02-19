@@ -20,6 +20,7 @@ export class DecorationSpawner implements Entity {
 
     // Logic
     private lastSpawnX = 0;
+    private initialized = false; 
     // Min distance palyer travel before spawning another decoration 
     private spawnInterval = 35;
     private rng: Rand;
@@ -38,6 +39,12 @@ export class DecorationSpawner implements Entity {
         // NO player, no moutain, don't run
         if (!player || !mountain) {
             return;
+        }
+
+        // Skiping decorations within player spawns, so it doens't ruin the animation         
+        if (!this.initialized) {
+            this.initialized = true;
+            this.lastSpawnX = player.position.x + 45;
         }
 
         const status = mountain.getSafeZoneStatus(player.position.x);
