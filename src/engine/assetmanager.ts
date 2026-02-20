@@ -6,6 +6,7 @@ export class AssetManager {
     private m_imageCache: Record<ResourcePath, HTMLImageElement>;
     private m_audioCache: Record<ResourcePath, HTMLAudioElement>;
     private m_downloadQueue: string[];
+    private m_shaderSourceCache: Record<ResourcePath, string>;
 
     constructor() {
         this.m_successCount = 0;
@@ -13,6 +14,7 @@ export class AssetManager {
         this.m_imageCache = {};
         this.m_audioCache = {};
         this.m_downloadQueue = [];
+        this.m_shaderSourceCache = {};
     };
 
     queueDownload(path: string) {
@@ -36,6 +38,21 @@ export class AssetManager {
             const ext = path.split('.').pop()?.toLowerCase();
 
             switch (ext) {
+                case 'glsl':
+                    fetch(path)
+                        .then(r => r.ok ? r.text() : Promise.reject(r.statusText))
+                        .then(src => {
+                            this.m_shaderSourceCache[ResourcePath.of(path)] = src;
+                            console.log("Loaded: " + path);
+                            this.m_successCount++;
+                            if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
+                        })
+                        .catch((err) => {
+                            console.error("Error loading shader: " + path + " Reason: " + err);
+                            this.m_errorCount++;
+                            if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
+                        });
+                    break;
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
@@ -81,6 +98,10 @@ export class AssetManager {
                     break;
             }
         }
+    };
+
+    getShaderSource(name: ShaderPath): string | undefined {
+        return this.m_shaderSourceCache[name.asRaw()];
     };
 
     getImage(path: ImagePath): HTMLImageElement | undefined {
@@ -135,6 +156,21 @@ export class ImagePath {
     /**
      * @returns The raw `ResourcePath` of this current `ImagePath`.
      */
+    asRaw(): ResourcePath {
+        return this.path;
+    }
+}
+
+export class ShaderPath {
+    private path: ResourcePath;
+
+    constructor(path: string) {
+        if (!(path.endsWith(".glsl"))) {
+            throw new Error("Shader path must be a path to an actual shader file!");
+        }
+        this.path = ResourcePath.of(path);
+    }
+
     asRaw(): ResourcePath {
         return this.path;
     }

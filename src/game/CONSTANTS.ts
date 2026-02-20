@@ -10,8 +10,6 @@ export const G_CONFIG = {
     TERRAIN_GENERATION_FORCE_FLAT: false,
     // If true, player does not take damage
     GOD_MODE: true,
-    // If true, use the new renderer, else use the old renderer
-    NEW_RENDERER: false,
     // If true, draw the safezone bounding boxes
     DRAW_SAFEZONE_BB: true,
     // If true, create the entities right in front of the player

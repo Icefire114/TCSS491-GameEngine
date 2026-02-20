@@ -2,7 +2,7 @@ import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer, Vec2 } from "../engine/types.js";
-import { ShaderEngine } from "../engine/WebGL/WebGL.js";
+import { WebGL } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./zombies/BasicZombie.js";
 import { G_CONFIG } from "./CONSTANTS.js";
@@ -132,6 +132,12 @@ ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
 
+// === Shader Assets ===
+ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
+
+
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
         console.error(`Error loading assets ${errorCount} of them failed to load!`);
@@ -143,15 +149,12 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    if (!ShaderEngine.isWebGL2Supported() || !G_CONFIG.NEW_RENDERER) {
-        console.warn(`WebGL2 Unsupported or disabled NEW_RENDERER=${G_CONFIG.NEW_RENDERER}!`);
-        if (G_CONFIG.NEW_RENDERER) {
-            alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
-        } else {
-            alert("[!] WebGL support has been disabled! Lets hope things are feature flagged correctly :)");
-        }
+    if (!WebGL.isWebGL2Supported()) {
+        console.warn(`WebGL2 Unsupported!`);
+        alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
     } else {
         console.log("WebGL2 Supported!");
+        WebGL.initWebGL(ASSET_MANAGER);
     }
 
 

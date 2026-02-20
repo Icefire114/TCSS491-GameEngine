@@ -5,8 +5,8 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/types.js";
 import { unwrap } from "../../engine/util.js";
-import { SunShader } from "../../engine/WebGL/SunShader.js";
-import { G_CONFIG } from "../CONSTANTS.js";
+import { ShaderRegistry } from "../../engine/WebGL/ShaderRegistry.js";
+import { WebGL } from "../../engine/WebGL/WebGL.js";
 import { Mountain } from "../worldEntities/mountain.js";
 
 export class Tree implements Entity {
@@ -33,7 +33,6 @@ export class Tree implements Entity {
     ],
         // new Vec2(4, 10)
     );
-    shader: SunShader | undefined = undefined;
 
     constructor(pos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -42,44 +41,37 @@ export class Tree implements Entity {
 
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        if (G_CONFIG.NEW_RENDERER) {
-            const currentAnim = {
-                sprite: unwrap(GameEngine.g_INSTANCE.getSprite(this.sprite)),
-                frameWidth: 512,
-                frameHeight: 512,
-                frameCount: 1,
-                offsetX: 0
-            };
+        const currentAnim = {
+            sprite: unwrap(GameEngine.g_INSTANCE.getSprite(this.sprite)),
+            frameWidth: 512,
+            frameHeight: 512,
+            frameCount: 1,
+            offsetX: 0
+        };
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_SUN, currentAnim.sprite), "Did not find shader for given template");
 
-            if (this.shader === undefined) {
-                this.shader = new SunShader(currentAnim.sprite);
-                console.log("Shader created, canvas size:", this.shader.canvas.width, this.shader.canvas.height);
-            }
+        const sunAngle = -130; // or calculate based on game time
+        const rad = (sunAngle * Math.PI) / 180;
+        const sunDir = [Math.cos(rad), Math.sin(rad)];
+        shader.render([
+            // Snow shader uniforms
+            {
+                u_snowHeight: 0.45,
+                u_snowThickness: 0.7
+            },
+            // Sun shader uniforms
+            {
+                u_sunDirection: sunDir,
+                u_intensity: 0.3,
+                u_baseLight: 0.6,
+                u_warmth: 0.05
+            },
+        ]);
 
-
-            this.shader.render(-60);
-
-            const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            const worldW = currentAnim.frameWidth / meterInPixels;
-            const worldH = currentAnim.frameHeight / meterInPixels;
-            const screenW = (worldW * meterInPixels) / game.zoom;
-            const screenH = (worldH * meterInPixels) / game.zoom;
-
-            const screenX =
-                ((this.position.x - (worldW / 2) - game.viewportX + currentAnim.offsetX) * meterInPixels) / game.zoom;
-            const screenY =
-                ((this.position.y - worldH - game.viewportY) * meterInPixels) / game.zoom;
-
-            ctx.drawImage(
-                this.shader.canvas,
-                screenX,
-                screenY,
-                screenW,
-                screenH
-            );
-        } else {
-            this.animator.drawCurrentAnimFrameAtPos(this.position);
-        }
+        game.renderer.drawRawCanvasAtWorldPos(
+            this.position,
+            shader.canvas
+        );
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {

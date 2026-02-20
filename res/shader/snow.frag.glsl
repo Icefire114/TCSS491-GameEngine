@@ -18,7 +18,7 @@ void main() {
     vec4 texColor = texture(u_texture, vec2(v_texCoord.x, 1.0f - v_texCoord.y));
 
     // Only apply snow to non-transparent pixels
-    if(texColor.a < 0.01f) {
+    if(texColor.a < 0.1f) {
         fragColor = texColor;
         return;
     }
@@ -44,7 +44,7 @@ void main() {
     snowColor += vec3(sparkle);
 
     // Blend original texture with snow
-    vec3 finalColor = mix(texColor.rgb, snowColor, snowFactor);
+    vec3 finalColor = mix(texColor.rgb, snowColor, snowFactor * 0.55);
 
     fragColor = vec4(finalColor, texColor.a);
 }

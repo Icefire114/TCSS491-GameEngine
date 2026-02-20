@@ -9,6 +9,8 @@ export class ShaderPass {
 
 
     constructor(gl: WebGL2RenderingContext, fragmentShaderSource: string, w: number, h: number) {
+        console.log("[WebGL2] Creating new ShaderPass");
+
         this.gl = gl;
 
         const vertexShaderSource = `#version 300 es
