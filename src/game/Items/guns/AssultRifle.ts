@@ -75,13 +75,15 @@ export class AssultRifle extends Gun {
     }
 
     protected createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet {
-    
-        const muzzleDistance = 3.5;
-        const verticleOffset = 0.2; 
-        
-        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
-        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RifleBullet(muzzleX, muzzleY, targetX, targetY, playerVelocity);
+        const localOffsetX = 1.0;  // along the gun barrel direction
+        const localOffsetY = -0.2;   // perpendicular to the gun
+
+        const originX = startX + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
+        const originY = startY + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
+
+        const muzzleX = originX + Math.cos(this.travelAngle);
+        const muzzleY = originY + Math.sin(this.travelAngle);
+        return new RifleBullet(originX, originY, muzzleX, muzzleY, playerVelocity);
     }
 
 }

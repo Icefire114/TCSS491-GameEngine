@@ -16,6 +16,7 @@ import { Zombie } from "../zombies/Zombie.js";
 import { Gun } from "../Items/guns/Gun.js";
 import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
+import { RayGun } from "../Items/guns/RayGun.js";
 
 /**
  * @author PG
@@ -111,6 +112,39 @@ export class Player implements Entity, Collidable {
         ]
     );
 
+    private rayGunAnimator = new Animator(
+        [
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Shot_2.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                    fireOnFrame: 2
+                },
+                AnimationState.ATTACK
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/IdleRay.png"),
+                    frameCount: 7,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/ReloadRay.png"),
+                    frameCount: 9,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.RELOAD
+            ]
+        ]
+    );
+
     prevGroundSpeed: number = 0;
 
     // Movement tuning constants
@@ -186,14 +220,18 @@ export class Player implements Entity, Collidable {
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         // this.weapon = new AssultRifle(this.position);
-        this.weapon = new RPG(this.position);
+        // this.weapon = new RPG(this.position);
+        this.weapon = new RayGun(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
 
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
+        this.setUpAnimatorEvents(this.rayGunAnimator);
+
+        // this.animator = this.rpgAnimator;
 
         // this.animator = this.rifleAnimator;
-        this.animator = this.rpgAnimator;
+        this.animator = this.rayGunAnimator;
 
         this.synchroizeAttackFrames();
     }
@@ -498,6 +536,12 @@ export class Player implements Entity, Collidable {
             console.log(`skipping fireWeapon.`);
             return;
         }
+
+        // if (this.weapon.tag == "RayGun") {
+        //     console.log(`Currently only RayGun is implemented, skipping fireWeapon.`);
+        //     return;
+        // }
+            
 
         const currentTime = Date.now();
         const bullet = this.weapon.shoot(this.position.x, this.position.y, this.queuedShotTarget.x, this.queuedShotTarget.y, currentTime);

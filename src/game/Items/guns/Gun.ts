@@ -10,9 +10,9 @@ import { Player } from "../../worldEntities/player.js";
 
 export abstract class Gun implements Entity {
 
-    private readonly SHOULDER_OFFSET_X: number = -0.7;
-    private readonly SHOULDER_OFFSET_Y: number = -3.8;
-    private readonly GUN_LENGTH: number = 1;
+    readonly SHOULDER_OFFSET_X: number = -0.7;
+    readonly SHOULDER_OFFSET_Y: number = -3.8;
+    readonly GUN_LENGTH: number = 1;
     protected travelAngle = 0;
 
     tag: string;

@@ -4,6 +4,10 @@ import { Entity, EntityID } from "../../../engine/Entity.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { Bullet } from "./Bullet.js";
+import { Vec2 } from "../../../engine/types.js";
+import { GameEngine } from "../../../engine/gameengine.js";
+import { Mountain } from "../mountain.js";
+import { Player } from "../player.js";
 
 /**
  * @author JK
@@ -12,36 +16,49 @@ import { Bullet } from "./Bullet.js";
 export class LazerBullet extends Bullet {
     tag: string = "LazerBullet";
 
-    physicsCollider = new BoxCollider(2, 1);
-    sprite: ImagePath = new ImagePath("res/img/ammo/test_bullet.png");
+    physicsCollider = new BoxCollider(4, 2);
+    sprite: ImagePath = new ImagePath("res/img/ammo/Lazer.png");
     removeFromWorld: boolean = false;
     damage: number = 20;
     explosionRadius: number = 20; // world units
     speed: number = 100 // world units per second
     hitEnemies: Set<EntityID> = new Set(); // track which enemies have already been hit to prevent multiple hits
+    endPoint: Vec2;
 
     animator: Animator = new Animator(
         [
             [
                 {
-                    sprite: new ImagePath("res/img/ammo/test_bullet.png"),
-                    frameCount: 1,
-                    frameHeight: 28,
-                    frameWidth: 36,
+                    sprite: new ImagePath("res/img/ammo/Lazer.png"),
+                    frameCount: 6,
+                    frameHeight: 95,
+                    frameWidth: 122,
                     offestX: 0
                 },
                 AnimationState.IDLE
             ]
         ],
-        { x: 1, y: 1 }
+        { x: 4, y: 2 }
     );
 
 
-    constructor(startX: number, startY: number, endX: number, endY: number) {
-        super("LazerBullet", startX, startY, endX, endY, 100, 30);
+    constructor(startX: number, startY: number, endX: number, endY: number, playerVelocity: Vec2) {
+        super("LazerBullet", startX, startY, endX, endY, 100, 30, playerVelocity);
 
-        //this.position.x += this.velocity.x * 0.04;
-        //this.position.y += this.velocity.y * 0.5;
+        this.endPoint = this.calculateEndPoint(startX, startY, endX, endY);
+        
+        //this.hitScan();
+    }
+
+    calculateEndPoint(startX: number, startY: number, targetX: number, targetY: number): Vec2 {
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+        const angle = Math.atan2(dy, dx);
+        
+        return new Vec2(
+            startX + Math.cos(angle),
+            startY + Math.sin(angle)
+        );
     }
 
     protected onEnemyHit(target: Entity, allEnemies: Entity[]): void {
@@ -56,7 +73,7 @@ export class LazerBullet extends Bullet {
         }
     }
 
-    onTerrainHit(mountain: Entity): void {
+    onTerrainHit(mountain: Entity): void { 
         this.removeFromWorld = true;
     }
 
@@ -64,4 +81,22 @@ export class LazerBullet extends Bullet {
         return false;
     }
 
+    draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        ctx.save();
+        
+        const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
+        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
+
+        ctx.translate(screenX, screenY);
+        ctx.rotate(this.travelAngle);
+        this.animator.drawCurrentAnimFrameAtOrigin(ctx);
+        ctx.restore();
+    }
+
+    update(keys: { [key: string]: boolean }, deltaTime: number): void {
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime); 
+        super.update(keys, deltaTime);
+    }
 }

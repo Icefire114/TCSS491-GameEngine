@@ -48,6 +48,8 @@ ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRay.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRay.png");
 
 
 
@@ -84,6 +86,7 @@ ASSET_MANAGER.queueDownload("res/img/items/AmmoBox.png");
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
 ASSET_MANAGER.queueDownload("res/img/guns/RPG/Shot.png");
+ASSET_MANAGER.queueDownload("res/img/guns/ray_gun/Shot.png");
 ASSET_MANAGER.queueDownload("res/img/guns/IdleGun.png");
 
 // === Bullet Assets ===
@@ -91,6 +94,8 @@ ASSET_MANAGER.queueDownload("res/img/ammo/RifleBullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGRocket.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGExplode.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/Lazer.png");
+
 
 
 // === SKY Background Assets ===
