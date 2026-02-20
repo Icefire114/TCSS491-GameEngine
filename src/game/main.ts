@@ -161,8 +161,13 @@ function main() {
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
-        const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
-        gameEngine.addUniqueEntity(new UILayer(shopUI), DrawLayer.UI_LAYER);
+        gameEngine.addUniqueEntity(
+            new UILayer(gameEngine.addUniqueEntity(
+                new ShopUI(),
+                DrawLayer.UI_LAYER
+            ) as ShopUI),
+            DrawLayer.UI_LAYER
+        );
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
 
