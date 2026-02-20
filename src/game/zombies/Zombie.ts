@@ -128,8 +128,6 @@ export abstract class Zombie implements Entity {
     }
 
     protected updateZombieAnimation(distance: number, deltaTime: number): void {
-        // Using global deltaTime for consistency, should probably be passed as a param
-
         if (distance <= this.attack_range) {
             this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
         } else if (distance > this.run_range) {
@@ -146,7 +144,7 @@ export abstract class Zombie implements Entity {
     }
 
     protected checkDespawn(player: Player): void {
-        if (this.position.x < player.position.x - 20) {
+        if (this.position.x < player.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT * 3) {
             this.removeFromWorld = true;
         }
     }
