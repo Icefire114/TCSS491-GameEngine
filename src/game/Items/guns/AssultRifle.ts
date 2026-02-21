@@ -9,6 +9,13 @@ export class AssultRifle extends Gun {
 
     sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
     ammoBox = 60;
+    static tag: string = "AssultRifle";
+    static damage: number = 30;
+    static fireRate: number = 10;
+    static reloadTime: number = 2;
+    static magSize: number = 30;
+    static ammo: number = 120;
+    static speed: number = 100;
 
     animator = new Animator(
         [
@@ -45,11 +52,11 @@ export class AssultRifle extends Gun {
     );
 
     constructor(position: Vec2) {
-        super("AssultRifle", //tag
-            120, //ammo
-            300, //magSize
-            10, //fireRate
-            2, //reloadTime
+        super(AssultRifle.tag, //tag
+            AssultRifle.ammo, //ammo
+            AssultRifle.magSize, //magSize
+            AssultRifle.fireRate, //fireRate
+            AssultRifle.reloadTime, //reloadTime
             position
         );
 

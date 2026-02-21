@@ -8,6 +8,7 @@ import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./ShopUI.js";
+import { ArmoryUI } from "./ArmoryUI.js";
 
 export class UILayer implements Entity {
     readonly id: EntityID;
@@ -20,15 +21,21 @@ export class UILayer implements Entity {
     removeFromWorld: boolean = false;
     drawEnterSZPrompt: boolean = false;
     drawOpenShopPrompt: boolean = false;
+    drawOpenArmoryPrompt: boolean = false;
 
     // Shop UI Properties
     private shop: ShopUI;
     private lWasPressed: boolean = false;
 
+    // Armory UI Properties
+    private armory: ArmoryUI;
+    private pWasPressed: boolean = false;
 
-    constructor(shop: ShopUI) {
+
+    constructor(shop: ShopUI, armory: ArmoryUI) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.shop = shop;
+        this.armory = armory;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
@@ -118,6 +125,9 @@ export class UILayer implements Entity {
         } else if (this.drawOpenShopPrompt) {
             ctx.fillStyle = "black"
             ctx.fillText("Press E to open/ close the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
+        } else if (this.drawOpenArmoryPrompt) {
+                ctx.fillStyle = "black"
+                ctx.fillText("Press P to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
         ctx.restore();
     }
@@ -128,5 +138,10 @@ export class UILayer implements Entity {
             this.shop.isOpen = !this.shop.isOpen;
         }
         this.lWasPressed = keys['l'];
+
+        if (keys['p'] && !this.pWasPressed) {
+            this.armory.isOpen = !this.armory.isOpen;
+        }
+        this.pWasPressed = keys['p'];
     }
 }

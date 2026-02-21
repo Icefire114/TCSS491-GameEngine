@@ -7,8 +7,9 @@ import { Vec2 } from "../../../engine/types.js";
 
 export class RPG extends Gun {
 
-    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    sprite: ImagePath = new ImagePath("res/img/guns/RPG/Shot.png");
     ammoBox = 10;
+    static tag: string = "RPG";
 
     animator = new Animator(
             [
@@ -44,7 +45,7 @@ export class RPG extends Gun {
         );
     
     constructor(position: Vec2) {
-        super("RPG", //tag
+        super(RPG.tag, //tag
             10, //ammo
             1, //magSize
             2, //fireRate

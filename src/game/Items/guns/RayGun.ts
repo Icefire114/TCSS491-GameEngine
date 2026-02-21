@@ -11,8 +11,9 @@ export class RayGun extends Gun {
     readonly SHOULDER_OFFSET_Y: number = -3.6;
     readonly GUN_LENGTH: number = 1;
 
-    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    sprite: ImagePath = new ImagePath("res/img/guns/ray_gun/Shot.png");
     ammoBox = 100;
+    static tag: string = "RayGun";
 
     animator = new Animator(
             [
@@ -48,7 +49,7 @@ export class RayGun extends Gun {
         );
     
     constructor(position: Vec2) {
-        super("RayGun", //tag
+        super(RayGun.tag, //tag
             1000, //ammo
             1000, //magSize
             20, //fireRate

@@ -29,6 +29,7 @@ import { unwrap } from "../engine/util.js";
 import { ShopUI } from "./ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
+import { ArmoryUI } from "./ArmoryUI.js";
 
 
 
@@ -82,6 +83,9 @@ ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 ASSET_MANAGER.queueDownload("res/img/items/bomb.png");
 ASSET_MANAGER.queueDownload("res/img/items/boots.png");
 ASSET_MANAGER.queueDownload("res/img/items/AmmoBox.png");
+ASSET_MANAGER.queueDownload("res/img/items/assult_rifle.png");
+ASSET_MANAGER.queueDownload("res/img/items/rpg.png");
+ASSET_MANAGER.queueDownload("res/img/items/ray_gun.png");
 
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
@@ -136,6 +140,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/crate.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/testArmory.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -167,7 +172,8 @@ function main() {
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
-        gameEngine.addUniqueEntity(new UILayer(shopUI), DrawLayer.UI_LAYER);
+        const armoryUI: ArmoryUI = gameEngine.addUniqueEntity(new ArmoryUI(), DrawLayer.UI_LAYER) as ArmoryUI;
+        gameEngine.addUniqueEntity(new UILayer(shopUI, armoryUI), DrawLayer.UI_LAYER);
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
 
