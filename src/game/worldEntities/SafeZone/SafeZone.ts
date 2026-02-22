@@ -10,7 +10,7 @@ import { DecorationSpawner } from "../../DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
-import { Armory } from "./ArmoryTemp.js";
+import { Armory } from "./Armory.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 import { Shop } from "./Shop.js";
 
@@ -63,7 +63,7 @@ export class SafeZone implements Entity {
 
         GameEngine.g_INSTANCE.addEntity(
             new Armory(
-                Vec2.compAdd(this.position, new Vec2(this.size.x / 2, 0))
+                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 - 30, 0))
             ), DrawLayer.WORLD_DECORATION
         );
     }

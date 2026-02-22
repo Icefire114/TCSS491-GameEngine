@@ -4,27 +4,25 @@ import { Entity } from "../../../engine/Entity.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { Bullet } from "./Bullet.js";
-import { Vec2 } from "../../../engine/types.js";
+import { AssultRifle } from "../../Items/guns/AssultRifle.js";
 
 /**
  * @author JK
  * @description The Bullet class.
  */
 export class RifleBullet extends Bullet {
-    tag: string = "RifleBullet";
 
-    physicsCollider = new BoxCollider(1, 0.5);
-    sprite: ImagePath = new ImagePath("res/img/ammo/RifleBullet.png");
-    removeFromWorld: boolean = false;
-    damage: number = 30;
-
-    speed: number = 100 // world units per second
+    public tag: string = "RifleBullet";
+    public damage: number = AssultRifle.DAMAGE;
+    public physicsCollider = new BoxCollider(1, 0.5);
+    public sprite: ImagePath = new ImagePath("res/img/ammo/RifleBullet.png");
+    public removeFromWorld: boolean = false;
 
     animator: Animator = new Animator(
         [
             [
                 {
-                    sprite: new ImagePath("res/img/ammo/RifleBullet.png"),
+                    sprite: this.sprite,
                     frameCount: 1,
                     frameHeight: 28,
                     frameWidth: 36,
@@ -36,17 +34,12 @@ export class RifleBullet extends Bullet {
         { x: 1, y: 0.5 }
     );
 
-
-    constructor(startX: number, startY: number, endX: number, endY: number, playerVelocity: Vec2) {
-        super("RifleBullet", startX, startY, endX, endY, 100, 30, playerVelocity);
-
-        //this.position.x += this.velocity.x * 0.04;
-        //this.position.y += this.velocity.y * 0.5;
-
-        console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
+    constructor(startX: number, startY: number, angle: number) {
+        super("RifleBullet", startX, startY, angle);
+        //console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
     }
 
-    onEnemyHit(target: Entity, allEnemies: Entity[]): void {
+    onEnemyHit(target: Entity): void {
         if (target instanceof Zombie) {
             target.takeDamage(this.damage);
         }
@@ -55,7 +48,7 @@ export class RifleBullet extends Bullet {
         }
     }
 
-    onTerrainHit(mountain: Entity): void {
+    onTerrainHit(): void {
         this.removeFromWorld = true;
     }
 

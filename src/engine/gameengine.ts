@@ -42,7 +42,6 @@ export class GameEngine {
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
-    private mouseInfo: { pos: Vec2 | null, click: Vec2 | null } = { pos: null, click: null };
 
     public get renderer(): Renderer {
         return this.m_Renderer;

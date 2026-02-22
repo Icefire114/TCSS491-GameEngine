@@ -2,7 +2,6 @@ import { AnimationState } from "../../../engine/Animator.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
-import { Collider } from "../../../engine/physics/Collider.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "../../worldEntities/bullets/Bullet.js";
@@ -10,38 +9,58 @@ import { Player } from "../../worldEntities/player.js";
 
 export abstract class Gun implements Entity {
 
+    /**
+     * Offset for position
+     */
     readonly SHOULDER_OFFSET_X: number = -0.7;
     readonly SHOULDER_OFFSET_Y: number = -3.8;
-    readonly GUN_LENGTH: number = 1;
+
+    /**
+     * Angle at which the gun is facing/traveling.
+     */
     protected travelAngle = 0;
 
-    tag: string;
-    id: EntityID;
-
-    velocity: Vec2 = new Vec2();
-    position: Vec2 = new Vec2();
-    physicsCollider = null;
+    /**
+     * abstract properties that all guns must have
+     */
     abstract sprite: ImagePath;
-    removeFromWorld: boolean = false;
     abstract animator: any;
     abstract equipped: boolean;
     abstract unlocked: boolean;
-
     abstract ammoBox: number; // how much ammo this gun refills to when picking up an ammo restore item
-    ammoOnHand: number; // total ammo the player has for this gun (not including what's currently loaded)
-    ammoInGun: number; // current ammo in the gun
-    magSize: number;
-    fireRate: number; // in shots per second
-    lastShotTime: number = 0;
-    isReloading: boolean = false;
-    reloadTime: number; // in seconds
 
-    wantsToShoot: boolean = false;
-    wantsToReload: boolean = false;
-    isShooting: boolean = false;
+    /**
+     * Entity properties
+     */
+    public tag: string;
+    public id: EntityID;
+    public velocity: Vec2 = new Vec2();
+    public position: Vec2 = new Vec2();
+    public physicsCollider = null;
+    public removeFromWorld: boolean = false;
+    
+    /**
+     * Gun-specific properties
+     */
+    public ammoOnHand: number; // total ammo the player has for this gun (not including what's currently loaded)
+    public ammoInGun: number; // current ammo in the gun
+    public magSize: number;
+    public fireRate: number; // in shots per second
+    public reloadTime: number; // in seconds
+
+    public wantsToShoot: boolean = false;
+    public wantsToReload: boolean = false;
+    public isShooting: boolean = false;
+    public isReloading: boolean = false;
+
+    /**
+     * abstract methods to create bullets and sync animations
+     */
+    protected abstract createBullet(): Bullet;
+    public abstract syncFrames(): void;
 
 
-    constructor(tag: string, ammo: number, magSize: number, fireRate: number, reloadTime: number, position: Vec2) {
+    constructor(tag: string, ammo: number, magSize: number, fireRate: number, reloadTime: number) {
         this.tag = tag;
         this.id = `${this.tag}#${crypto.randomUUID()}`;
 
@@ -50,47 +69,26 @@ export abstract class Gun implements Entity {
         this.ammoOnHand = ammo;
         this.fireRate = fireRate;
         this.reloadTime = reloadTime;
-
-        this.position = new Vec2(position.x, position.y);
     }
 
-    getShotCooldown(): number {
-        return 1000 / this.fireRate; // convert fire rate to milliseconds
-    }
-
-    getReloadCooldown(): number {
-        return this.reloadTime * 1000; // convert seconds to milliseconds
-    }
-
-    canShoot(currentTime: number): boolean {
-        if (this.isReloading) return false;
-        if (this.ammoInGun <= 0) return false;
-
-        
-
-        return !this.isReloading && this.ammoInGun > 0;
-    }
-
-    shoot(startX: number, startY: number, targetX: number, targetY: number, currentTime: number): Bullet | null {
-        if (!this.canShoot(currentTime)) {
+    /**
+     * Call when the player shoots 
+     * @returns A projectile
+     */
+    public shoot(): Bullet | null {
+        if (!this.canShoot()) {
             return null;
         }
 
         this.ammoInGun--;
-        this.lastShotTime = currentTime;
-
-        const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player;
-        const playerVelocity = player.velocity;
-
-        return this.createBullet(this.position.x, this.position.y, targetX, targetY, playerVelocity);
+        return this.createBullet();
     }
 
-    canReload(): boolean {
-        return !this.isReloading && this.ammoInGun < this.magSize && this.ammoOnHand > 0;
-    }
-
-    reload(): void {
-        
+    /**
+     * Call when the player reloads
+     */
+    public reload(): void {
+        if (!this.canReload()) return;
         
             const ammoToReload = this.magSize - this.ammoInGun;
             if (this.ammoOnHand >= ammoToReload) {
@@ -104,12 +102,14 @@ export abstract class Gun implements Entity {
         
     }
 
-    draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+    /**
+     * Draw the gun. Gun should only be drawn if it's currently equipped by the player.
+     */
+    public draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         if (!this.equipped) return;
 
         ctx.save();
 
-        const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
@@ -122,12 +122,7 @@ export abstract class Gun implements Entity {
         ctx.restore();
     }
 
-    updatePos(pos: Vec2): void {
-        this.position = new Vec2(pos.x, pos.y);
-    }
-
-    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
-
+    public update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
         const shoulderY = player.position.y + this.SHOULDER_OFFSET_Y;
@@ -156,8 +151,17 @@ export abstract class Gun implements Entity {
                 this.travelAngle = Math.atan2(dy, dx);
             }
 
-            this.position.x = shoulderX + Math.cos(this.travelAngle) * this.GUN_LENGTH;
-            this.position.y = shoulderY + Math.sin(this.travelAngle) * this.GUN_LENGTH;
+            this.position.x = shoulderX + Math.cos(this.travelAngle);
+            this.position.y = shoulderY + Math.sin(this.travelAngle);
+        }
+
+        if (!player.uiOpen) {
+            this.wantsToShoot = keys["Mouse0"] && this.canShoot();
+            this.wantsToReload = keys["r"] && this.canReload();
+        } else {
+            this.wantsToShoot = false;
+            this.wantsToReload = false;
+            this.isShooting = false;
         }
         
         // ---------- Animation Logic ----------
@@ -166,17 +170,35 @@ export abstract class Gun implements Entity {
             this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
         } else if (this.wantsToShoot) {
             // start attack animation
+            this.isShooting = true;
             this.animator.updateAnimState(AnimationState.ATTACK, deltaTime);
         } else if (this.isReloading) {
             this.animator.updateAnimState(AnimationState.RELOAD, deltaTime);
         } else if (this.wantsToReload) {
+            this.isReloading = true;
             this.animator.updateAnimState(AnimationState.RELOAD, deltaTime);
         } else {
             // Idle animation state
             this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
         }
-        
     }
 
-    protected abstract createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet;
+    /**
+     * 
+     * @returns true if the player can shoot; false if otherwise
+     */
+    private canShoot(): boolean {
+        if (this.isReloading) return false;
+        if (this.ammoInGun <= 0) return false;
+
+        return !this.isReloading && this.ammoInGun > 0;
+    }
+
+    /**
+     * 
+     * @returns true if the player can reload; false if otherwise
+     */
+    private canReload(): boolean {
+        return !this.isReloading && this.ammoInGun < this.magSize && this.ammoOnHand > 0;
+    }
 }

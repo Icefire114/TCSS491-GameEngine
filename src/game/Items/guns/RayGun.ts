@@ -3,25 +3,27 @@ import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { LazerBullet } from "../../worldEntities/bullets/LazerBullet.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Vec2 } from "../../../engine/types.js";
 import { GameEngine } from "../../../engine/gameengine.js";
+import { Player } from "../../worldEntities/player.js";
 
 export class RayGun extends Gun {
     readonly SHOULDER_OFFSET_X: number = -0.7;
     readonly SHOULDER_OFFSET_Y: number = -3.6;
-    readonly GUN_LENGTH: number = 1;
 
-    sprite: ImagePath = new ImagePath("res/img/guns/ray_gun/Shot.png");
-    ammoBox = 100;
-    static tag: string = "RayGun";
-    static damage: number = 15;
-    static fireRate: number = 20;
-    static reloadTime: number = 3;
-    static magSize: number = 100;
-    static ammo: number = 100;
-    static speed: number = 100;
-    equipped = false;
-    unlocked = false;
+    /**
+     * Ray Gun components
+     */
+    static TAG: string = "RayGun";
+    static DAMAGE: number = 15;
+    static FIRE_RATE: number = 20;
+    static RELOAD_TIME: number = 3;
+    static MAG_SIZE: number = 100;
+    static SPAWN_AMMO: number = 100;
+
+    public sprite: ImagePath = new ImagePath("res/img/guns/ray_gun/Shot.png");
+    public ammoBox = 100;
+    public equipped = false;
+    public unlocked = false;
 
     animator = new Animator(
             [
@@ -56,60 +58,51 @@ export class RayGun extends Gun {
             ]
         );
     
-    constructor(position: Vec2) {
-        super(RayGun.tag, //tag
-            RayGun.ammo, //ammo
-            RayGun.magSize, //magSize
-            RayGun.fireRate, //fireRate
-            RayGun.reloadTime, //reloadTime
-            position
+    constructor() {
+        super(RayGun.TAG,
+            RayGun.SPAWN_AMMO,
+            RayGun.MAG_SIZE,
+            RayGun.FIRE_RATE,
+            RayGun.RELOAD_TIME,
         );
 
-        this.synchroizeAttackFrames();
-        
+        this.syncFrames();
     }
 
-    draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-            ctx.save();
-    
-            const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
-            const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
-            
-            ctx.translate(screenX, screenY);
-            ctx.rotate(this.travelAngle);
-    
-            this.animator.drawCurrentAnimFrameAtOrigin(ctx, 0.5, 0.2);
-    
-            ctx.restore();
-        }
-
-    synchroizeAttackFrames(): void {
-        // Get the attack animation info
-        const attackAnimInfo = this.animator['spriteSheet'][AnimationState.ATTACK];
-        if (!attackAnimInfo) return;
-        
-        // Calculate desired animation duration based on fire rate
-        const shotCooldownSeconds = this.getShotCooldown() / 1000; // convert ms to seconds
-        
-        // Calculate how long the animation naturally takes at base speed
-        const baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
-        
-        // Calculate speed multiplier needed
-        const speedMultiplier = baseAnimDuration / shotCooldownSeconds;
-        
-        // Update the animation speed
-        attackAnimInfo.animationSpeed = speedMultiplier;
+    /**
+     * Call if you want to change reload time or fire rate. 
+     */
+    public syncFrames(): void {
+        this.animator.synchroizeFrames(RayGun.FIRE_RATE, AnimationState.ATTACK);
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet {
-        const originX = startX + Math.cos(this.travelAngle) - Math.sin(this.travelAngle);
-        const originY = startY + Math.sin(this.travelAngle) + Math.cos(this.travelAngle);
+    public draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        if (!this.equipped) return;
+        ctx.save();
+
+        const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
+        const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
+        
+        ctx.translate(screenX, screenY);
+        ctx.rotate(this.travelAngle);
+
+        this.animator.drawCurrentAnimFrameAtOrigin(ctx, 0.5, 0.2);
+
+        ctx.restore();
+    }
+
+     /**
+     * 
+     * @returns A bullet spawned at the muzzle of the gun
+     */
+    protected createBullet(): Bullet {
+        const originX = this.position.x + Math.cos(this.travelAngle) - Math.sin(this.travelAngle);
+        const originY = this.position.y + Math.sin(this.travelAngle) + Math.cos(this.travelAngle);
 
         const muzzleX = originX + Math.cos(this.travelAngle);
         const muzzleY = originY + Math.sin(this.travelAngle);
 
-        return new LazerBullet(originX, originY, muzzleX, muzzleY, playerVelocity);
+        return new LazerBullet(originX, originY, this.travelAngle);
     }
 }

@@ -9,6 +9,7 @@ import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./ShopUI.js";
 import { ArmoryUI } from "./ArmoryUI.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 
 export class UILayer implements Entity {
     readonly id: EntityID;
@@ -127,28 +128,23 @@ export class UILayer implements Entity {
             ctx.fillText("Press E to open/ close the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
         } else if (this.drawOpenArmoryPrompt) {
                 ctx.fillStyle = "black"
-                ctx.fillText("Press P to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
+                ctx.fillText("Press E to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
         ctx.restore();
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         // DEBUG: To see the visualization of the Shop UI (WILL DELETE LATERRRRR)
         if (keys['l'] && !this.lWasPressed) {
             this.shop.isOpen = !this.shop.isOpen;
         }
         this.lWasPressed = keys['l'];
 
-        if (keys['p'] && !this.pWasPressed) {
+        if (keys['p'] && G_CONFIG.UNLOCK_ALL_GUNS && !this.pWasPressed) {
             this.armory.isOpen = !this.armory.isOpen;
+            player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state
         }
         this.pWasPressed = keys['p'];
-
-        // if (clickCoords && keys["Mouse0"]) {
-        //     if (this.armory.isOpen) {
-        //         this.armory.handleClick(clickCoords);
-        //         keys["Mouse0"] = false;
-        //     }
-        // }
     }
 }
