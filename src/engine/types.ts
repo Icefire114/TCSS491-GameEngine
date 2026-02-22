@@ -39,6 +39,12 @@ export namespace ResourcePath {
 }
 
 /**
+ * Marker class see {@link GameEngine.draw}
+ */
+export class ForceDraw {
+}
+
+/**
  * A 2D vector
  */
 export class Vec2 {

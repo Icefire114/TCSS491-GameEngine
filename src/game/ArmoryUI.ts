@@ -1,5 +1,5 @@
 import { GameEngine } from "../engine/gameengine.js";
-import { Vec2 } from "../engine/types.js";
+import { ForceDraw, Vec2 } from "../engine/types.js";
 import { ImagePath } from "../engine/assetmanager.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { AssultRifle } from "./Items/guns/AssultRifle.js";
@@ -32,10 +32,10 @@ interface ArmoryItemStats {
 /**
  * Class that represents the Armory UI
  */
-export class ArmoryUI implements Entity {
+export class ArmoryUI extends ForceDraw implements Entity {
 
     //UI Colors
-    
+
     static BORDER_DARK = "#211f1f";
     static BORDER_LIGHT = "#8b8b8a";
     static BG_MAIN = "#252320";
@@ -104,6 +104,7 @@ export class ArmoryUI implements Entity {
     ];
 
     constructor() {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 
@@ -117,7 +118,7 @@ export class ArmoryUI implements Entity {
         const w = ctx.canvas.width;
         const h = ctx.canvas.height;
 
-        
+
 
         // Panel Dimesions
         const cardH = h * 0.45;
@@ -149,24 +150,24 @@ export class ArmoryUI implements Entity {
 
         // Setup to draw each item
         // this.items.forEach((item, idx) => {
-            //const col = idx % itemsPerRow;
-            //const x = panelX + cardMargin + (col * (cardW + cardSpacing));
-            const x = panelX + cardMargin;
-            const y = cardsY;
+        //const col = idx % itemsPerRow;
+        //const x = panelX + cardMargin + (col * (cardW + cardSpacing));
+        const x = panelX + cardMargin;
+        const y = cardsY;
 
-            this.items[0].rect = { x, y, w: cardW, h: cardH };
-            // Drawing the card itself 
-            this.drawItemCard(ctx, game, this.items[0], x, y, cardW, cardH);
+        this.items[0].rect = { x, y, w: cardW, h: cardH };
+        // Drawing the card itself 
+        this.drawItemCard(ctx, game, this.items[0], x, y, cardW, cardH);
         // });
 
         // setup weapon stats
         const statsW = (panelW * 0.4 - (cardMargin * 2));
-        
+
         const statsX = panelX + cardMargin + cardW + cardMargin;
         const statsY = cardsY;
 
         this.drawItemStats(ctx, game, this.itemsStats[0], statsX, statsY, statsW, cardH);
-        
+
     }
 
     private drawItemStats(
@@ -277,7 +278,7 @@ export class ArmoryUI implements Entity {
             };
             ctx.fillText(tickValue.toString(), tickX, y + h - 5);
         }
-    }    
+    }
 
     /**
      * Private method to draw each indvidual card 

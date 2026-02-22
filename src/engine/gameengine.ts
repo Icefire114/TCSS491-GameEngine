@@ -1,4 +1,4 @@
-import { DrawLayer } from "./types.js";
+import { DrawLayer, ForceDraw, Vec2 } from "./types.js";
 import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, AudioPath, ImagePath } from "./assetmanager.js";
@@ -237,6 +237,10 @@ export class GameEngine {
         normalEnts.sort((a, b) => b[1] - a[1]);
         const drawStart = performance.now();
         for (const [ent] of normalEnts) {
+            // skip drawing entities that are too far away
+            if (Vec2.dist(ent.position, unwrap(this.getUniqueEntityByTag("player")).position) > GameEngine.WORLD_UNITS_IN_VIEWPORT * 3 && !(ent instanceof ForceDraw)) {
+                continue;
+            }
             this.ctx.save();
             const t0 = performance.now();
             ent.draw(this.ctx, this);

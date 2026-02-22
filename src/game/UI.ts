@@ -2,7 +2,7 @@ import { ImagePath } from "../engine/assetmanager.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
-import { Vec2 } from "../engine/types.js";
+import { ForceDraw, Vec2 } from "../engine/types.js";
 import { unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
@@ -10,7 +10,7 @@ import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ArmoryUI } from "./ArmoryUI.js";
 
-export class UILayer implements Entity {
+export class UILayer extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
 
@@ -33,6 +33,7 @@ export class UILayer implements Entity {
 
 
     constructor(shop: ShopUI, armory: ArmoryUI) {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.shop = shop;
         this.armory = armory;

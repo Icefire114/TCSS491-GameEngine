@@ -2,7 +2,7 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { MountainCollider } from "../../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
-import { DrawLayer, Vec2 } from "../../engine/types.js";
+import { DrawLayer, ForceDraw, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
@@ -14,7 +14,7 @@ export interface SafeZoneInfo {
     endX: number;
 }
 
-export class Mountain implements Entity {
+export class Mountain extends ForceDraw implements Entity {
     [x: string]: any;
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
@@ -74,6 +74,7 @@ export class Mountain implements Entity {
      * Initalizing the moutain entity.
      */
     constructor(seed: string) {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.rng = new Rand(seed);
 

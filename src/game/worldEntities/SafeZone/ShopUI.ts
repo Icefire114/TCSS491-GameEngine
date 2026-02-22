@@ -1,5 +1,5 @@
 import { GameEngine } from "../../../engine/gameengine.js";
-import { Vec2 } from "../../../engine/types.js";
+import { ForceDraw, Vec2 } from "../../../engine/types.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Player } from "../player.js";
@@ -23,7 +23,7 @@ interface ShopItem {
 /**
  * Class that represents the Shop UI
  */
-export class ShopUI implements Entity {
+export class ShopUI extends ForceDraw implements Entity {
     tag: string = "shop_ui";
     id: EntityID;
     position: Vec2 = new Vec2(0, 0);
@@ -70,6 +70,7 @@ export class ShopUI implements Entity {
     ];
 
     constructor() {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
     }
 

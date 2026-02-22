@@ -232,7 +232,7 @@ export class Player implements Entity, Collidable {
         this.weapon = new AssultRifle(this.position);
         // this.weapon = new AssultRifle(this.position);
         // this.weapon = new RPG(this.position);
-        this.weapon = new RayGun(this.position);
+        // this.weapon = new RayGun(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
 
         this.setUpAnimatorEvents(this.rpgAnimator);
@@ -240,9 +240,8 @@ export class Player implements Entity, Collidable {
         this.setUpAnimatorEvents(this.rayGunAnimator);
 
         // this.animator = this.rpgAnimator;
-
-        // this.animator = this.rifleAnimator;
-        this.animator = this.rayGunAnimator;
+        this.animator = this.rifleAnimator;
+        // this.animator = this.rayGunAnimator;
 
         this.synchroizeAttackFrames();
     }
