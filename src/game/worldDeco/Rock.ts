@@ -60,8 +60,8 @@ export class Rock implements Entity {
         shader.render([
             // Snow shader uniforms
             {
-                u_snowHeight: 0.5,
-                u_snowThickness: 0.85
+                u_snowHeight: 0.4,
+                u_snowThickness: 0.75
             },
             // Sun shader uniforms
             {
