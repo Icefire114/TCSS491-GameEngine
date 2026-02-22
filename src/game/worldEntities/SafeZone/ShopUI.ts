@@ -4,7 +4,7 @@ import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Player } from "../player.js";
 import { AmmoRestore } from "../../Items/AmmoRestore.js";
-import { InstantHealthItem } from "../../Items/InstantHealth.js";
+import { InstantInfectionCureBuff } from "../../Items/InstantInfectionCure.js";
 import { ShieldRestorePickupItem } from "../../Items/ShieldRestore.js";
 import { Buff } from "../../Items/Buff.js";
 
@@ -80,7 +80,7 @@ export class ShopUI extends ForceDraw implements Entity {
     private createBuff(itemId: string): Buff | null {
         switch (itemId) {
             case "ammo": return new AmmoRestore();
-            case "health": return new InstantHealthItem();
+            case "health": return new InstantInfectionCureBuff();
             case "shield": return new ShieldRestorePickupItem();
             default: return null;
         }

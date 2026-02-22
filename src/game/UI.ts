@@ -81,21 +81,21 @@ export class UILayer extends ForceDraw implements Entity {
         }
 
         //draw player health on top right corner of the screen
-        if (player.health < 100) {
+        if (player.infection < 100) {
             ctx.fillStyle = "green";
-        } else if (player.health < 200) {
+        } else if (player.infection < 200) {
             ctx.fillStyle = "orange";
         } else {
             ctx.fillStyle = "red";
         }
         ctx.font = "30px Arial";
-        ctx.fillText(`Health: ${player.health}%`, ctx.canvas.width - 200, 40);
+        ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
         //console.log(`Player Health: ${player.health}`);
 
         //draw player shield below health
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "rgb(255, 60, 0)";
         ctx.font = "30px Arial";
-        ctx.fillText(`Shield: ${player.shield}%`, ctx.canvas.width - 200, 80);
+        ctx.fillText(`Health: ${player.health}`, ctx.canvas.width - 200, 80);
         //console.log(`Player Shield: ${player.shield}`);
 
         // draw total player weapon ammo below shield

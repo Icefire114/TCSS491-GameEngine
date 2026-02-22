@@ -20,6 +20,9 @@ import { DeathScreen } from "../DeathScreen.js";
 import { RavineDeathZone } from "./RavineZone.js";
 import { RayGun } from "../Items/guns/RayGun.js";
 
+
+export type DamageType = "Infection" | "Health";
+
 /**
  * @author PG
  * @description The main player class.
@@ -173,12 +176,13 @@ export class Player implements Entity, Collidable {
     }
 
     // players current health and sheild health
-    health: number = 0;
-    shield: number = 100;
+    infection: number = 0;
+    health: number = 100;
+    infectionImmune: boolean = false;
 
-    // players max health (smash bros health system where 0% is max health)
-    maxHealth: number = 0;
-    maxShield: number = 100;
+    // players max health (smash bros health system where 0% is min infection)
+    minInfection: number = 0;
+    maxHealth: number = 100;
 
     // invulnerbale time frame after getting hit
     iTime: number = 0;
@@ -346,6 +350,7 @@ export class Player implements Entity, Collidable {
             ) {
                 buff.currentDuration = buff.currentDuration - deltaTime;
                 if (buff.currentDuration <= 0) {
+                    buff.onEnd();
                     this.buffs.splice(this.buffs.indexOf(buff), 1);
                 }
             }
@@ -534,18 +539,19 @@ export class Player implements Entity, Collidable {
                 const spikes: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("spike");
                 for (const spikeEntity of spikes) {
                     if (this.physicsCollider.collides(this, spikeEntity) && !this.isInvulnerable()) {
-                        this.damagePlayer(5);
+                        this.damagePlayer(5, "Health");
                         this.velocity.x = -this.velocity.x * 0.8; // stop player movement on spike hit
                         this.velocity.y = -10; // bounce player up a bit on spike hit
                         this.iTime = this.iDuration; // start invulnerability time
                     }
                 }
 
-                // -- Collision with zombies --
+                // -- Collision damge with zombies --
+                // Note that is is seperate from the zombies individual attack logic
                 const zombies: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
                 for (const zombie of zombies) {
                     if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
-                        this.damagePlayer(10);
+                        this.damagePlayer(1, "Infection");
                         this.iTime = this.iDuration; // start invulnerability time
                     }
                 }
@@ -674,37 +680,40 @@ export class Player implements Entity, Collidable {
         ctx.restore();
     }
 
-    damagePlayer(damage: number): void {
+    damagePlayer(damage: number, damageType: DamageType): void {
         if (!G_CONFIG.GOD_MODE) {
             // increase damage based on current health
             // Note: scaled damage is only applied to health, not shield
-            const scalingFactor = 1 + (this.health / 100);
+            const scalingFactor = 1 + (this.infection / 100);
             const ScaledDamage = Math.round(damage * scalingFactor);
             this.hitMultiplier += 0.1; // increase hit multiplier on each hit
+            switch (damageType) {
+                case "Infection":
+                    if (!this.infectionImmune) {
+                        this.infection += ScaledDamage;
+                        var death = Math.random() * this.infection;
+                        //console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
+                        death *= this.hitMultiplier;
+                        console.log(`Adjusted death chance: ${death.toFixed(2)}`);
 
-            if (this.shield <= 0) { //damage shield first
-                this.health += ScaledDamage;
-                var death = Math.random() * this.health;
-                //console.log(`health: ${this.health}, death: ${death}, hitMultiplier: ${this.hitMultiplier.toFixed(2)}`);
-                death *= this.hitMultiplier;
-                console.log(`Adjusted death chance: ${death.toFixed(2)}`);
+                        if (death >= 150) { // chance of death increases with health%
+                            //console.log(`Player has died!`);
+                            this.dead = true;
 
-                if (death >= 150) { // chance of death increases with health%
-                    //console.log(`Player has died!`);
-                    this.dead = true;
-
-                    // The Check if we need a death screen
-                    GameEngine.g_INSTANCE.addUniqueEntity(
-                        new DeathScreen(this.position.x, this.position.y, () => {
-                            // in order to reset, refresh windows! 
-                            window.location.reload();
-                        }, "infection"),
-                        998 as DrawLayer  // just below intro screen layer
-                    );
-                }
-
-            } else {
-                this.shield = Math.max(0, this.shield - damage);
+                            // The Check if we need a death screen
+                            GameEngine.g_INSTANCE.addUniqueEntity(
+                                new DeathScreen(this.position.x, this.position.y, () => {
+                                    // in order to reset, refresh windows! 
+                                    window.location.reload();
+                                }, "infection"),
+                                998 as DrawLayer  // just below intro screen layer
+                            );
+                        }
+                    }
+                    break;
+                case "Health":
+                    this.health = Math.max(0, this.health - damage);
+                    break;
             }
         }
     }

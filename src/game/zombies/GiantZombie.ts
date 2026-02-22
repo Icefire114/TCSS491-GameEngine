@@ -109,7 +109,7 @@ export class GiantZombie extends Zombie {
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                 this.lastAttackTime = currentTime;
-                player.damagePlayer(this.player_damage_amount);
+                player.damagePlayer(this.player_damage_amount, "Infection");
             }
         }
     }

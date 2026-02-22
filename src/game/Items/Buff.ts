@@ -33,4 +33,9 @@ export type TempBuff = {
      * The amount of time remaining on the buff.
      */
     currentDuration: number;
+
+    /**
+     * Called when the buff ends
+     */
+    onEnd(): void;
 }

@@ -135,7 +135,7 @@ export class ExplodingZombie extends Zombie {
         // deal damage if player is in explosion radius
         if (distanceToPlayer <= this.explosion_radius) {
             console.log(`ExplodingZombie exploded! Dealing ${this.explosion_damage} damage to player`);
-            player.damagePlayer(this.explosion_damage);
+            player.damagePlayer(this.explosion_damage, "Infection");
         }
 
         // TODO: Add explosion visual effect here later
