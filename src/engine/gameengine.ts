@@ -310,12 +310,12 @@ export class GameEngine {
 
         // Check for death screen udpates
         if (deathEnt && !deathEnt.removeFromWorld) {
-            deathEnt.update(this.keys, dt, this.rightclick);
+            deathEnt.update(this.keys, dt, this.mouse);
         }
 
         // Checks for intro screen 
         if (introEnt && !introEnt.removeFromWorld) {
-            introEnt.update(this.keys, dt, this.rightclick);
+            introEnt.update(this.keys, dt, this.mouse);
             if (introEnt.removeFromWorld) {
                 this.uniqueEnts.delete("intro_screen");
                 this.ents.get("intro_screen")?.clear();

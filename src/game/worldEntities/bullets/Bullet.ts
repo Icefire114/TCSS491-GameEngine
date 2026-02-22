@@ -46,12 +46,11 @@ export abstract class Bullet implements Entity, Collidable {
         this.velocity.x = Math.cos(angle) * 100 + player.velocity.x;
         this.velocity.y = Math.sin(angle) * 100 + player.velocity.y;
         this.travelAngle = angle;
-        
     }
 
-     /**
-     * Draw the projectile.
-     */
+    /**
+    * Draw the projectile.
+    */
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         ctx.save();
 

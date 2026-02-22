@@ -89,7 +89,10 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                 });
 
             for (const z of targets) {
-                GameEngine.g_INSTANCE.addEntity(new RifleBullet(turretTip.x, turretTip.y, z.position.x, z.position.y, new Vec2()), DrawLayer.BULLET);
+                const dx = z.position.x - turretTip.x;
+                const dy = z.position.y - turretTip.y;
+                const angle = Math.atan2(dy, dx);
+                GameEngine.g_INSTANCE.addEntity(new RifleBullet(turretTip.x, turretTip.y, angle), DrawLayer.BULLET);
             }
         }
     }
