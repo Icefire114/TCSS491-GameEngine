@@ -238,7 +238,7 @@ export class GameEngine {
         const drawStart = performance.now();
         for (const [ent] of normalEnts) {
             // skip drawing entities that are too far away
-            if (Vec2.dist(ent.position, unwrap(this.getUniqueEntityByTag("player")).position) > GameEngine.WORLD_UNITS_IN_VIEWPORT * 3 && !(ent instanceof ForceDraw)) {
+            if (Vec2.dist(ent.position, unwrap(this.getUniqueEntityByTag("player")).position) > GameEngine.WORLD_UNITS_IN_VIEWPORT * 2 && !(ent instanceof ForceDraw)) {
                 continue;
             }
             this.ctx.save();
