@@ -5,6 +5,7 @@ import { ShaderRegistry } from "./ShaderRegistry.js";
 export class WebGL {
     public static readonly CHRISTMAS_TREE = "ChristmasTree";
     public static readonly SNOW_AND_SUN = "SnowAndSun";
+    public static readonly SNOW = "Snow";
 
     static isWebGL2Supported(): boolean {
         return document.createElement("canvas").getContext("webgl2") !== null;
@@ -19,6 +20,9 @@ export class WebGL {
         ShaderRegistry.registerPassesByName(WebGL.SNOW_AND_SUN, [
             unwrap(assMan.getShaderSource(new ShaderPath("res/shader/snow.frag.glsl"))),
             unwrap(assMan.getShaderSource(new ShaderPath("res/shader/sun.frag.glsl"))),
+        ]);
+        ShaderRegistry.registerPassesByName(WebGL.SNOW, [
+            unwrap(assMan.getShaderSource(new ShaderPath("res/shader/snow.frag.glsl"))),
         ]);
     }
 }

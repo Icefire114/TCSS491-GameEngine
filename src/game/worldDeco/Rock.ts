@@ -52,7 +52,7 @@ export class Rock implements Entity {
             frameCount: 1,
             offsetX: 0
         };
-        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_SUN, currentAnim.sprite), "Did not find shader for given template");
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW, currentAnim.sprite), "Did not find shader for given template");
 
         const sunAngle = -130; // or calculate based on game time
         const rad = (sunAngle * Math.PI) / 180;
@@ -63,13 +63,13 @@ export class Rock implements Entity {
                 u_snowHeight: 0.4,
                 u_snowThickness: 0.75
             },
-            // Sun shader uniforms
-            {
-                u_sunDirection: sunDir,
-                u_intensity: 0.3,
-                u_baseLight: 0.6,
-                u_warmth: 0.15
-            },
+            // // Sun shader uniforms
+            // {
+            //     u_sunDirection: sunDir,
+            //     u_intensity: 0.3,
+            //     u_baseLight: 0.6,
+            //     u_warmth: 0.15
+            // },
         ]);
 
         game.renderer.drawRawCanvasAtWorldPos(
