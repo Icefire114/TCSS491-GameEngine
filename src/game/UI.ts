@@ -7,7 +7,7 @@ import { unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
-import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js"; 
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 
 export class UILayer implements Entity {
     readonly id: EntityID;

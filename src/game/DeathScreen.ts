@@ -7,7 +7,7 @@ export type DeathCause = "infection" | "ravine";
 
 export class DeathScreen implements Entity {
     // Required info
-    readonly id: EntityID = `death_screen#${crypto.randomUUID()}` as EntityID;
+    readonly id: EntityID;
     readonly tag = "death_screen";
     position: Vec2;
     velocity: Vec2 = new Vec2(0, 0);
@@ -25,7 +25,7 @@ export class DeathScreen implements Entity {
     // Setup for the blackhole expanding
     private phase: "expanding" | "showing" = "expanding";
     private readonly START_RADIUS = 18;
-    private readonly EXPAND_SPEED = 200; 
+    private readonly EXPAND_SPEED = 200;
     private alpha: number = 0;
     private readonly FADE_SPEED = 0.5;
 
@@ -34,6 +34,7 @@ export class DeathScreen implements Entity {
     private cause: DeathCause;
 
     constructor(playerWorldX: number, playerWorldY: number, onRestart: () => void, cause: DeathCause = "infection") {
+        this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = new Vec2(playerWorldX, playerWorldY);
         this.onRestart = onRestart;
         this.cause = cause;

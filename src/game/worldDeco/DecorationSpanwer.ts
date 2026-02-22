@@ -20,7 +20,7 @@ export class DecorationSpawner implements Entity {
 
     // Logic
     private lastSpawnX = 0;
-    private initialized = false; 
+    private initialized = false;
     // Min distance palyer travel before spawning another decoration 
     private spawnInterval = 35;
     private rng: Rand;

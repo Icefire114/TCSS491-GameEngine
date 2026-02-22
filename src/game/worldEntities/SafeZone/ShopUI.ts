@@ -37,7 +37,7 @@ export class ShopUI implements Entity {
     private flashMessage: string | null = null;
     private flashColor: string = "#FF5555";
     private flashTimer: number = 0;
-    private readonly FLASH_DURATION = 1.5; 
+    private readonly FLASH_DURATION = 1.5;
 
     private items: ShopItem[] = [
         {
@@ -78,10 +78,10 @@ export class ShopUI implements Entity {
      */
     private createBuff(itemId: string): Buff | null {
         switch (itemId) {
-            case "ammo":   return new AmmoRestore();
+            case "ammo": return new AmmoRestore();
             case "health": return new InstantHealthItem();
             case "shield": return new ShieldRestorePickupItem();
-            default:       return null;
+            default: return null;
         }
     }
 
@@ -147,19 +147,19 @@ export class ShopUI implements Entity {
         const h = ctx.canvas.height;
 
         // Color scheme of the UI
-        const BG = "#1a2030";      
-        const SURFACE = "#212840";     
-        const BORDER = "#3a4e66";      
-        const ACCENT = "#5aafdf";    
-        const TEXT = "#eef4fa";     
-        const TEXT_DIM = "#7a96aa";      
-        const GOLD = "#f5c842";      
-        const GREEN = "#4deba0";     
+        const BG = "#1a2030";
+        const SURFACE = "#212840";
+        const BORDER = "#3a4e66";
+        const ACCENT = "#5aafdf";
+        const TEXT = "#eef4fa";
+        const TEXT_DIM = "#7a96aa";
+        const GOLD = "#f5c842";
+        const GREEN = "#4deba0";
         const RED = "#f06060";
         const SEP = "#2a3a50";
 
         // UI Backdrop
-        ctx.fillStyle = "rgba(4, 7, 12, 0.52)";  
+        ctx.fillStyle = "rgba(4, 7, 12, 0.52)";
         ctx.fillRect(0, 0, w, h);
 
         // Panel Dimesions
@@ -238,7 +238,7 @@ export class ShopUI implements Entity {
         }
     }
 
-    
+
     /**
      * Private method to draw each indvidual card 
      */
@@ -246,18 +246,18 @@ export class ShopUI implements Entity {
         ctx: CanvasRenderingContext2D,
         game: GameEngine,
         item: ShopItem,
-        x: number, 
-        y: number, 
-        w: number, 
+        x: number,
+        y: number,
+        w: number,
         h: number,
-        bg: string, 
-        border: string, 
+        bg: string,
+        border: string,
         sep: string,
-        accent: string, 
-        textMain: string, 
+        accent: string,
+        textMain: string,
         textDim: string,
-        gold: string, 
-        green: string, 
+        gold: string,
+        green: string,
         red: string,
         canAfford: boolean
     ) {
@@ -276,18 +276,18 @@ export class ShopUI implements Entity {
         ctx.fillRect(x, y, 2, h);
 
         // Icons
-        const iconH  = Math.floor(h * 0.40);
-        const iconY  = y + 12;
+        const iconH = Math.floor(h * 0.40);
+        const iconY = y + 12;
         const iconPad = 10;
 
         ctx.fillStyle = "rgba(0,0,0,0.35)";
         ctx.fillRect(x + iconPad, iconY, w - iconPad * 2, iconH);
 
         if (item.spritePath && item.frameWidth && item.frameHeight) {
-            const sprite  = game.getSprite(new ImagePath(item.spritePath));
+            const sprite = game.getSprite(new ImagePath(item.spritePath));
             const maxSize = Math.min(w - iconPad * 2 - 16, iconH - 16);
-            const scale   = Math.min(maxSize / item.frameWidth, maxSize / item.frameHeight);
-            const sw = item.frameWidth  * scale;
+            const scale = Math.min(maxSize / item.frameWidth, maxSize / item.frameHeight);
+            const sw = item.frameWidth * scale;
             const sh = item.frameHeight * scale;
             ctx.drawImage(
                 sprite, 0, 0, item.frameWidth, item.frameHeight,

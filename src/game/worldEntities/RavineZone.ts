@@ -56,7 +56,7 @@ export class RavineDeathZone implements Entity {
             // Bounce zone of the left side
             {
                 type: "bounce",
-                x: leftWallX - wallThickness - 3,              
+                x: leftWallX - wallThickness - 3,
                 y: wallTopY + 3,
                 width: wallThickness,
                 height: bounceHeight
@@ -74,7 +74,7 @@ export class RavineDeathZone implements Entity {
             // Bounce zone of the right side
             {
                 type: "bounce",
-                x: rightWallX + 5,  
+                x: rightWallX + 5,
                 y: wallTopY,
                 width: wallThickness,
                 height: bounceHeight
@@ -104,16 +104,16 @@ export class RavineDeathZone implements Entity {
      */
     checkContact(x: number, y: number, playerWidth: number = 2.5, playerHeight: number = 5.25): RavineZoneType | null {
         // Using player is bottom-center anchored
-        const playerLeft   = x - playerWidth / 2;
-        const playerRight  = x + playerWidth / 2;
-        const playerTop    = y - playerHeight;
+        const playerLeft = x - playerWidth / 2;
+        const playerRight = x + playerWidth / 2;
+        const playerTop = y - playerHeight;
         const playerBottom = y;
 
         // Death zones is always first 
         for (const zone of this.zones) {
             if (zone.type !== "death") continue;
             const overlapX = playerRight > zone.x && playerLeft < zone.x + zone.width;
-            const overlapY = playerBottom > zone.y && playerTop  < zone.y + zone.height;
+            const overlapY = playerBottom > zone.y && playerTop < zone.y + zone.height;
             if (overlapX && overlapY) return "death";
         }
 
@@ -121,7 +121,7 @@ export class RavineDeathZone implements Entity {
         for (const zone of this.zones) {
             if (zone.type !== "bounce") continue;
             const overlapX = playerRight > zone.x && playerLeft < zone.x + zone.width;
-            const overlapY = playerBottom > zone.y && playerTop  < zone.y + zone.height;
+            const overlapY = playerBottom > zone.y && playerTop < zone.y + zone.height;
             if (overlapX && overlapY) return "bounce";
         }
 
@@ -134,7 +134,7 @@ export class RavineDeathZone implements Entity {
      * Return "left" mean palyer hit the left wallk, and should boucne right (postive x), and vice versa
      */
     getNearestWall(x: number): "left" | "right" {
-        const distToLeft  = Math.abs(x - this.leftWallX);
+        const distToLeft = Math.abs(x - this.leftWallX);
         const distToRight = Math.abs(x - this.rightWallX);
         return distToLeft < distToRight ? "left" : "right";
     }
@@ -145,14 +145,14 @@ export class RavineDeathZone implements Entity {
 
     // Drawing out the ravine hitbox 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        if (!G_CONFIG.DRAW_PHYSICS_COLLIDERS) return; 
+        if (!G_CONFIG.DRAW_PHYSICS_COLLIDERS) return;
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
         for (const zone of this.zones) {
             const sx = (zone.x - game.viewportX) * scale / game.zoom;
             const sy = (zone.y - game.viewportY) * scale / game.zoom;
-            const sw = zone.width  * scale / game.zoom;
+            const sw = zone.width * scale / game.zoom;
             const sh = zone.height * scale / game.zoom;
 
             ctx.save();

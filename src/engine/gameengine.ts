@@ -43,7 +43,7 @@ export class GameEngine {
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
-    
+
     // Reset Field
     public resetCallback: (() => void) | null = null;
 
@@ -227,7 +227,7 @@ export class GameEngine {
         // Filitering out the intro and death screen from normal entities so it always draws last aka on top
         const introEnt = ents.find(([e]) => e.tag === "intro_screen");
         const deathEnt = ents.find(([e]) => e.tag === "death_screen");
-        const normalEnts = ents.filter(([e]) => 
+        const normalEnts = ents.filter(([e]) =>
             e.tag !== "intro_screen" && e.tag !== "death_screen"
         );
 
@@ -299,10 +299,10 @@ export class GameEngine {
         // Ensure that intro screen is specfically only able to get update forinput and dismiss 
         const introEnt = this.uniqueEnts.get("intro_screen")?.[0];
         const deathEnt = this.uniqueEnts.get("death_screen")?.[0];
-        
+
         // Check for death screen udpates
         if (deathEnt && !deathEnt.removeFromWorld) {
-           deathEnt.update(this.keys, dt, this.rightclick);
+            deathEnt.update(this.keys, dt, this.rightclick);
         }
 
         // Checks for intro screen 
@@ -434,7 +434,7 @@ export class GameEngine {
         audio.loop = true;
         audio.volume = 0.2;
     };
-    
+
     /**
      * Method that snaps the viewport to the followed entity
      * Used before the loop starts, since thers a frame that camera does to jump to the player

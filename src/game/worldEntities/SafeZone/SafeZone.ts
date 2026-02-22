@@ -26,7 +26,7 @@ export class SafeZone implements Entity {
 
     //Safezone Notification Setting
     private zoneLevel: number;
-    private hasNotified: boolean = false; 
+    private hasNotified: boolean = false;
 
     constructor(pos: Vec2, endX: number, zoneLevel: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -105,10 +105,10 @@ export class SafeZone implements Entity {
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
 
         // Triggering a notfication to occur once we eneter
-         if (!this.hasNotified) {
+        if (!this.hasNotified) {
             // Spawn the UI Notification
             GameEngine.g_INSTANCE.addEntity(
-                new SafeZoneNotification(this.zoneLevel), 
+                new SafeZoneNotification(this.zoneLevel),
                 999 as DrawLayer // Ensurign it draws above everything
             );
             this.hasNotified = true;

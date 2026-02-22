@@ -148,9 +148,9 @@ export class BackgroundLayer implements Entity {
             const W = ctx.canvas.width;
             const H = ctx.canvas.height;
             const blueGrad = ctx.createLinearGradient(0, 0, 0, H);
-            blueGrad.addColorStop(0,   `rgba(10, 18, 40,  ${blendAlpha})`);
+            blueGrad.addColorStop(0, `rgba(10, 18, 40,  ${blendAlpha})`);
             blueGrad.addColorStop(0.5, `rgba(20, 40, 75,  ${blendAlpha * 0.8})`);
-            blueGrad.addColorStop(1,   `rgba(40, 70, 110, ${blendAlpha * 0.5})`);
+            blueGrad.addColorStop(1, `rgba(40, 70, 110, ${blendAlpha * 0.5})`);
             ctx.fillStyle = blueGrad;
             ctx.fillRect(0, 0, W, H);
         }
@@ -177,19 +177,19 @@ export class BackgroundLayer implements Entity {
         // When the intro is active, freeze cycle
         if (intro) {
             this.dayNightCycleTime = 0;
-            this.timeOfDayAlpha   = 0;
+            this.timeOfDayAlpha = 0;
 
             // Making the sun off the screen
             if (this.spriteType === "sky") {
-                this.sprite      = this.spritePaths[0];
-                this.position.x  = this.playerPosition.x;
-                this.position.y  = this.playerPosition.y - 5;
+                this.sprite = this.spritePaths[0];
+                this.position.x = this.playerPosition.x;
+                this.position.y = this.playerPosition.y - 5;
             }
 
             // Any non layers, still need to follow player s o its in the right frame
             // when transititong from intro animation to game 
             if (this.spriteType !== "sky") {
-                this.position.y  = this.playerPosition.y + this.startY;
+                this.position.y = this.playerPosition.y + this.startY;
                 this.position2.y = this.playerPosition.y + this.startY;
             }
             return;

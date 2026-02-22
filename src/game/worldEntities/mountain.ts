@@ -62,7 +62,7 @@ export class Mountain implements Entity {
     private maxDistanceBetweenZones = 3500;
 
     // Used to handle the background of the ravine 
-    private completedRavines: { 
+    private completedRavines: {
         startAnchorX: number;
         endAnchorX: number;
     }[] = [];
@@ -111,7 +111,7 @@ export class Mountain implements Entity {
         }
 
         // Drawing ravine background
-         this.drawRavines(ctx, game, scale); 
+        this.drawRavines(ctx, game, scale);
 
         // Drawing the moutain 
         this.drawMoutain(ctx, game, scale);
@@ -308,7 +308,7 @@ export class Mountain implements Entity {
      * Setup for a staring a ravine sequence anchor
      */
     startRavineSequence() {
-        this.ravineStartAnchorX = this.lastAnchor.x; 
+        this.ravineStartAnchorX = this.lastAnchor.x;
         this.isRavineSequence = true;
         this.ravineStep = 0;
         this.ravineBaseY = this.lastAnchor.y;
@@ -357,16 +357,16 @@ export class Mountain implements Entity {
                 });
 
                 // Spawning the Ravine Death Zone Entity
-                const wallTopY    = this.ravineBaseY;
+                const wallTopY = this.ravineBaseY;
                 const wallBottomY = this.ravineBaseY + 5000;
                 GameEngine.g_INSTANCE.addEntity(
                     new RavineDeathZone(
-                        this.ravineLeftWallX,   
-                        this.ravineRightWallX,  
-                        wallTopY,               
-                        wallBottomY,            
-                        1,                      
-                        15                      
+                        this.ravineLeftWallX,
+                        this.ravineRightWallX,
+                        wallTopY,
+                        wallBottomY,
+                        1,
+                        15
                     ),
                     DrawLayer.BACKGROUND
                 );
@@ -409,7 +409,7 @@ export class Mountain implements Entity {
         if (this.flatStep >= this.flatGenerationTick) {
             this.flatSequenceOn = false;
             this.flatEndX = x;
-            
+
             // Keeping count the # that safezone is in and passing it to safezone itself
             const zoneIndex = this.safeZones.length + 1;
 
@@ -598,11 +598,11 @@ export class Mountain implements Entity {
                 const dy = this.getHeightAt(x - 1) - this.getHeightAt(x);
                 if (dy > 5) break; // steep drop detected (going backwards)
                 rightWorldX = x;
-            }       
+            }
 
-            const leftX  = (leftWorldX  - game.viewportX) * scale;
+            const leftX = (leftWorldX - game.viewportX) * scale;
             const rightX = (rightWorldX - game.viewportX) * scale;
-            const leftY  = (this.getHeightAt(leftWorldX)  - game.viewportY) * scale;
+            const leftY = (this.getHeightAt(leftWorldX) - game.viewportY) * scale;
             const rightY = (this.getHeightAt(rightWorldX) - game.viewportY) * scale;
 
             if (rightX < 0 || leftX > ctx.canvas.width) continue;
@@ -612,15 +612,15 @@ export class Mountain implements Entity {
 
             // Gradient background
             const grad = ctx.createLinearGradient(0, topY, 0, canvasH);
-            grad.addColorStop(0,    "#C2D4E6"); 
-            grad.addColorStop(0.08, "#7a9db5"); 
-            grad.addColorStop(0.3,  "#2a5a7a");
-            grad.addColorStop(0.7,  "#0d2a40");
-            grad.addColorStop(1,    "#000000");
+            grad.addColorStop(0, "#C2D4E6");
+            grad.addColorStop(0.08, "#7a9db5");
+            grad.addColorStop(0.3, "#2a5a7a");
+            grad.addColorStop(0.7, "#0d2a40");
+            grad.addColorStop(1, "#000000");
 
             ctx.beginPath();
-            ctx.moveTo(leftX,  canvasH);
-            ctx.lineTo(leftX,  leftY);
+            ctx.moveTo(leftX, canvasH);
+            ctx.lineTo(leftX, leftY);
             ctx.lineTo(rightX, rightY);
             ctx.lineTo(rightX, canvasH);
             ctx.closePath();

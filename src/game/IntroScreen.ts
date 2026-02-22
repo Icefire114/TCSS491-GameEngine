@@ -27,14 +27,14 @@ const enum Phase {
 
 // Constants for phases settings
 const PAN_START_OFFSET = 100; // In x
-const PAN_DURATION = 2;   
+const PAN_DURATION = 2;
 const SLIDE_DURATION = .9;
-const GO_DURATION= .8;   
+const GO_DURATION = .8;
 
 
 // Title transition to animation 
 const TITLE_EXIT_DURATION = 1.5;
-const FLASH_PEAK = 0.5; 
+const FLASH_PEAK = 0.5;
 
 
 // Simple ease in fucntions 
@@ -67,7 +67,7 @@ export class IntroScreen implements Entity {
 
     // Misallenous Settings 
     private alpha = 1;
-    private fadeOut  = false;
+    private fadeOut = false;
     private onDismiss: () => void;
     private showFakePlayer = true;
 
@@ -81,13 +81,13 @@ export class IntroScreen implements Entity {
     private nextFlickerIn = 2.5;
 
     // The animation state 
-    private phase: Phase  = Phase.TITLE;
+    private phase: Phase = Phase.TITLE;
     private phaseTimer = 0;
     private elapsed = 0;
 
     // Viewport bookkeeping for the pan
-    private viewportXAtPanStart = 0;  
-    private viewportXPanFrom = 0; 
+    private viewportXAtPanStart = 0;
+    private viewportXPanFrom = 0;
 
     // GO flash alpha
     private goAlpha = 0;
@@ -97,8 +97,8 @@ export class IntroScreen implements Entity {
 
 
     // Player dummy setting animation 
-    private PLAYER_WALK_SPEED = 30; 
-    private playerWalkX  = 0;
+    private PLAYER_WALK_SPEED = 30;
+    private playerWalkX = 0;
     private playerWalkY = 0;
     private waypointIndex = 0;
     private playerFrameTimer = 0;
@@ -133,7 +133,7 @@ export class IntroScreen implements Entity {
             "res/img/zombies/Zombie Woman/Run.png",
         ];
         for (const path of paths) {
-            try { engine.getSprite(new ImagePath(path)); } catch {}
+            try { engine.getSprite(new ImagePath(path)); } catch { }
         }
     }
 
@@ -142,7 +142,7 @@ export class IntroScreen implements Entity {
         this.elapsed += dt;
         this.phaseTimer += dt;
         const engine = GameEngine.g_INSTANCE;
-        
+
         // The Title Screen Phase
         if (this.phase === Phase.TITLE) {
             this.tickFlicker(dt);
@@ -152,13 +152,13 @@ export class IntroScreen implements Entity {
             if (keys["Enter"] || keys[" "] || keys["Mouse0"]) {
                 this.viewportXAtPanStart = engine.viewportX;
                 this.viewportXPanFrom = engine.viewportX - PAN_START_OFFSET;
-                engine.viewportX = this.viewportXPanFrom;  
+                engine.viewportX = this.viewportXPanFrom;
                 this.enterPhase(Phase.TITLE_EXIT);
             }
             return;
         }
 
-       if (this.phase === Phase.TITLE_EXIT) {
+        if (this.phase === Phase.TITLE_EXIT) {
             this.tickParticles(1280, 720, dt);
             for (const zombie of this.cinemaZombies) {
                 zombie.frameTimer += dt;
@@ -183,7 +183,7 @@ export class IntroScreen implements Entity {
         // Panning to the left to the right until to our "player"
         if (this.phase === Phase.PAN_LEFT) {
             const t = Math.min(this.phaseTimer / PAN_DURATION, 1);
-            engine.viewportX = this.viewportXPanFrom +  easeInOutCubic(t) * (this.viewportXAtPanStart - this.viewportXPanFrom);
+            engine.viewportX = this.viewportXPanFrom + easeInOutCubic(t) * (this.viewportXAtPanStart - this.viewportXPanFrom);
 
             if (t >= 1) {
                 engine.viewportX = this.viewportXAtPanStart;
@@ -201,24 +201,24 @@ export class IntroScreen implements Entity {
 
             const mountain = (GameEngine.g_INSTANCE as any).getUniqueEntityByTag("mountain") as any;
             this.playerFrameTimer += dt;
-            
+
             if (this.playerFrameTimer > 0.08) {
                 this.playerFrameTimer = 0;
                 this.playerFrame = (this.playerFrame + 1) % 7;
             }
-            
+
             if (this.waypointIndex < this.WALK_WAYPOINTS.length) {
                 const [targetX] = this.WALK_WAYPOINTS[this.waypointIndex];
                 const step = this.PLAYER_WALK_SPEED * dt;
                 const dist = targetX - this.playerWalkX;
-            
+
                 if (Math.abs(dist) <= step) {
                     this.playerWalkX = targetX;
                     this.waypointIndex++;
                 } else {
                     this.playerWalkX += step * Math.sign(dist);
                 }
-        
+
                 this.playerWalkY = this.getInterpolatedY(this.playerWalkX);
             }
 
@@ -227,7 +227,7 @@ export class IntroScreen implements Entity {
                 try {
                     const p = engine.getSprite(new ImagePath("res/img/soldiers/Soldier_1/Idle.png"));
                     const s = engine.getSprite(new ImagePath("res/img/snowboard.png"));
-                     if (p.complete && s.complete && p.naturalWidth > 0 && s.naturalWidth > 0) {
+                    if (p.complete && s.complete && p.naturalWidth > 0 && s.naturalWidth > 0) {
                         this.spritesReady = true;
                         this.showFakePlayer = true;
                     }
@@ -263,7 +263,7 @@ export class IntroScreen implements Entity {
                 } else {
                     this.playerWalkX += step * Math.sign(dist);
                 }
-                
+
                 this.playerWalkY = this.getInterpolatedY(this.playerWalkX);
 
             } else {
@@ -276,7 +276,7 @@ export class IntroScreen implements Entity {
 
         // Handling the Go Flash
         if (this.phase === Phase.GO_FLASH) {
-            const t      = this.phaseTimer / GO_DURATION;
+            const t = this.phaseTimer / GO_DURATION;
             this.goAlpha = t < 0.3 ? t / 0.3 : 1 - ((t - 0.3) / 0.7);
             if (this.phaseTimer > 0.1) {
                 this.fadeOut = true;
@@ -329,9 +329,9 @@ export class IntroScreen implements Entity {
     private tickFlicker(dt: number): void {
         this.flickerTimer -= dt;
         if (this.flickerTimer <= 0) {
-            this.flickerAlpha  = 0.15 + Math.random() * 0.4;
-            this.flickerTimer  = 0.05 + Math.random() * 0.08;
-            this.nextFlickerIn = 1.5  + Math.random() * 3.5;
+            this.flickerAlpha = 0.15 + Math.random() * 0.4;
+            this.flickerTimer = 0.05 + Math.random() * 0.08;
+            this.nextFlickerIn = 1.5 + Math.random() * 3.5;
         } else if (this.flickerTimer <= this.nextFlickerIn * 0.03) {
             this.flickerAlpha = 1;
             if (this.flickerTimer < 0) this.flickerTimer = this.nextFlickerIn;
@@ -354,7 +354,7 @@ export class IntroScreen implements Entity {
             this.particles.push(this.makeParticle(W, H, true));
         }
     }
-    
+
     /** 
      * Creating the particles themselves
      */
@@ -395,10 +395,10 @@ export class IntroScreen implements Entity {
         }
 
         // What phases we are in 
-        const isShowingWorld = this.phase === Phase.TITLE_EXIT || 
-                           this.phase === Phase.PAN_LEFT || 
-                           this.phase === Phase.SLIDE_IN || 
-                           this.phase === Phase.GO_FLASH;
+        const isShowingWorld = this.phase === Phase.TITLE_EXIT ||
+            this.phase === Phase.PAN_LEFT ||
+            this.phase === Phase.SLIDE_IN ||
+            this.phase === Phase.GO_FLASH;
 
         // Drawing our actors 
         if (isShowingWorld) {
@@ -426,7 +426,7 @@ export class IntroScreen implements Entity {
             const irisT = easeInOutCubic(Math.max(0, Math.min((t - 0.6) / 0.4, 1)));
             const maxR = Math.sqrt(W * W + H * H) / 2;
             const holeR = irisT * maxR * 1.1;
-            const iris = ctx.createRadialGradient(W/2, H/2, Math.max(0, holeR - 40), W/2, H/2, holeR + 20);
+            const iris = ctx.createRadialGradient(W / 2, H / 2, Math.max(0, holeR - 40), W / 2, H / 2, holeR + 20);
             iris.addColorStop(0, 'rgba(7,8,13,0)');
             iris.addColorStop(0.7, 'rgba(7,8,13,0)');
             iris.addColorStop(1, 'rgba(7,8,13,1)');
@@ -470,10 +470,10 @@ export class IntroScreen implements Entity {
         // The Vignette 
         const revealRadius = (1 - baseAlpha) * W * 1.5;
         const maskGrad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(revealRadius, W));
-        const dark = `rgba(7, 8, 13, ${activeAlpha * 0.7})`; 
+        const dark = `rgba(7, 8, 13, ${activeAlpha * 0.7})`;
         const transparent = `rgba(7, 8, 13, 0)`;
         maskGrad.addColorStop(0, transparent);
-        maskGrad.addColorStop(0.4, transparent); 
+        maskGrad.addColorStop(0.4, transparent);
         maskGrad.addColorStop(1, dark);
         ctx.fillStyle = maskGrad;
         ctx.fillRect(0, 0, W, H);
@@ -489,12 +489,12 @@ export class IntroScreen implements Entity {
 
         // The movie bars style
         const barHeightPercent = 0.07;
-        const barH = H * barHeightPercent * introProgress * Math.min(1, baseAlpha * 1.5); 
+        const barH = H * barHeightPercent * introProgress * Math.min(1, baseAlpha * 1.5);
         ctx.fillStyle = "#07080d";
-        ctx.globalAlpha = 1; 
+        ctx.globalAlpha = 1;
         ctx.fillRect(0, 0, W, barH);
         ctx.fillRect(0, H - barH, W, barH);
-        
+
         ctx.globalAlpha = baseAlpha;
     }
 
@@ -544,7 +544,7 @@ export class IntroScreen implements Entity {
         // Snow effect
         for (const p of this.particles) {
             ctx.globalAlpha = baseAlpha * p.opacity;
-            ctx.fillStyle   = "#c8ddf0";
+            ctx.fillStyle = "#c8ddf0";
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             ctx.fill();
@@ -561,7 +561,7 @@ export class IntroScreen implements Entity {
 
 
         // Title glow
-       const titleSize = W * 0.09;
+        const titleSize = W * 0.09;
         ctx.font = `bold ${titleSize}px monospace`;
         ctx.globalAlpha = baseAlpha * 0.18 * this.flickerAlpha;
         ctx.fillStyle = "#4a90b8";
@@ -573,19 +573,19 @@ export class IntroScreen implements Entity {
         ctx.globalAlpha = baseAlpha;
 
         // The red underline under the title
-        const titleW     = ctx.measureText("STEEP").width;
+        const titleW = ctx.measureText("STEEP").width;
         const underlineY = H * 0.45 + titleSize * 0.12;
-        const scarGrad   = ctx.createLinearGradient(W / 2 - titleW / 2, 0, W / 2 + titleW / 2, 0);
-        scarGrad.addColorStop(0,   "rgba(192, 57, 43, 0)");
+        const scarGrad = ctx.createLinearGradient(W / 2 - titleW / 2, 0, W / 2 + titleW / 2, 0);
+        scarGrad.addColorStop(0, "rgba(192, 57, 43, 0)");
         scarGrad.addColorStop(0.2, "rgba(192, 57, 43, 0.9)");
         scarGrad.addColorStop(0.8, "rgba(192, 57, 43, 0.9)");
-        scarGrad.addColorStop(1,   "rgba(192, 57, 43, 0)");
+        scarGrad.addColorStop(1, "rgba(192, 57, 43, 0)");
         ctx.fillStyle = scarGrad;
         ctx.fillRect(W / 2 - titleW / 2, underlineY, titleW, 3);
 
         // sub text
         const subSize = W * 0.022;
-        ctx.font      = `${subSize}px monospace`;
+        ctx.font = `${subSize}px monospace`;
         ctx.fillStyle = "#6a7a8a";
         ctx.fillText("A Zombie Survival", W / 2, H * 0.58);
         ctx.fillText("The world has fallen.  You have not.", W / 2, H * 0.58 + subSize + 10);
@@ -593,18 +593,18 @@ export class IntroScreen implements Entity {
         // The pusling prompt
         const pulse = Math.abs(Math.sin(performance.now() / 600));
         ctx.globalAlpha = baseAlpha * pulse;
-        ctx.fillStyle   = "#c0392b";
-        ctx.font        = `${W * 0.025}px monospace`;
+        ctx.fillStyle = "#c0392b";
+        ctx.font = `${W * 0.025}px monospace`;
         ctx.fillText("[ PRESS ENTER OR CLICK TO BEGIN ]", W / 2, H * 0.72);
 
         // Border lines
         ctx.globalAlpha = baseAlpha * 0.35;
-        ctx.fillStyle   = "#4a90b8";
+        ctx.fillStyle = "#4a90b8";
         ctx.fillRect(0, 0, W, 2);
         ctx.fillRect(0, H - 2, W, 2);
 
         ctx.globalAlpha = 1;
-        ctx.textAlign   = "left";
+        ctx.textAlign = "left";
     }
 
     /**
@@ -666,30 +666,30 @@ export class IntroScreen implements Entity {
 
         // The red screen
         ctx.globalAlpha = alpha * 0.10;
-        ctx.fillStyle   = "#c0392b";
+        ctx.fillStyle = "#c0392b";
         ctx.fillRect(0, 0, W, H);
         const fontSize = W * 0.13;
-        ctx.font       = `bold ${fontSize}px monospace`;
-        ctx.textAlign  = "center";
+        ctx.font = `bold ${fontSize}px monospace`;
+        ctx.textAlign = "center";
 
         // glowing pass
         ctx.globalAlpha = alpha * 0.22;
-        ctx.fillStyle   = "#ff6644";
+        ctx.fillStyle = "#ff6644";
         ctx.fillText("GO!", W / 2 + 5, H * 0.5 + 5);
 
         // main text
         ctx.globalAlpha = alpha;
-        ctx.fillStyle   = "#ffffff";
+        ctx.fillStyle = "#ffffff";
         ctx.fillText("GO!", W / 2, H * 0.5);
 
         // the undderline
         const textW = ctx.measureText("GO!").width;
         ctx.globalAlpha = alpha * 0.85;
-        ctx.fillStyle   = "#c0392b";
+        ctx.fillStyle = "#c0392b";
         ctx.fillRect(W / 2 - textW / 2, H * 0.5 + fontSize * 0.1, textW, 4);
 
         ctx.globalAlpha = 1;
-        ctx.textAlign   = "left";
+        ctx.textAlign = "left";
     }
 
     /**
@@ -726,14 +726,14 @@ export class IntroScreen implements Entity {
         // Differnet types of zombies
         const SPRITE_MAP = {
             basic: "res/img/zombies/Zombie Man/Run.png",
-            fast:  "res/img/zombies/Wild Zombie/Run.png",
+            fast: "res/img/zombies/Wild Zombie/Run.png",
             giant: "res/img/zombies/Zombie Woman/Run.png",
         };
 
         // Each zombie frame settings
         const FRAME_INFO = {
             basic: { fw: 96, fh: 96, frames: 10, scale: 10 },
-            fast:  { fw: 96, fh: 96, frames: 10, scale: 10 },
+            fast: { fw: 96, fh: 96, frames: 10, scale: 10 },
             giant: { fw: 96, fh: 96, frames: 10, scale: 10 },
         };
 
@@ -755,7 +755,7 @@ export class IntroScreen implements Entity {
             ctx.globalAlpha = baseAlpha;
             ctx.drawImage(
                 sprite,
-                zombie.frame * info.fw, 0,   
+                zombie.frame * info.fw, 0,
                 info.fw, info.fh,
                 screenX, screenY,
                 drawW, drawH
@@ -787,10 +787,10 @@ export class IntroScreen implements Entity {
                 const t2 = t * t;
                 const t3 = t2 * t;
 
-                return (2*t3 - 3*t2 + 1) * y0
-                    + (t3 - 2*t2 + t)   * m0
-                    + (-2*t3 + 3*t2)    * y1
-                    + (t3 - t2)         * m1;
+                return (2 * t3 - 3 * t2 + 1) * y0
+                    + (t3 - 2 * t2 + t) * m0
+                    + (-2 * t3 + 3 * t2) * y1
+                    + (t3 - t2) * m1;
             }
         }
         return pts[pts.length - 1][1];

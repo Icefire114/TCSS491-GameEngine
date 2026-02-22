@@ -156,7 +156,7 @@ export class Player implements Entity, Collidable {
 
     // For Jump multipler
     jumpMultiplier: number = 1;
-    
+
     // Flying cheat
     isFlying: boolean = false;
     private pressFKey: boolean = false;
@@ -276,7 +276,7 @@ export class Player implements Entity, Collidable {
 
         // CHEATS: (Remove later) abilty for player to fly
         this.flyKey(keys);
-        
+
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
@@ -625,7 +625,7 @@ export class Player implements Entity, Collidable {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         // Won't draw if visible is false 
-        if ((this as any).visible === false) return; 
+        if ((this as any).visible === false) return;
 
         this.drawSnowboard(ctx, game);
         this.animator.drawCurrentAnimFrameAtPos(this.position);
@@ -714,7 +714,7 @@ export class Player implements Entity, Collidable {
     /**
      * TEMP METHOD: USE to immedite debug and look at the death animation 
      */
-    debugForceDeath(keys: { [key: string]: boolean}) {
+    debugForceDeath(keys: { [key: string]: boolean }) {
         if (keys["k"]) {
             this.dead = true;
             GameEngine.g_INSTANCE.addUniqueEntity(
@@ -724,7 +724,7 @@ export class Player implements Entity, Collidable {
                 998 as DrawLayer
             );
         }
-        
+
     }
 
 
