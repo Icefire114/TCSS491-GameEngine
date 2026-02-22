@@ -13,5 +13,6 @@ export const G_CONFIG = {
     // If true, draw the safezone bounding boxes
     DRAW_SAFEZONE_BB: true,
     // If true, create the entities right in front of the player
-    CREATE_TESTING_ENTS: false
+    CREATE_TESTING_ENTS: false,
+    ENABLE_DEBUG_KEYS: true
 }

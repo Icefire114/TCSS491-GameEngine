@@ -596,18 +596,6 @@ export class Player implements Entity, Collidable {
 
     }
 
-    /**
-     * Method when press F, it allows us to fly
-     * WILL DEELTE LATER, DEBUG since its a pain to die
-     */
-    flyKey(keys: { [key: string]: boolean }) {
-        if (keys["f"] && !this.pressFKey) {
-            this.isFlying = !this.isFlying;
-        }
-        this.pressFKey = keys["f"];
-    }
-
-
     fireWeapon(): void {
         console.log(`queuedTarget: ${this.queuedShotTarget}, wantsToShoot: ${this.wantsToShoot}`);
 
@@ -733,7 +721,7 @@ export class Player implements Entity, Collidable {
      * TEMP METHOD: USE to immedite debug and look at the death animation 
      */
     debugForceDeath(keys: { [key: string]: boolean }) {
-        if (keys["k"]) {
+        if (keys["k"] && G_CONFIG.ENABLE_DEBUG_KEYS) {
             this.dead = true;
             GameEngine.g_INSTANCE.addUniqueEntity(
                 new DeathScreen(this.position.x, this.position.y, () => {
@@ -745,6 +733,14 @@ export class Player implements Entity, Collidable {
 
     }
 
-
-
+    /**
+     * Method when press F, it allows us to fly
+     * WILL DEELTE LATER, DEBUG since its a pain to die
+     */
+    flyKey(keys: { [key: string]: boolean }) {
+        if (keys["f"] && !this.pressFKey && G_CONFIG.ENABLE_DEBUG_KEYS) {
+            this.isFlying = !this.isFlying;
+        }
+        this.pressFKey = keys["f"];
+    }
 }
