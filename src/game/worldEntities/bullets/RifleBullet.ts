@@ -4,6 +4,7 @@ import { Entity } from "../../../engine/Entity.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { Bullet } from "./Bullet.js";
+import { Vec2 } from "../../../engine/types.js";
 
 /**
  * @author JK
@@ -36,8 +37,8 @@ export class RifleBullet extends Bullet {
     );
 
 
-    constructor(startX: number, startY: number, endX: number, endY: number) {
-        super("RifleBullet", startX, startY, endX, endY, 100, 30);
+    constructor(startX: number, startY: number, endX: number, endY: number, playerVelocity: Vec2) {
+        super("RifleBullet", startX, startY, endX, endY, 100, 30, playerVelocity);
 
         //this.position.x += this.velocity.x * 0.04;
         //this.position.y += this.velocity.y * 0.5;

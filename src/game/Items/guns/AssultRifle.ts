@@ -9,6 +9,13 @@ export class AssultRifle extends Gun {
 
     sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
     ammoBox = 60;
+    static tag: string = "AssultRifle";
+    static damage: number = 30;
+    static fireRate: number = 10;
+    static reloadTime: number = 2;
+    static magSize: number = 30;
+    static ammo: number = 120;
+    static speed: number = 100;
 
     animator = new Animator(
         [
@@ -17,7 +24,8 @@ export class AssultRifle extends Gun {
                     sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
                     frameCount: 4,
                     frameHeight: 20,
-                    frameWidth: 64,
+                    frameWidth: 66,
+                    offestX: 4,
                     fireOnFrame: 2
                 },
                 AnimationState.ATTACK
@@ -44,11 +52,11 @@ export class AssultRifle extends Gun {
     );
 
     constructor(position: Vec2) {
-        super("AssultRifle", //tag
-            120, //ammo
-            30, //magSize
-            10, //fireRate
-            2, //reloadTime
+        super(AssultRifle.tag, //tag
+            AssultRifle.ammo, //ammo
+            AssultRifle.magSize, //magSize
+            AssultRifle.fireRate, //fireRate
+            AssultRifle.reloadTime, //reloadTime
             position
         );
 
@@ -73,14 +81,16 @@ export class AssultRifle extends Gun {
         attackAnimInfo.animationSpeed = speedMultiplier;
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-    
-        const muzzleDistance = 3.5;
-        const verticleOffset = 0.8; 
-        
-        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
-        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RifleBullet(muzzleX, muzzleY, targetX, targetY);
+    protected createBullet(startX: number, startY: number, targetX: number, targetY: number, playerVelocity: Vec2): Bullet {
+        const localOffsetX = 1.0;  // along the gun barrel direction
+        const localOffsetY = -0.2;   // perpendicular to the gun
+
+        const originX = startX + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
+        const originY = startY + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
+
+        const muzzleX = originX + Math.cos(this.travelAngle);
+        const muzzleY = originY + Math.sin(this.travelAngle);
+        return new RifleBullet(originX, originY, muzzleX, muzzleY, playerVelocity);
     }
 
 }

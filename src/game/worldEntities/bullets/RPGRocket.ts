@@ -2,7 +2,7 @@ import { ImagePath } from "../../../engine/assetmanager.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Entity } from "../../../engine/Entity.js";
-import { DrawLayer } from "../../../engine/types.js";
+import { DrawLayer, Vec2 } from "../../../engine/types.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Bullet } from "./Bullet.js";
 import { Explosion } from "./Explosion.js";
@@ -39,8 +39,8 @@ export class RPGRocket extends Bullet {
     );
 
 
-    constructor(startX: number, startY: number, endX: number, endY: number) {
-        super("RPGRocket", startX, startY, endX, endY, 100, 30);
+    constructor(startX: number, startY: number, endX: number, endY: number, playerVelocity: Vec2) {
+        super("RPGRocket", startX, startY, endX, endY, 100, 30, playerVelocity);
 
         //this.position.x += this.velocity.x * 0.04;
         //this.position.y += this.velocity.y * 0.5;

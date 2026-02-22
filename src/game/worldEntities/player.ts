@@ -18,7 +18,7 @@ import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
 import { DeathScreen } from "../DeathScreen.js";
 import { RavineDeathZone } from "./RavineZone.js";
-
+import { RayGun } from "../Items/guns/RayGun.js";
 
 /**
  * @author PG
@@ -114,6 +114,39 @@ export class Player implements Entity, Collidable {
         ]
     );
 
+    private rayGunAnimator = new Animator(
+        [
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/Shot_2.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                    fireOnFrame: 2
+                },
+                AnimationState.ATTACK
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/IdleRay.png"),
+                    frameCount: 7,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/ReloadRay.png"),
+                    frameCount: 9,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.RELOAD
+            ]
+        ]
+    );
+
     prevGroundSpeed: number = 0;
 
     // Movement tuning constants
@@ -197,14 +230,19 @@ export class Player implements Entity, Collidable {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         this.position = new Vec2(spawnPos.x, mountain ? mountain.getHeightAt(spawnPos.x) : spawnPos.y);
         this.weapon = new AssultRifle(this.position);
+        // this.weapon = new AssultRifle(this.position);
         // this.weapon = new RPG(this.position);
+        this.weapon = new RayGun(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
 
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
+        this.setUpAnimatorEvents(this.rayGunAnimator);
 
-        this.animator = this.rifleAnimator;
         // this.animator = this.rpgAnimator;
+
+        // this.animator = this.rifleAnimator;
+        this.animator = this.rayGunAnimator;
 
         this.synchroizeAttackFrames();
     }
@@ -342,31 +380,6 @@ export class Player implements Entity, Collidable {
             } else {
                 // Idle animation state
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-            }
-
-            if (!this.inAnimation) {
-                // -- Shooting guns --
-                if (keys["Mouse0"] && this.weapon.ammoInGun > 0) {
-                    this.weapon.ammoInGun -= 1;
-                    this.endTime = 666.667; // duration of attack animation in ms
-                    this.inAnimation = true;
-                    this.timer = Date.now();
-
-                    // Create bullet entity
-                    console.log(`Click Coords: (${clickCoords.x.toFixed(2)}, ${clickCoords.y.toFixed(2)})`);
-
-                    // Only use converted world coords; fallback to a small offset if conversion failed.
-                    const targetX = mouseWorldX ?? (this.position.x + 1);
-                    const targetY = mouseWorldY ?? this.position.y;
-
-                    // create bullet
-                    GameEngine.g_INSTANCE.addEntity(
-                        new RifleBullet(this.position.x, this.position.y, targetX, targetY),
-                        DrawLayer.BULLET);
-                    //console.log(`ammo: ${this.ammo}`);
-                } else {
-                    this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
-                }
             }
 
 
@@ -603,6 +616,12 @@ export class Player implements Entity, Collidable {
             console.log(`skipping fireWeapon.`);
             return;
         }
+
+        // if (this.weapon.tag == "RayGun") {
+        //     console.log(`Currently only RayGun is implemented, skipping fireWeapon.`);
+        //     return;
+        // }
+
 
         const currentTime = Date.now();
         const bullet = this.weapon.shoot(this.position.x, this.position.y, this.queuedShotTarget.x, this.queuedShotTarget.y, currentTime);

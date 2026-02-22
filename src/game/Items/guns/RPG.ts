@@ -7,8 +7,9 @@ import { Vec2 } from "../../../engine/types.js";
 
 export class RPG extends Gun {
 
-    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    sprite: ImagePath = new ImagePath("res/img/guns/RPG/Shot.png");
     ammoBox = 10;
+    static tag: string = "RPG";
 
     animator = new Animator(
             [
@@ -44,7 +45,7 @@ export class RPG extends Gun {
         );
     
     constructor(position: Vec2) {
-        super("RPG", //tag
+        super(RPG.tag, //tag
             10, //ammo
             1, //magSize
             2, //fireRate
@@ -73,12 +74,15 @@ export class RPG extends Gun {
         attackAnimInfo.animationSpeed = speedMultiplier;
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-        const muzzleDistance = 3;
-        const verticleOffset = 0.8; 
-                
-        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
-        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RPGRocket(muzzleX, muzzleY, targetX, targetY);
+    protected createBullet(startX: number, startY: number, targetX: number, targetY: number,  playerVelocity: Vec2): Bullet {
+        const localOffsetX = 1.0;  // along the gun barrel direction
+        const localOffsetY = -0.2;   // perpendicular to the gun
+
+        const originX = startX + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
+        const originY = startY + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
+
+        const muzzleX = originX + Math.cos(this.travelAngle);
+        const muzzleY = originY + Math.sin(this.travelAngle);
+        return new RPGRocket(originX, originY, muzzleX, muzzleY, playerVelocity);
     }
 }
