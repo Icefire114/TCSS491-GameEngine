@@ -43,6 +43,10 @@ export class GameEngine {
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
+    
+    // Reset Field
+    public resetCallback: (() => void) | null = null;
+
 
     public get renderer(): Renderer {
         return this.m_Renderer;
@@ -218,13 +222,20 @@ export class GameEngine {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
+        const ents = Array.from(this.ents.values()).flatMap(set => Array.from(set));
+
+        // Filitering out the intro and death screen from normal entities so it always draws last aka on top
+        const introEnt = ents.find(([e]) => e.tag === "intro_screen");
+        const deathEnt = ents.find(([e]) => e.tag === "death_screen");
+        const normalEnts = ents.filter(([e]) => 
+            e.tag !== "intro_screen" && e.tag !== "death_screen"
+        );
+
+        // Sort: higher draw layer number = drawn first (further back)
         // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
         // And then draw them, no garuntee of order when their draw priority is the same.
-
-        const ents = Array.from(this.ents.values())
-            .flatMap(set => Array.from(set));
-        ents.sort((a, b) => b[1] - a[1])
-        for (const [ent] of ents) {
+        normalEnts.sort((a, b) => b[1] - a[1]);
+        for (const [ent] of normalEnts) {
             this.ctx.save();
             const t0 = performance.now();
             ent.draw(this.ctx, this);
@@ -235,10 +246,25 @@ export class GameEngine {
             }
         }
 
-        if (G_CONFIG.DRAW_PHYSICS_COLLIDERS) {
+        // Ensures the death screen is close to always last so it covers everything
+        if (deathEnt) {
+            this.ctx.save();
+            deathEnt[0].draw(this.ctx, this);
+            this.ctx.restore();
+        }
+
+        // Ensures that intro screen is always last so it covers everything 
+        if (introEnt) {
+            this.ctx.save();
+            introEnt[0].draw(this.ctx, this);
+            this.ctx.restore();
+        }
+
+        // Shows Colliders only if the game is actually running 
+        if (G_CONFIG.DRAW_PHYSICS_COLLIDERS && this.running && !this.uniqueEnts.has("death_screen")) {
             const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             const meterInPixelsY = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            for (const ent of ents) {
+            for (const ent of normalEnts) {
                 if (ent[0].physicsCollider !== null && ent[0].physicsCollider instanceof BoxCollider) {
                     const collider = ent[0].physicsCollider;
 
@@ -270,9 +296,30 @@ export class GameEngine {
     };
 
     update(dt: number) {
+        // Ensure that intro screen is specfically only able to get update forinput and dismiss 
+        const introEnt = this.uniqueEnts.get("intro_screen")?.[0];
+        const deathEnt = this.uniqueEnts.get("death_screen")?.[0];
+        
+        // Check for death screen udpates
+        if (deathEnt && !deathEnt.removeFromWorld) {
+           deathEnt.update(this.keys, dt, this.rightclick);
+        }
+
+        // Checks for intro screen 
+        if (introEnt && !introEnt.removeFromWorld) {
+            introEnt.update(this.keys, dt, this.rightclick);
+            if (introEnt.removeFromWorld) {
+                this.uniqueEnts.delete("intro_screen");
+                this.ents.get("intro_screen")?.clear();
+            }
+        }
+
+        // Blocking for any other enties to update until start() is called
+        if (!this.running) return;
+
         for (const set of this.ents.values()) {
             for (const [entity] of set) {
-                if (!entity.removeFromWorld) {
+                if (!entity.removeFromWorld && entity.tag !== "intro_screen") {
                     const t0 = performance.now();
                     entity.update(this.keys, dt, this.rightclick);
                     const t = t0 - performance.now();
@@ -284,9 +331,11 @@ export class GameEngine {
             }
         }
 
-        this.followEntByScreenRatioX(unwrap(this.m_followingEnt), this.m_followPercenageX);
-        this.followEntByScreenRatioY(unwrap(this.m_followingEnt), this.m_followPercentageY);
-
+        // Added safety check to ensure we're not following entites that are null
+        if (this.m_followingEnt) {
+            this.followEntByScreenRatioX(this.m_followingEnt, this.m_followPercenageX);
+            this.followEntByScreenRatioY(this.m_followingEnt, this.m_followPercentageY);
+        }
 
         for (const set of this.ents.values()) {
             for (const ent of set) {
@@ -385,4 +434,15 @@ export class GameEngine {
         audio.loop = true;
         audio.volume = 0.2;
     };
+    
+    /**
+     * Method that snaps the viewport to the followed entity
+     * Used before the loop starts, since thers a frame that camera does to jump to the player
+     */
+    snapViewportToFollowedEnt(): void {
+        if (this.m_followingEnt) {
+            this.followEntByScreenRatioX(this.m_followingEnt, this.m_followPercenageX);
+            this.followEntByScreenRatioY(this.m_followingEnt, this.m_followPercentageY);
+        }
+    }
 };

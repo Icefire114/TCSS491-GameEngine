@@ -1,14 +1,13 @@
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { Vec2, DrawLayer } from "../engine/types.js";
-import { Mountain } from "./worldEntities/mountain.js";
-import { Tree } from "./worldDeco/Tree.js";
-import { Bush } from "./worldDeco/Bush.js";
-import { Rock } from "./worldDeco/Rock.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { Vec2, DrawLayer } from "../../engine/types.js";
+import { Mountain } from "../worldEntities/mountain.js";
+import { Tree } from "./Tree.js";
+import { Bush } from "./Bush.js";
+import { Rock } from "./Rock.js";
 import Rand from 'rand-seed';
-import { randomOfWeighted } from "../engine/util.js";
-import { FireBarrel } from "./worldDeco/FireBarrel.js";
-import { DecoFactory } from "./worldDeco/DecorationFactory.js";
+import { randomOfWeighted } from "../../engine/util.js";
+import { DecoFactory } from "./DecorationFactory.js";
 
 export class DecorationSpawner implements Entity {
     id: EntityID;
@@ -21,6 +20,7 @@ export class DecorationSpawner implements Entity {
 
     // Logic
     private lastSpawnX = 0;
+    private initialized = false; 
     // Min distance palyer travel before spawning another decoration 
     private spawnInterval = 35;
     private rng: Rand;
@@ -39,6 +39,12 @@ export class DecorationSpawner implements Entity {
         // NO player, no moutain, don't run
         if (!player || !mountain) {
             return;
+        }
+
+        // Skiping decorations within player spawns, so it doens't ruin the animation         
+        if (!this.initialized) {
+            this.initialized = true;
+            this.lastSpawnX = player.position.x + 45;
         }
 
         const status = mountain.getSafeZoneStatus(player.position.x);

@@ -23,13 +23,13 @@ import { Bush } from "./worldDeco/Bush.js";
 import { ChristmasTree } from "./worldDeco/ChristmasTree.js";
 import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
-import { WorldSpawner } from "./WorldSpawner.js";
-import { DecorationSpawner } from "./DecorationSpanwer.js";
+import { WorldSpawner } from "./worldEntities/WorldSpawner.js";
+import { DecorationSpawner } from "./worldDeco/DecorationSpanwer.js";
 import { unwrap } from "../engine/util.js";
-import { ShopUI } from "./ShopUI.js";
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
-
+import { IntroScreen } from "./IntroScreen.js";
 
 
 /**
@@ -159,8 +159,9 @@ function main() {
 
 
     try {
-        gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
+        GameEngine.g_INSTANCE.addUniqueEntity(new Player(new Vec2(55, 0)), DrawLayer.PLAYER);
         gameEngine.positionScreenOnEnt(unwrap(gameEngine.getUniqueEntityByTag("player")), 0.15, 0.65);
+        gameEngine.snapViewportToFollowedEnt();
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
@@ -355,7 +356,13 @@ function main() {
             ), DrawLayer.WORLD_DECORATION);
         }
 
-        gameEngine.start();
+        // Drawing our intro screen at the top, and will called gameengine start to start the geame
+        gameEngine.addUniqueEntity(new IntroScreen(() => {
+            gameEngine.start();
+        }), 999 as DrawLayer);
+
+        // Update loop is going, but intro is the one that calls the gameengine.start
+        gameEngine.loop();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
         alert(`Engine has encounted an uncaught error! ${e}`);

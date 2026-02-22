@@ -6,12 +6,13 @@ import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { DecorationSpawner } from "../../DecorationSpanwer.js";
+import { DecorationSpawner } from "../../worldDeco/DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 import { Shop } from "./Shop.js";
+import { SafeZoneNotification } from "./SafeZoneNotification.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -23,11 +24,18 @@ export class SafeZone implements Entity {
     removeFromWorld: boolean = false;
     readonly size: Vec2 = new Vec2(140, 50);
 
-    constructor(pos: Vec2, endX: number) {
+    //Safezone Notification Setting
+    private zoneLevel: number;
+    private hasNotified: boolean = false; 
+
+    constructor(pos: Vec2, endX: number, zoneLevel: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = Vec2.compAdd(pos, new Vec2(5, 0));
         this.size = new Vec2(endX - pos.x - 5, this.size.y);
         console.log(`Created SafeZone with size ${this.size}`);
+
+        // Tracking safezone Level
+        this.zoneLevel = zoneLevel;
 
         GameEngine.g_INSTANCE.addEntity(
             new BoxTrigger(
@@ -95,6 +103,17 @@ export class SafeZone implements Entity {
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
+
+        // Triggering a notfication to occur once we eneter
+         if (!this.hasNotified) {
+            // Spawn the UI Notification
+            GameEngine.g_INSTANCE.addEntity(
+                new SafeZoneNotification(this.zoneLevel), 
+                999 as DrawLayer // Ensurign it draws above everything
+            );
+            this.hasNotified = true;
+        }
+
 
         // Cleanup zombies
         for (let ent of GameEngine.g_INSTANCE.getAllZombies()) {

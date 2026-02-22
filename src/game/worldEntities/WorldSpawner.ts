@@ -1,17 +1,17 @@
-import { Entity, EntityID } from "../engine/Entity.js";
-import { GameEngine } from "../engine/gameengine.js";
-import { Vec2, DrawLayer } from "../engine/types.js";
-import { Mountain } from "./worldEntities/mountain.js";
-import { BasicZombie } from "./zombies/BasicZombie.js";
-import { Spike } from "./worldEntities/spike.js";
-import { ItemFactory } from "./Items/ItemFactory.js";
+import { Entity, EntityID } from "../../engine/Entity.js";
+import { GameEngine } from "../../engine/gameengine.js";
+import { Vec2, DrawLayer } from "../../engine/types.js";
+import { Mountain } from "./mountain.js";
+import { BasicZombie } from "../zombies/BasicZombie.js";
+import { Spike } from "./spike.js";
+import { ItemFactory } from "../Items/ItemFactory.js";
 import Rand from 'rand-seed';
-import { Player } from "./worldEntities/player.js";
-import { randomOf } from "../engine/util.js";
-import { ExplodingZombie } from "./zombies/ExplodingZombie.js";
-import { FastZombie } from "./zombies/FastZombie.js";
-import { GiantZombie } from "./zombies/GiantZombie.js";
-import { ThrowerZombie } from "./zombies/ThrowerZombie.js";
+import { Player } from "./player.js";
+import { randomOf } from "../../engine/util.js";
+import { ExplodingZombie } from "../zombies/ExplodingZombie.js";
+import { FastZombie } from "../zombies/FastZombie.js";
+import { GiantZombie } from "../zombies/GiantZombie.js";
+import { ThrowerZombie } from "../zombies/ThrowerZombie.js";
 
 export class WorldSpawner implements Entity {
     // Required info

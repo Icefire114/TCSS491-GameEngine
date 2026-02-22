@@ -16,6 +16,9 @@ import { Zombie } from "../zombies/Zombie.js";
 import { Gun } from "../Items/guns/Gun.js";
 import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
+import { DeathScreen } from "../DeathScreen.js";
+import { RavineDeathZone } from "./RavineZone.js";
+
 
 /**
  * @author PG
@@ -153,7 +156,13 @@ export class Player implements Entity, Collidable {
 
     // For Jump multipler
     jumpMultiplier: number = 1;
+    
+    // Flying cheat
+    isFlying: boolean = false;
+    private pressFKey: boolean = false;
 
+    // Used in intro animation to not show player
+    visible = false;
 
     // player gun states (player spawns with a gun)
     weapon: Gun;
@@ -183,8 +192,10 @@ export class Player implements Entity, Collidable {
      */
     currency: number = 0;
 
-    constructor() {
+    constructor(spawnPos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        this.position = new Vec2(spawnPos.x, mountain ? mountain.getHeightAt(spawnPos.x) : spawnPos.y);
         this.weapon = new AssultRifle(this.position);
         // this.weapon = new RPG(this.position);
         GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
@@ -260,6 +271,12 @@ export class Player implements Entity, Collidable {
 
 
     update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2): void {
+        // DEBUG: Force death
+        this.debugForceDeath(keys);
+
+        // CHEATS: (Remove later) abilty for player to fly
+        this.flyKey(keys);
+        
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
@@ -356,7 +373,17 @@ export class Player implements Entity, Collidable {
             const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
             const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
             const inSafeZone = this.isInSafeZone();
-            if (inSafeZone) {
+
+            // Handles when we are flying cheats 
+            if (this.isFlying) {
+                const FLY_SPEED = 150;
+                this.velocity.x = 0;
+                this.velocity.y = 0;
+                if (keys["d"]) this.position.x += FLY_SPEED * deltaTime;
+                if (keys["a"]) this.position.x -= FLY_SPEED * deltaTime;
+                if (keys["w"] || keys[" "]) this.position.y -= FLY_SPEED * deltaTime;
+                if (keys["s"]) this.position.y += FLY_SPEED * deltaTime;
+            } else if (inSafeZone) {
                 // Reset velocity when entering safe zone to avoid carrying momentum
                 const SAFE_ZONE_SPEED = this.MAX_SPEED * 0.85;
                 const SAFE_ZONE_ACCEL = 120;
@@ -462,6 +489,7 @@ export class Player implements Entity, Collidable {
                 }
             }
 
+
             // -- Collision with items --
             const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
             for (const itemEnt of items) {
@@ -509,12 +537,64 @@ export class Player implements Entity, Collidable {
                         this.iTime = this.iDuration; // start invulnerability time
                     }
                 }
+
+                // -- Collision with ravines --
+                const ravineZones = GameEngine.g_INSTANCE.getEntitiesByTag("RavineDeathZone") as RavineDeathZone[];
+                for (const zone of ravineZones) {
+                    const contact = zone.checkContact(this.position.x, this.position.y);
+
+                    // Handles the death when hitting the ravine
+                    if (contact === "death") {
+                        if (!this.dead) {
+                            this.dead = true;
+                            GameEngine.g_INSTANCE.addUniqueEntity(
+                                new DeathScreen(this.position.x, this.position.y, () => {
+                                    window.location.reload();
+                                }, "ravine"),
+                                998 as DrawLayer
+                            );
+                        }
+                        break;
+                    } else if (contact === "bounce") { // Handling if in ravine, not dead, then bounce 
+                        // Figuring out which wall was hit so we know which direction to bounce
+                        const wall = zone.getNearestWall(this.position.x);
+
+                        // Handling that bounc
+                        if (wall === "left") {
+                            // if hit the left wall then bounce to the right and push player away from the wall
+                            this.velocity.x = Math.abs(this.velocity.x) * 0.6;
+                            this.position.x = zone.leftWallX + 1.5; // nudge away from wall
+                        } else {
+                            // if hit the right wall then bounce to the left and push player away from the wall
+                            this.velocity.x = -Math.abs(this.velocity.x) * 0.6;
+                            this.position.x = zone.rightWallX - 1.5; // nudge away from wall
+                        }
+
+                        // Ensures that the player is being bounch downward to death zones
+                        this.velocity.y = Math.abs(this.velocity.y) * 0.8 + 5;
+
+                        break;
+                    }
+                }
             }
+
         } else {
             this.animator.updateAnimState(AnimationState.DEATH, deltaTime)
         }
 
     }
+
+    /**
+     * Method when press F, it allows us to fly
+     * WILL DEELTE LATER, DEBUG since its a pain to die
+     */
+    flyKey(keys: { [key: string]: boolean }) {
+        if (keys["f"] && !this.pressFKey) {
+            this.isFlying = !this.isFlying;
+        }
+        this.pressFKey = keys["f"];
+    }
+
 
     fireWeapon(): void {
         console.log(`queuedTarget: ${this.queuedShotTarget}, wantsToShoot: ${this.wantsToShoot}`);
@@ -544,6 +624,9 @@ export class Player implements Entity, Collidable {
     //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        // Won't draw if visible is false 
+        if ((this as any).visible === false) return; 
+
         this.drawSnowboard(ctx, game);
         this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
@@ -603,6 +686,15 @@ export class Player implements Entity, Collidable {
                 if (death >= 150) { // chance of death increases with health%
                     //console.log(`Player has died!`);
                     this.dead = true;
+
+                    // The Check if we need a death screen
+                    GameEngine.g_INSTANCE.addUniqueEntity(
+                        new DeathScreen(this.position.x, this.position.y, () => {
+                            // in order to reset, refresh windows! 
+                            window.location.reload();
+                        }, "infection"),
+                        998 as DrawLayer  // just below intro screen layer
+                    );
                 }
 
             } else {
@@ -618,4 +710,23 @@ export class Player implements Entity, Collidable {
     killedEnemy(enemy: Zombie): void {
         this.currency += enemy.reward;
     }
+
+    /**
+     * TEMP METHOD: USE to immedite debug and look at the death animation 
+     */
+    debugForceDeath(keys: { [key: string]: boolean}) {
+        if (keys["k"]) {
+            this.dead = true;
+            GameEngine.g_INSTANCE.addUniqueEntity(
+                new DeathScreen(this.position.x, this.position.y, () => {
+                    window.location.reload();
+                }),
+                998 as DrawLayer
+            );
+        }
+        
+    }
+
+
+
 }

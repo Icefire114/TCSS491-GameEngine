@@ -6,7 +6,7 @@ import { Collidable, Collider } from "../../../engine/physics/Collider.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { ShopUI } from "../../ShopUI.js";
+import { ShopUI } from "./ShopUI.js";
 import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
 
@@ -59,6 +59,22 @@ export class Shop implements Entity, Collidable {
             const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
             shop_ui.isOpen = !shop_ui.isOpen;
             keys['e'] = false;
+        }
+
+
+        // Route clicks to shop UI when open
+        if (keys["Mouse0"] && clickCoords) {
+            const shop_ui = GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui") as ShopUI | undefined;
+            if (shop_ui?.isOpen) {
+                const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+                if (canvas) {
+                    const rect = canvas.getBoundingClientRect();
+                    const canvasX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
+                    const canvasY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
+                    shop_ui.handleClick(canvasX, canvasY);
+                    keys["Mouse0"] = false; // consume the click so player doesn't shoot
+                }
+            }
         }
     }
 }

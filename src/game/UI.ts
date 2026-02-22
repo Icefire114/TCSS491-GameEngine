@@ -7,7 +7,7 @@ import { unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
-import { ShopUI } from "./ShopUI.js";
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js"; 
 
 export class UILayer implements Entity {
     readonly id: EntityID;
@@ -32,6 +32,9 @@ export class UILayer implements Entity {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        // Doesnt draw anything unless Intros creen is gone
+        if (game.getUniqueEntityByTag("intro_screen")) return;
+
         const player: Player = unwrap(game.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
         ctx.save();
