@@ -47,8 +47,8 @@ export class Rock implements Entity {
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const currentAnim = {
             sprite: unwrap(GameEngine.g_INSTANCE.getSprite(this.sprite)),
-            frameWidth: 256,
-            frameHeight: 256,
+            frameWidth: 128,
+            frameHeight: 128,
             frameCount: 1,
             offsetX: 0
         };
