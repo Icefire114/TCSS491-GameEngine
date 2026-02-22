@@ -244,10 +244,10 @@ export class GameEngine {
             this.ctx.save();
             const t0 = performance.now();
             ent.draw(this.ctx, this);
-            const t = t0 - performance.now();
+            const t = performance.now() - t0;
             this.ctx.restore();
-            if (t > 10) {
-                console.warn(`Ent: ${ent.id} took ${t.toFixed(3)}ms to draw`);
+            if (t > 2) {
+                console.warn(`Ent: ${ent.id} took ${t}ms to draw`);
             }
         }
         const drawEnd = performance.now();

@@ -7,6 +7,7 @@ import { G_CONFIG } from "../CONSTANTS.js";
 import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
 import { RavineDeathZone } from "./RavineZone.js";
+import { unwrap } from "../../engine/util.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -584,6 +585,12 @@ export class Mountain extends ForceDraw implements Entity {
      */
     drawRavines(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number) {
         for (const ravine of this.completedRavines) {
+            const player = unwrap(game.getUniqueEntityByTag("player"));
+            if (ravine.startAnchorX < player.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT * 2
+                || ravine.endAnchorX > player.position.x + GameEngine.WORLD_UNITS_IN_VIEWPORT * 2
+            ) {
+                continue;
+            }
 
             // Were looking  where terrain suddenly drops (ravine left edge)
             let leftWorldX = ravine.startAnchorX;
