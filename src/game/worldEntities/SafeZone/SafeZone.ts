@@ -10,7 +10,7 @@ import { DecorationSpawner } from "../../worldDeco/DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
-import { Armory } from "./ArmoryTemp.js";
+import { Armory } from "./Armorytemp.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 import { Shop } from "./Shop.js";
 import { SafeZoneNotification } from "./SafeZoneNotification.js";
