@@ -48,8 +48,8 @@ export class Bush implements Entity {
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const currentAnim = {
             sprite: unwrap(GameEngine.g_INSTANCE.getSprite(this.sprite)),
-            frameWidth: 512,
-            frameHeight: 512,
+            frameWidth: 256,
+            frameHeight: 256,
             frameCount: 1,
             offsetX: 0
         };
