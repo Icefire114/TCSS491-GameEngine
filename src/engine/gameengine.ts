@@ -235,6 +235,7 @@ export class GameEngine {
         // Sort the entities by their draw priority, lower numbers = drawn later, bigger numbers = drawn earlier.
         // And then draw them, no garuntee of order when their draw priority is the same.
         normalEnts.sort((a, b) => b[1] - a[1]);
+        const drawStart = performance.now();
         for (const [ent] of normalEnts) {
             this.ctx.save();
             const t0 = performance.now();
@@ -244,6 +245,12 @@ export class GameEngine {
             if (t > 10) {
                 console.warn(`Ent: ${ent.id} took ${t.toFixed(3)}ms to draw`);
             }
+        }
+        const drawEnd = performance.now();
+        const drawTime = drawEnd - drawStart;
+        // if draw time took more that ~ a 120fps frame budget then its a problem.
+        if (drawTime > 8.333333) {
+            console.warn(`Drawing took ${drawTime}ms`);
         }
 
         // Ensures the death screen is close to always last so it covers everything
@@ -317,6 +324,7 @@ export class GameEngine {
         // Blocking for any other enties to update until start() is called
         if (!this.running) return;
 
+        const updateStart = performance.now();
         for (const set of this.ents.values()) {
             for (const [entity] of set) {
                 if (!entity.removeFromWorld && entity.tag !== "intro_screen") {
@@ -329,6 +337,11 @@ export class GameEngine {
 
                 }
             }
+        }
+        const updateEnd = performance.now();
+        const updateTime = updateEnd - updateStart;
+        if (updateTime > 10) {
+            console.warn(`Update took ${updateTime}ms`);
         }
 
         // Added safety check to ensure we're not following entites that are null
