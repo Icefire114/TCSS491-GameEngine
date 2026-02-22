@@ -33,5 +33,5 @@ export type Entity = {
      * @param deltaTime The time in seconds since the last frame.
      * @param clickCoords The coordinates of the last click.
      */
-    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void;
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords?: Vec2 | null, mouse?: Vec2 | null): void;
 };

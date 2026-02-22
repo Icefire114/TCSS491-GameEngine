@@ -132,7 +132,7 @@ export class UILayer implements Entity {
         ctx.restore();
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
         // DEBUG: To see the visualization of the Shop UI (WILL DELETE LATERRRRR)
         if (keys['l'] && !this.lWasPressed) {
             this.shop.isOpen = !this.shop.isOpen;
@@ -143,5 +143,12 @@ export class UILayer implements Entity {
             this.armory.isOpen = !this.armory.isOpen;
         }
         this.pWasPressed = keys['p'];
+
+        // if (clickCoords && keys["Mouse0"]) {
+        //     if (this.armory.isOpen) {
+        //         this.armory.handleClick(clickCoords);
+        //         keys["Mouse0"] = false;
+        //     }
+        // }
     }
 }

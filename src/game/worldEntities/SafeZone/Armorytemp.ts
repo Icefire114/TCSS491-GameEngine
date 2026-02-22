@@ -55,10 +55,13 @@ export class Armory implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         UI.drawOpenArmoryPrompt = this.isPlayerTouching();
         if (UI.drawOpenArmoryPrompt && keys['e']) {
+            player.uiOpen = true;
             const armory_ui: ArmoryUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui")) as ArmoryUI;
             armory_ui.isOpen = !armory_ui.isOpen;
+            armory_ui.handleClick(clickCoords);
             keys['e'] = false;
         }
     }

@@ -10,6 +10,14 @@ export class RPG extends Gun {
     sprite: ImagePath = new ImagePath("res/img/guns/RPG/Shot.png");
     ammoBox = 10;
     static tag: string = "RPG";
+    static damage: number = 30;
+    static fireRate: number = 2;
+    static reloadTime: number = 3;
+    static magSize: number = 1;
+    static ammo: number = 10;
+    static speed: number = 100;
+    equipped = false;
+    unlocked = false;
 
     animator = new Animator(
             [
@@ -46,10 +54,10 @@ export class RPG extends Gun {
     
     constructor(position: Vec2) {
         super(RPG.tag, //tag
-            10, //ammo
-            1, //magSize
-            2, //fireRate
-            3, //reloadTime
+            RPG.ammo, //ammo
+            RPG.magSize, //magSize
+            RPG.fireRate, //fireRate
+            RPG.reloadTime, //reloadTime
             position
         );
 

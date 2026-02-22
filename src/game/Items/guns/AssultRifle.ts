@@ -16,6 +16,8 @@ export class AssultRifle extends Gun {
     static magSize: number = 30;
     static ammo: number = 120;
     static speed: number = 100;
+    equipped = true;
+    unlocked = true;
 
     animator = new Animator(
         [

@@ -17,6 +17,7 @@ import { Gun } from "../Items/guns/Gun.js";
 import { RPG } from "../Items/guns/RPG.js";
 import { AssultRifle } from "../Items/guns/AssultRifle.js";
 import { RayGun } from "../Items/guns/RayGun.js";
+import { Armory } from "./SafeZone/ArmoryTemp.js";
 
 /**
  * @author PG
@@ -191,6 +192,9 @@ export class Player implements Entity, Collidable {
 
     // player gun states (player spawns with a gun)
     weapon: Gun;
+    rpg: RPG;
+    rifle: AssultRifle;
+    rayGun: RayGun;
     wantsToReload: boolean = false;
     isReloading: boolean = false;
     isShooting: boolean = false;
@@ -201,6 +205,7 @@ export class Player implements Entity, Collidable {
     inAnimation: boolean = false;
     endTime: number = 0;
     timer: number = 0;
+    uiOpen: boolean = false;
 
     /**
      * The items the player has picked up.
@@ -219,20 +224,20 @@ export class Player implements Entity, Collidable {
 
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        // this.weapon = new AssultRifle(this.position);
-        // this.weapon = new RPG(this.position);
-        this.weapon = new RayGun(this.position);
-        GameEngine.g_INSTANCE.addEntity(this.weapon, DrawLayer.of(2));
+        this.rifle = new AssultRifle(this.position);
+        this.rpg = new RPG(this.position);
+        this.rayGun = new RayGun(this.position);
+        this.weapon = this.rifle;
+        GameEngine.g_INSTANCE.addUniqueEntity(this.rifle, DrawLayer.of(2));
+        GameEngine.g_INSTANCE.addUniqueEntity(this.rpg, DrawLayer.of(2));
+        GameEngine.g_INSTANCE.addUniqueEntity(this.rayGun, DrawLayer.of(2));
+        
 
         this.setUpAnimatorEvents(this.rpgAnimator);
         this.setUpAnimatorEvents(this.rifleAnimator);
         this.setUpAnimatorEvents(this.rayGunAnimator);
 
-        // this.animator = this.rpgAnimator;
-
-        // this.animator = this.rifleAnimator;
-        this.animator = this.rayGunAnimator;
-
+        this.animator = this.rifleAnimator;
         this.synchroizeAttackFrames();
     }
 
@@ -297,17 +302,17 @@ export class Player implements Entity, Collidable {
     }
 
 
-    update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2): void {
+    update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
         let mouseWorldX: number | null = null;
         let mouseWorldY: number | null = null;
         const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
-        if (canvas && clickCoords) {
+        if (canvas && mouse) {
             const rect = canvas.getBoundingClientRect();
             // canvas pixel coords (account for CSS scaling)
-            const canvasPxX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
-            const canvasPxY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
+            const canvasPxX = (mouse.x - rect.left) * (canvas.width / rect.width);
+            const canvasPxY = (mouse.y - rect.top) * (canvas.height / rect.height);
 
             const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             // inverse of: screen = (world - viewport) * meterInPixels / zoom
@@ -339,11 +344,13 @@ export class Player implements Entity, Collidable {
                 this.queuedShotTarget = new Vec2(mouseWorldX, mouseWorldY);
             }
 
+            if (!this.uiOpen) {
             const currentTime = Date.now();
             this.wantsToShoot = keys["Mouse0"] && this.weapon.canShoot(currentTime);
             this.weapon.wantsToShoot = this.wantsToShoot;
             this.wantsToReload = keys["r"] && this.weapon.canReload();
             this.weapon.wantsToReload = this.wantsToReload;
+            }
 
             // ---------- Animation Logic ----------
             if (this.isShooting) {
@@ -556,6 +563,31 @@ export class Player implements Entity, Collidable {
             console.log(`Bullet is null! Check weapon.shoot() implementation`);
 
         }
+    }
+
+    swapWeapon(newWeaponTag: string): void {
+        this.weapon.equipped = false;
+        switch (newWeaponTag) {
+            case AssultRifle.tag:
+                this.weapon = this.rifle;
+                this.animator = this.rifleAnimator;
+                this.synchroizeAttackFrames();
+                break;
+            case RPG.tag:
+                this.weapon = this.rpg;
+                this.animator = this.rpgAnimator;
+                this.synchroizeAttackFrames();
+                break;
+            case RayGun.tag:
+                this.weapon = this.rayGun;
+                this.animator = this.rayGunAnimator;
+                this.synchroizeAttackFrames();
+                break;
+            default:
+                console.log(`Unknown weapon tag: ${this.weapon.tag}`);
+        }
+        this.weapon.equipped = true;
+        this.weapon.updatePos(this.position);
     }
 
 

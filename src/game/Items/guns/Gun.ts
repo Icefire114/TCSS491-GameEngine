@@ -24,6 +24,8 @@ export abstract class Gun implements Entity {
     abstract sprite: ImagePath;
     removeFromWorld: boolean = false;
     abstract animator: any;
+    abstract equipped: boolean;
+    abstract unlocked: boolean;
 
     abstract ammoBox: number; // how much ammo this gun refills to when picking up an ammo restore item
     ammoOnHand: number; // total ammo the player has for this gun (not including what's currently loaded)
@@ -103,6 +105,8 @@ export abstract class Gun implements Entity {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        if (!this.equipped) return;
+
         ctx.save();
 
         const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
@@ -118,7 +122,11 @@ export abstract class Gun implements Entity {
         ctx.restore();
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
+    updatePos(pos: Vec2): void {
+        this.position = new Vec2(pos.x, pos.y);
+    }
+
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
 
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
@@ -131,11 +139,11 @@ export abstract class Gun implements Entity {
         let mouseWorldY: number | null = null;
         const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
 
-        if (canvas && clickCoords) {
+        if (canvas && mouse) {
             const rect = canvas.getBoundingClientRect();
             // canvas pixel coords (account for CSS scaling)
-            const canvasPxX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
-            const canvasPxY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
+            const canvasPxX = (mouse.x - rect.left) * (canvas.width / rect.width);
+            const canvasPxY = (mouse.y - rect.top) * (canvas.height / rect.height);
 
             const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
             // inverse of: screen = (world - viewport) * meterInPixels / zoom

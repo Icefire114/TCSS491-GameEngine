@@ -1,4 +1,4 @@
-import { DrawLayer } from "./types.js";
+import { DrawLayer, Vec2 } from "./types.js";
 import { Entity, EntityID } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, AudioPath, ImagePath } from "./assetmanager.js";
@@ -36,13 +36,13 @@ export class GameEngine {
     private options: { debugging: boolean };
     private running: boolean;
     private timer: Timer;
-    private rightclick: { x: number, y: number };
     private clockTick: number;
     private assetManager: AssetManager;
     private m_followingEnt: Entity | null = null;
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
+    private mouseInfo: { pos: Vec2 | null, click: Vec2 | null } = { pos: null, click: null };
 
     public get renderer(): Renderer {
         return this.m_Renderer;
@@ -62,8 +62,8 @@ export class GameEngine {
         this.uniqueEnts = new Map<string, [Entity, DrawLayer]>();
 
         // Information on the input
-        this.click = null;
-        this.mouse = null;
+        this.click = { x: 0, y: 0 };
+        this.mouse = { x: 0, y: 0 };
         this.wheel = null;
         this.keys = {};
 
@@ -73,7 +73,6 @@ export class GameEngine {
         };
         this.running = false;
         this.timer = new Timer();
-        this.rightclick = { x: 0, y: 0 };
         this.clockTick = 0;
         this.assetManager = assetManager;
 
@@ -129,7 +128,6 @@ export class GameEngine {
                 console.log("MOUSE_MOVE", getXandY(e));
             }
             this.mouse = getXandY(e);
-            this.rightclick = this.mouse;
         });
 
         this.ctx.canvas.addEventListener("click", e => {
@@ -167,7 +165,7 @@ export class GameEngine {
                 console.log("RIGHT_CLICK", getXandY(e));
             }
             e.preventDefault(); // Prevent Context Menu
-            this.rightclick = getXandY(e);
+            this.click = getXandY(e);
         });
 
         this.ctx.canvas.addEventListener("keydown", event => {
@@ -274,7 +272,7 @@ export class GameEngine {
             for (const [entity] of set) {
                 if (!entity.removeFromWorld) {
                     const t0 = performance.now();
-                    entity.update(this.keys, dt, this.rightclick);
+                    entity.update(this.keys, dt, this.click, this.mouse);
                     const t = t0 - performance.now();
                     if (t > 10) {
                         console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
@@ -296,6 +294,7 @@ export class GameEngine {
                 }
             }
         }
+        this.click = null;
     };
 
     positionScreenOnEnt(e: Entity, percentageX: number, percentageY: number): void {

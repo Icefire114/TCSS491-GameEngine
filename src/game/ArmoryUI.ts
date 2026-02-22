@@ -5,12 +5,15 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { AssultRifle } from "./Items/guns/AssultRifle.js";
 import { RPG } from "./Items/guns/RPG.js";
 import { RayGun } from "./Items/guns/RayGun.js";
+import { Player } from "./worldEntities/player.js";
+import { unwrap } from "../engine/util.js";
 
 interface ArmoryItem {
     id: string;
     name: string;
     description: string;
-    availability: String;
+    unlocked: boolean;
+    equipped: boolean;
     spritePath?: string;
     frameWidth?: number;
     frameHeight?: number;
@@ -29,13 +32,18 @@ interface ArmoryItemStats {
     frameHeight?: number;
 }
 
+interface Button {
+    label: string;
+    action: () => void;
+    buttonRect?: { x: number, y: number, w: number, h: number };
+}
+
 /**
  * Class that represents the Armory UI
  */
 export class ArmoryUI implements Entity {
 
     //UI Colors
-    
     static BORDER_DARK = "#211f1f";
     static BORDER_LIGHT = "#8b8b8a";
     static BG_MAIN = "#252320";
@@ -48,15 +56,7 @@ export class ArmoryUI implements Entity {
     static STATS_BAR_FILL = "#ffffff";
     static STATS_BAR_BORDER = "#ff0000";
 
-    tag: string = "armory_ui";
-    id: EntityID;
-    position: Vec2 = new Vec2(0, 0);
-    velocity: Vec2 = new Vec2(0, 0);
-    physicsCollider = null;
-    sprite = null;
-    removeFromWorld: boolean = false;
-    public isOpen: boolean = false;
-    //private selectedItemId: string | null = null;
+    private index: number;
 
     // List of all items
     private items: ArmoryItem[] = [
@@ -64,7 +64,8 @@ export class ArmoryUI implements Entity {
             id: AssultRifle.tag,
             name: "Assult Rifle",
             description: "AN ALL AROUND SOLID WEAPON,\n GOOD FOR MOST SITUATIONS.",
-            availability: "UNLOCKED",
+            unlocked: true,
+            equipped: true,
             spritePath: "res/img/items/rifle.png",
             frameWidth: 42,
             frameHeight: 16,
@@ -73,7 +74,8 @@ export class ArmoryUI implements Entity {
             id: RPG.tag,
             name: "RPG",
             description: "A HIGH DAMAGE EXPLOSIVE WEAPON, \nBEST USED FOR GROUPS OF ENEMIES.",
-            availability: "LOCKED",
+            unlocked: false,
+            equipped: false,
             spritePath: "res/img/items/rpg.png",
             frameWidth: 47,
             frameHeight: 11,
@@ -82,7 +84,8 @@ export class ArmoryUI implements Entity {
             id: RayGun.tag,
             name: "Ray Gun",
             description: "A HIGH DAMAGE LASER WEAPON, \nBEST FOR SHREDDING \nTHROUGH ENEMIES QUICKLY.",
-            availability: "LOCKED",
+            unlocked: false,
+            equipped: false,
             spritePath: "res/img/items/ray_gun.png",
             frameWidth: 38,
             frameHeight: 15,
@@ -100,15 +103,116 @@ export class ArmoryUI implements Entity {
             ammoSpritePath: "res/img/ammo/RifleBullet.png",
             frameWidth: 360,
             frameHeight: 121,
+        },
+        {
+            id: RPG.tag,
+            damage: RPG.damage,
+            fireRate: RPG.fireRate,
+            reloadTime: RPG.reloadTime,
+            magSize: RPG.magSize,
+            ammoSpritePath: "res/img/ammo/RPGRocket.png",
+            frameWidth: 42,
+            frameHeight: 8,
+        }, 
+        {
+            id: RayGun.tag,
+            damage: RayGun.damage,
+            fireRate: RayGun.fireRate,
+            reloadTime: RayGun.reloadTime,
+            magSize: RayGun.magSize,
+            ammoSpritePath: "res/img/ammo/Lazer.png",
+            frameWidth: 360,
+            frameHeight: 121,
         }
     ];
 
+    // list of buttons
+    private buttons: Button[] = [
+        {
+                label: "left",
+                action: () => {
+                    this.index = this.index - 1;
+                    if (this.index < 0) {
+                        this.index = this.items.length - 1;
+                    }
+                    console.log(`leftButton`);
+                }
+                
+        },
+        {
+                label: "right",
+                action: () => {
+                    this.index += 1;
+                    if (this.index >= this.items.length) {
+                        this.index = 0;
+                    }
+                    console.log(`rightButton`);
+                }
+        },
+        {
+                label: "equip",
+                action: () => {
+                    if (this.items[this.index].unlocked) {
+                        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
+                        player.swapWeapon(this.items[this.index].id);
+                        this.equipItem(this.items[this.index].id);
+                    }
+                }
+        }
+    ];
+
+    public tag: string = "armory_ui";
+    public id: EntityID;
+    public position: Vec2 = new Vec2(0, 0);
+    public velocity: Vec2 = new Vec2(0, 0);
+    public physicsCollider = null;
+    public sprite = null;
+    public removeFromWorld: boolean = false;
+    public isOpen: boolean = false;
+
     constructor() {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        this.index = 0;
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2 | null): void {
+        if (!this.isOpen) return;
 
+        if (clickCoords) {
+            this.handleClick(clickCoords);
+        }
+    }
+
+    unlockItem(itemId: string): void {
+        const item = this.items.find(i => i.id === itemId);
+        if (item) {
+            item.unlocked = true;
+        }
+    }
+
+    equipItem(itemId: string): void {
+        this.items.forEach(item => {
+            if (item.id === itemId) {
+                item.equipped = true;
+            } else {
+                item.equipped = false;
+            }
+        });
+    }
+
+    handleClick(click: Vec2): void {
+        if (!this.isOpen) return;
+
+        console.log(`Handling click at (${click.x}, ${click.y})`);
+        for (const button of this.buttons) {
+            console.log("button rect:", button.label, button.buttonRect);
+            if (!button.buttonRect) continue;
+            const { x, y, w, h } = button.buttonRect;
+            if (click.x >= x && click.x <= x + w && click.y >= y && click.y <= y + h) {
+                button.action();
+                return;
+            }
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine) {
@@ -116,8 +220,6 @@ export class ArmoryUI implements Entity {
 
         const w = ctx.canvas.width;
         const h = ctx.canvas.height;
-
-        
 
         // Panel Dimesions
         const cardH = h * 0.45;
@@ -140,33 +242,22 @@ export class ArmoryUI implements Entity {
         ctx.fillText("ARMORY", w / 2, titleBarY + 35);
 
         // Setup to draw the items
-        // const itemsPerRow = 3;
         const cardMargin = 20;
-        // const cardSpacing = 15;
-        //const cardW = (panelW - (cardMargin * 2) - (cardSpacing * (itemsPerRow - 1))) / itemsPerRow;
         const cardW = (panelW * 0.6 - (cardMargin * 2));
         const cardsY = titleBarY + titleBarH + 20;
 
-        // Setup to draw each item
-        // this.items.forEach((item, idx) => {
-            //const col = idx % itemsPerRow;
-            //const x = panelX + cardMargin + (col * (cardW + cardSpacing));
-            const x = panelX + cardMargin;
-            const y = cardsY;
+        const x = panelX + cardMargin;
+        const y = cardsY;
+        this.items[0].rect = { x, y, w: cardW, h: cardH };
 
-            this.items[0].rect = { x, y, w: cardW, h: cardH };
-            // Drawing the card itself 
-            this.drawItemCard(ctx, game, this.items[0], x, y, cardW, cardH);
-        // });
+        // Drawing the card itself 
+        this.drawItemCard(ctx, game, this.items[this.index], x, y, cardW, cardH);
 
         // setup weapon stats
         const statsW = (panelW * 0.4 - (cardMargin * 2));
-        
         const statsX = panelX + cardMargin + cardW + cardMargin;
         const statsY = cardsY;
-
-        this.drawItemStats(ctx, game, this.itemsStats[0], statsX, statsY, statsW, cardH);
-        
+        this.drawItemStats(ctx, game, this.itemsStats[this.index], statsX, statsY, statsW, cardH);
     }
 
     private drawItemStats(
@@ -178,7 +269,6 @@ export class ArmoryUI implements Entity {
         w: number,
         h: number,
     ) {
-
         // draw background
         this.drawPixelPanel(ctx, x, y, w, h, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, ArmoryUI.CARD_BG);
 
@@ -193,7 +283,6 @@ export class ArmoryUI implements Entity {
         //graphic next to title
         const iconAreaH = h * 0.2;
         const iconY = y;
-        //this.drawPixelPanel(ctx, x + 10, iconY, w - 20, iconAreaH, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, "#9B6F47");
         if (itemStats.ammoSpritePath && itemStats.frameWidth && itemStats.frameHeight) {
             const sprite = game.getSprite(new ImagePath(itemStats.ammoSpritePath));
 
@@ -221,10 +310,27 @@ export class ArmoryUI implements Entity {
             ctx.fillText("?", x + w / 2, iconY + iconAreaH / 2 + 15);
         }
 
+        // draw all stats
         this.drawStatsBar(ctx, x + 10, y + 70, w - 25, 30, "Damage", itemStats.damage, 100);
         this.drawStatsBar(ctx, x + 10, y + 120, w - 25, 30, "Fire Rate", itemStats.fireRate, 20);
         this.drawStatsBar(ctx, x + 10, y + 170, w - 25, 30, "Reload Time", itemStats.reloadTime, 3);
         this.drawStatsBar(ctx, x + 10, y + 220, w - 25, 30, "Magazine Size", itemStats.magSize, 100);
+
+        //previous button
+        this.buttons[0].buttonRect = { x: x + 10, y: y + 260, w: 50, h: 50 };
+        this.drawPixelButton(ctx, x + 10, y + 260, 50, 50, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, ArmoryUI.BG2_MAIN);
+        ctx.fillStyle = ArmoryUI.TEXT_COLOR;
+        ctx.font = "bold 18px monospace";
+        ctx.fillText("◀", x + 30, y + 290);
+        ctx.textAlign = "center";
+
+        //next button
+        this.buttons[1].buttonRect = { x: x + w - 60, y: y + 260, w: 50, h: 50 };
+        this.drawPixelButton(ctx, x + w - 60, y + 260, 50, 50, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, ArmoryUI.BG2_MAIN);
+        ctx.fillStyle = ArmoryUI.TEXT_COLOR;
+        ctx.font = "bold 18px monospace";
+        ctx.fillText("▶", x + w - 35, y + 290);
+        ctx.textAlign = "center";
     }
 
     private drawStatsBar(
@@ -255,7 +361,6 @@ export class ArmoryUI implements Entity {
         // Draw value bar border
         ctx.strokeStyle = ArmoryUI.STATS_BAR_BORDER;
         ctx.strokeRect(x + 1, y + 6, w - 1, h - 20);
-
         for (let i = 1; i < 5; i++) {
             const tickX = x + (i * w / 5);
             ctx.strokeStyle = ArmoryUI.STATS_BAR_BORDER;
@@ -266,17 +371,17 @@ export class ArmoryUI implements Entity {
         }
 
         // draw tick labels
-        ctx.fillStyle = ArmoryUI.TEXT_COLOR;
-        ctx.font = "10px monospace";
-        ctx.textAlign = "center";
-        for (let i = 0; i <= 5; i++) {
-            const tickX = x + (i * w / 5);
-            let tickValue = (i / 5) * maxValue;
-            if (tickValue - Math.floor(tickValue) !== 0) {
-                tickValue = parseFloat(tickValue.toFixed(1)); // show 1 decimal place if not whole number
-            };
-            ctx.fillText(tickValue.toString(), tickX, y + h - 5);
-        }
+        // ctx.fillStyle = ArmoryUI.TEXT_COLOR;
+        // ctx.font = "10px monospace";
+        // ctx.textAlign = "center";
+        // for (let i = 0; i <= 5; i++) {
+        //     const tickX = x + (i * w / 5);
+        //     let tickValue = (i / 5) * maxValue;
+        //     if (tickValue - Math.floor(tickValue) !== 0) {
+        //         tickValue = parseFloat(tickValue.toFixed(1)); // show 1 decimal place if not whole number
+        //     };
+        //     ctx.fillText(tickValue.toString(), tickX, y + h - 5);
+        // }
     }    
 
     /**
@@ -344,25 +449,34 @@ export class ArmoryUI implements Entity {
             ctx.fillText(line, x + w / 2, descY + (i * 16));
         });
 
-        // Gold Cost 
+        // locked/unlocked status
         const availableY = y + h - 80;
         ctx.fillStyle = ArmoryUI.GOLD;
         ctx.font = "bold 18px monospace";
-
-        // Gold Coin
         const availableX = x + w / 2 - 25;
-        ctx.fillText(item.availability.toString(), availableX + 30, availableY + 5);
+        if (this.items[this.index].unlocked) {
+             ctx.fillText("UNLOCKED", availableX + 30, availableY + 5);
+        } else {
+             ctx.fillText("LOCKED", availableX + 30, availableY + 5);
+        }
+       
 
-        // Buy Button
+        // equip Button
         const btnW = w - 20;
         const btnH = 35;
         const btnX = x + 10;
         const btnY = y + h - btnH - 10;
         item.buttonRect = { x: btnX, y: btnY, w: btnW, h: btnH };
         this.drawPixelButton(ctx, btnX, btnY, btnW, btnH, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, "#A67C52");
+        this.buttons[2].buttonRect = { x: btnX, y: btnY, w: btnW, h: btnH };
         ctx.fillStyle = ArmoryUI.TEXT_COLOR;
         ctx.font = "bold 18px monospace";
-        ctx.fillText("Select", x + w / 2, btnY + 23);
+
+        if (this.items[this.index].equipped) {
+            ctx.fillText("EQUIPPED", x + w / 2, btnY + 23);
+        } else {
+            ctx.fillText("EQUIP", x + w / 2, btnY + 23);
+        }
         ctx.textAlign = "left";
     }
 

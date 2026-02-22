@@ -14,6 +14,14 @@ export class RayGun extends Gun {
     sprite: ImagePath = new ImagePath("res/img/guns/ray_gun/Shot.png");
     ammoBox = 100;
     static tag: string = "RayGun";
+    static damage: number = 15;
+    static fireRate: number = 20;
+    static reloadTime: number = 3;
+    static magSize: number = 100;
+    static ammo: number = 100;
+    static speed: number = 100;
+    equipped = false;
+    unlocked = false;
 
     animator = new Animator(
             [
@@ -50,10 +58,10 @@ export class RayGun extends Gun {
     
     constructor(position: Vec2) {
         super(RayGun.tag, //tag
-            1000, //ammo
-            1000, //magSize
-            20, //fireRate
-            3, //reloadTime
+            RayGun.ammo, //ammo
+            RayGun.magSize, //magSize
+            RayGun.fireRate, //fireRate
+            RayGun.reloadTime, //reloadTime
             position
         );
 
