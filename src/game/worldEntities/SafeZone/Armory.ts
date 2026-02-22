@@ -2,7 +2,7 @@ import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
-import { Collidable, Collider } from "../../../engine/physics/Collider.js";
+import { Collidable } from "../../../engine/physics/Collider.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { ArmoryUI } from "../../ArmoryUI.js";
@@ -11,34 +11,30 @@ import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
 
 export class Armory implements Entity, Collidable {
-    tag: string = "Armory";
-    id: EntityID;
-    position: Vec2;
-    velocity: Vec2 = new Vec2();
-    physicsCollider: BoxCollider;
-    sprite: ImagePath = new ImagePath("res/img/safe_zone/testArmory.png");
-    removeFromWorld: boolean = false;
-
-    size: Vec2 = new Vec2(10, 15);
-
-    private isArmoryOpen: boolean = false;
+    public tag: string = "Armory";
+    public id: EntityID;
+    public position: Vec2;
+    public velocity: Vec2 = new Vec2();
+    public physicsCollider: BoxCollider;
+    public sprite: ImagePath = new ImagePath("res/img/safe_zone/testArmory.png");
+    public removeFromWorld: boolean = false;
+    private size: Vec2 = new Vec2(10, 15);
 
     constructor(pos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = pos;
         this.physicsCollider = new BoxCollider(this.size.x, this.size.y);
-        console.log("v2");
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        GameEngine.g_INSTANCE.renderer.drawRawSpriteAtWorldPos(
+        game.renderer.drawRawSpriteAtWorldPos(
             this.position,
-            GameEngine.g_INSTANCE.getSprite(this.sprite),
+           game.getSprite(this.sprite),
             this.size
         );
 
         if (G_CONFIG.DRAW_SAFEZONE_BB) {
-            GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
+            game.renderer.drawRectAtWorldPos(
                 Vec2.compSub(this.position, new Vec2(this.size.x / 2, 0)),
                 this.size,
                 "rgba(183, 0, 255,0)",
@@ -55,10 +51,12 @@ export class Armory implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         UI.drawOpenArmoryPrompt = this.isPlayerTouching();
         if (UI.drawOpenArmoryPrompt && keys['e']) {
             const armory_ui: ArmoryUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui")) as ArmoryUI;
             armory_ui.isOpen = !armory_ui.isOpen;
+            player.uiOpen = armory_ui.isOpen;
             keys['e'] = false;
         }
     }

@@ -14,5 +14,7 @@ export const G_CONFIG = {
     DRAW_SAFEZONE_BB: true,
     // If true, create the entities right in front of the player
     CREATE_TESTING_ENTS: false,
-    ENABLE_DEBUG_KEYS: true
+    ENABLE_DEBUG_KEYS: true,
+    // If true, player can access armory at anytime by pressing 'p', and can access all guns
+    UNLOCK_ALL_GUNS: true
 }

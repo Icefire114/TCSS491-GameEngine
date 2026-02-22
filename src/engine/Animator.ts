@@ -1,3 +1,4 @@
+import { Gun } from "../game/Items/guns/Gun.js";
 import { ImagePath } from "./assetmanager.js";
 import { GameEngine } from "./gameengine.js";
 import { Renderer } from "./Renderer.js";
@@ -105,6 +106,23 @@ export class Animator {
 
     onEvent(event: AnimationEvent, callback: () => void): void {
         this.eventCallBacks.set(event, callback);
+    }
+
+    
+
+    synchroizeFrames(duration: number, state: AnimationState): void {
+        // Get the attack animation info
+        const animInfo = this.spriteSheet[state];
+        if (!animInfo) return;
+        
+        // Calculate how long the animation naturally takes at base speed
+        const baseAnimDuration = animInfo.frameCount / this.ANIMATION_FPS;
+        
+        // Calculate speed multiplier needed
+        const animationSpeed = baseAnimDuration * duration;
+        
+        // Update the animation speed
+        animInfo.animationSpeed = animationSpeed;
     }
 
     updateAnimState(newState: AnimationState, deltaTime: number): void {
