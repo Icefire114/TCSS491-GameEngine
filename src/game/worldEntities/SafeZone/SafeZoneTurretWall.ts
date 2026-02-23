@@ -5,6 +5,8 @@ import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Collidable, Collider } from "../../../engine/physics/Collider.js";
 import { DrawLayer, Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
+import { ShaderRegistry } from "../../../engine/WebGL/ShaderRegistry.js";
+import { WebGL } from "../../../engine/WebGL/WebGL.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { UILayer } from "../../UI.js";
@@ -51,9 +53,26 @@ export class SafeZoneTurretWall implements Entity, Collidable {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        GameEngine.g_INSTANCE.renderer.drawRawSpriteAtWorldPos(
+        const currentAnim = {
+            sprite: unwrap(GameEngine.g_INSTANCE.getSprite(this.sprite)),
+            frameWidth: 256,
+            frameHeight: 256,
+            frameCount: 1,
+            offsetX: 0
+        };
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW, currentAnim.sprite), "Did not find shader for given template");
+
+        shader.render([
+            // Snow shader uniforms
+            {
+                u_snowHeight: 0.2,
+                u_snowThickness: 0.8
+            },
+        ]);
+
+        game.renderer.drawRawCanvasAtWorldPos(
             this.position,
-            GameEngine.g_INSTANCE.getSprite(this.sprite),
+            shader.canvas,
             this.size
         );
 

@@ -111,6 +111,14 @@ export abstract class Zombie implements Entity {
                 this.velocity.y = 0;
             }
         }
+
+        const walls = GameEngine.g_INSTANCE.getEntitiesByTag("SafeZoneTurretWall");
+        for (const wall of walls) {
+            if (this.physicsCollider.collides(this, wall)) {
+                this.velocity.x = this.velocity.x * -1;
+                this.position.x += this.velocity.x * 0.009;
+            }
+        }
     }
 
     protected updatePosition(deltaTime: number): void {
