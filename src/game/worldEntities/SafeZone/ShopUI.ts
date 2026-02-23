@@ -61,7 +61,7 @@ export class ShopUI extends ForceDraw implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "Restores shield\nby 25 points.",
+            description: "Boots health\nby 25 points.\n(Can exceed max health)",
             cost: 150,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
