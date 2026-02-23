@@ -145,7 +145,7 @@ export class UILayer extends ForceDraw implements Entity {
         }
         this.lWasPressed = keys['l'];
 
-        if (keys['p'] && G_CONFIG.UNLOCK_ALL_GUNS && !this.pWasPressed) {
+        if (keys['p'] && G_CONFIG.ENABLE_DEBUG_KEYS && !this.pWasPressed) {
             this.armory.isOpen = !this.armory.isOpen;
             player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state
         }

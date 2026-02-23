@@ -29,7 +29,7 @@ export class Armory implements Entity, Collidable {
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         game.renderer.drawRawSpriteAtWorldPos(
             this.position,
-           game.getSprite(this.sprite),
+            game.getSprite(this.sprite),
             this.size
         );
 
@@ -53,11 +53,14 @@ export class Armory implements Entity, Collidable {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         UI.drawOpenArmoryPrompt = this.isPlayerTouching();
+        const armory_ui: ArmoryUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui")) as ArmoryUI;
         if (UI.drawOpenArmoryPrompt && keys['e']) {
-            const armory_ui: ArmoryUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui")) as ArmoryUI;
             armory_ui.isOpen = !armory_ui.isOpen;
             player.uiOpen = armory_ui.isOpen;
             keys['e'] = false;
+        }
+        if (!UI.drawOpenArmoryPrompt) {
+            armory_ui.isOpen = false;
         }
     }
 }

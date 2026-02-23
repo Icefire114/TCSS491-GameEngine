@@ -547,7 +547,16 @@ export class Player implements Entity, Collidable {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
         const inSafeZone = this.isInSafeZone();
-        if (inSafeZone) {
+        // Handles when we are flying cheats 
+        if (this.isFlying) {
+            const FLY_SPEED = 150;
+            this.velocity.x = 0;
+            this.velocity.y = 0;
+            if (keys["d"]) this.position.x += FLY_SPEED * deltaTime;
+            if (keys["a"]) this.position.x -= FLY_SPEED * deltaTime;
+            if (keys["w"] || keys[" "]) this.position.y -= FLY_SPEED * deltaTime;
+            if (keys["s"]) this.position.y += FLY_SPEED * deltaTime;
+        } else if (inSafeZone) {
             // Reset velocity when entering safe zone to avoid carrying momentum
             const SAFE_ZONE_SPEED = Player.MAX_SPEED * 0.85;
             const SAFE_ZONE_ACCEL = 120;
@@ -774,5 +783,4 @@ export class Player implements Entity, Collidable {
         }
         this.pressFKey = keys["f"];
     }
-
 }

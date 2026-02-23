@@ -116,7 +116,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
             ammoSpritePath: "res/img/ammo/RPGRocket.png",
             frameWidth: 42,
             frameHeight: 8,
-        }, 
+        },
         {
             id: RayGun.TAG,
             damage: RayGun.DAMAGE,
@@ -141,7 +141,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 //console.log(`leftButton`);
             },
             color: ArmoryUI.BG2_MAIN
-                
+
         },
         {
             label: "right",
@@ -376,7 +376,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
         this.drawPixelButton(ctx, btnX1, btnY1, btnW1, btnH1, ArmoryUI.CARD_DARK, ArmoryUI.BORDER_LIGHT, this.buttons[0].color);
         ctx.fillStyle = ArmoryUI.TEXT_COLOR;
         ctx.font = "bold 18px monospace";
-        
+
         ctx.fillText("◀", btnX1 + btnW1 / 2 - 10, btnY1 + btnH1 / 2 + 5);
 
         //next button
@@ -445,7 +445,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
         //     };
         //     ctx.fillText(tickValue.toString(), tickX, y + h - 5);
         // }
-    }    
+    }
 
     /**
      * Private method to draw each indvidual card 
@@ -523,7 +523,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
             ctx.fillStyle = "#ff0000";
             ctx.fillText("LOCKED", availableX + 30, availableY + 5);
         }
-       
+
         // equip Button
         const btnW = w - 20;
         const btnH = 35;

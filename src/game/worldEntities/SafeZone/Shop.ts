@@ -55,12 +55,14 @@ export class Shop implements Entity, Collidable {
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
         UI.drawOpenShopPrompt = this.isPlayerTouching();
+        const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
         if (UI.drawOpenShopPrompt && keys['e']) {
-            const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
             shop_ui.isOpen = !shop_ui.isOpen;
             keys['e'] = false;
         }
-
+        if (!UI.drawOpenShopPrompt) {
+            shop_ui.isOpen = false;
+        }
 
         // Route clicks to shop UI when open
         if (keys["Mouse0"] && clickCoords) {

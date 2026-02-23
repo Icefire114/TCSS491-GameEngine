@@ -1,6 +1,6 @@
 import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
-import { unwrap } from "../../engine/util.js";
+import { clamp, unwrap } from "../../engine/util.js";
 import { Player } from "../worldEntities/player.js";
 import { Buff, BuffType } from "./Buff.js";
 
@@ -12,6 +12,6 @@ export class InstantInfectionCureBuff implements Buff {
     onApply(): void {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Could not find player entity!") as Player
 
-        player.infection = Math.min(player.minInfection, player.infection - 40);
+        player.infection = clamp(player.infection - 40, 0, player.infection);
     }
 }
