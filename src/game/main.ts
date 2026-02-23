@@ -12,7 +12,7 @@ import { ExplodingZombie } from "./zombies/ExplodingZombie.js";
 import { FastZombie } from "./zombies/FastZombie.js";
 import { GiantZombie } from "./zombies/GiantZombie.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
-import { InstantInfectionCureBuff } from "./Items/InstantInfectionCure.js";
+import { InstantHealthPickupBuff } from "./Items/InstantHealthPickupBuff.js";
 import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
 import { Mountain } from "./worldEntities/mountain.js";
 import { Player } from "./worldEntities/player.js";
@@ -213,7 +213,7 @@ function main() {
 
 
             gameEngine.addEntity(new BuffEntity(
-                new InstantInfectionCureBuff(),
+                new InstantHealthPickupBuff(),
                 new Animator(
                     [
                         [

@@ -1,6 +1,6 @@
 import { InfectionImmunityItem } from "./InfectionImmunity.js";
 import { ShieldRestorePickupItem } from "./ShieldRestore.js";
-import { InstantInfectionCureBuff } from "./InstantInfectionCure.js";
+import { InstantHealthPickupBuff } from "./InstantHealthPickupBuff.js";
 import { AmmoRestore } from "./AmmoRestore.js";
 import { Animator, AnimationState } from "../../engine/Animator.js";
 import { ImagePath } from "../../engine/assetmanager.js";
@@ -13,7 +13,7 @@ export class ItemFactory {
     // Creating Health Item
     static createHealthPack(pos: Vec2): BuffEntity {
         return new BuffEntity(
-            new InstantInfectionCureBuff(),
+            new InstantHealthPickupBuff(),
             new Animator(
                 [
                     [
