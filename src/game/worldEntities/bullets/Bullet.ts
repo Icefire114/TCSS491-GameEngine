@@ -94,6 +94,12 @@ export abstract class Bullet implements Entity, Collidable {
             }
         }
 
+        // ---------- Collision with boss ----------
+        const boss = GameEngine.g_INSTANCE.getUniqueEntityByTag("boss") as any;
+        if (boss && this.physicsCollider.collides(this, boss)) {
+            this.onEnemyHit(boss, []);
+        }
+
         // Move the bullet
 
         const playerVelocity = player.velocity;

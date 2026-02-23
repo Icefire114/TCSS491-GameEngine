@@ -207,11 +207,5 @@ export class BasicZombie extends Zombie {
                 this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
             }
         }
-
-        //despawn zombie if it is behind player
-        if (this.position.x < player.position.x - 20) {
-            this.removeFromWorld = true;
-            return;
-        }
     }
 }

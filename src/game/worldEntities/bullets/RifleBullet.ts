@@ -4,6 +4,7 @@ import { Entity } from "../../../engine/Entity.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { Bullet } from "./Bullet.js";
+import { Boss } from "../../worldEntities/Boss.js";
 
 /**
  * @author JK
@@ -48,6 +49,9 @@ export class RifleBullet extends Bullet {
     onEnemyHit(target: Entity, allEnemies: Entity[]): void {
         if (target instanceof Zombie) {
             target.takeDamage(this.damage);
+        }
+        if (target instanceof Boss) {
+            target.damage(this.damage);
         }
         if (this.shouldRemoveOnHit()) {
             this.removeFromWorld = true;
