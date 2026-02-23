@@ -657,6 +657,7 @@ export class Player implements Entity, Collidable {
         for (const wall of safeZoneWalls) {
             if (this.physicsCollider.collides(this, wall)) {
                 this.velocity.x = this.velocity.x * -1;
+                this.position.x += this.velocity.x * 0.009;
             }
         }
 

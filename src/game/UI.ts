@@ -21,6 +21,7 @@ export class UILayer extends ForceDraw implements Entity {
     drawEnterSZPrompt: boolean = false;
     drawOpenShopPrompt: boolean = false;
     drawOpenArmoryPrompt: boolean = false;
+    drawExitSZPrompt: boolean = false;
 
     // Shop UI Properties
     private shop: ShopUI;
@@ -131,6 +132,9 @@ export class UILayer extends ForceDraw implements Entity {
         } else if (this.drawOpenArmoryPrompt) {
             ctx.fillStyle = "black"
             ctx.fillText("Press E to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
+        } else if (this.drawExitSZPrompt) {
+            ctx.fillStyle = "black"
+            ctx.fillText("Press E to exit the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
         ctx.restore();
     }

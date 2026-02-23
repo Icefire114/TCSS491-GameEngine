@@ -39,21 +39,18 @@ export class SafeZone implements Entity {
         this.zoneLevel = zoneLevel;
 
         GameEngine.g_INSTANCE.addEntity(
-            new BoxTrigger(
-                Vec2.compAdd(this.position, new Vec2(this.size.x - 5, 0)),
-                new Vec2(1, this.size.y),
-                ["player"],
-                true,
-                (e: Entity) => {
-                    this.onPlayerExitSafeZone(e as Player);
-                }
-            ), DrawLayer.DEFAULT
+            new SafeZoneTurretWall(
+                Vec2.compAdd(this.position, new Vec2(5, 0)),
+                this,
+                "enter"
+            ), DrawLayer.WORLD_DECORATION
         );
 
         GameEngine.g_INSTANCE.addEntity(
             new SafeZoneTurretWall(
-                Vec2.compAdd(this.position, new Vec2(5, 0)),
-                this
+                Vec2.compSub(new Vec2(this.position.x + this.size.x, this.position.y), new Vec2(25, 0)),
+                this,
+                "exit"
             ), DrawLayer.WORLD_DECORATION
         );
 
@@ -101,7 +98,7 @@ export class SafeZone implements Entity {
         }
     }
 
-    private onPlayerExitSafeZone(ent: Player): void {
+    onPlayerExitSafeZone(): void {
         console.log("Player exited the SafeZone!");
         // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
     }
@@ -140,5 +137,6 @@ export class SafeZone implements Entity {
         this.cleanupEntByTag("SafeZone");
         this.cleanupEntByTag("SafeZoneTurretWall");
         this.cleanupEntByTag("Shop");
+        this.cleanupEntByTag("Armory");
     }
 }
