@@ -54,29 +54,17 @@ export class Shop implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
-        UI.drawOpenShopPrompt = this.isPlayerTouching();
         const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
+        UI.drawOpenShopPrompt = this.isPlayerTouching();
         if (UI.drawOpenShopPrompt && keys['e']) {
             shop_ui.isOpen = !shop_ui.isOpen;
+            player.uiOpen = shop_ui.isOpen;
             keys['e'] = false;
         }
-        if (!UI.drawOpenShopPrompt) {
+        if (!UI.drawOpenShopPrompt && shop_ui.isOpen) {
             shop_ui.isOpen = false;
-        }
-
-        // Route clicks to shop UI when open
-        if (keys["Mouse0"] && clickCoords) {
-            const shop_ui = GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui") as ShopUI | undefined;
-            if (shop_ui?.isOpen) {
-                const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
-                if (canvas) {
-                    const rect = canvas.getBoundingClientRect();
-                    const canvasX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
-                    const canvasY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
-                    shop_ui.handleClick(canvasX, canvasY);
-                    keys["Mouse0"] = false; // consume the click so player doesn't shoot
-                }
-            }
+            player.uiOpen = shop_ui.isOpen;
         }
     }
 }

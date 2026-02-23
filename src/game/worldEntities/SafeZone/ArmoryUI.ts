@@ -1,13 +1,13 @@
-import { GameEngine } from "../engine/gameengine.js";
-import { ForceDraw, Vec2 } from "../engine/types.js";
-import { ImagePath } from "../engine/assetmanager.js";
-import { Entity, EntityID } from "../engine/Entity.js";
-import { AssultRifle } from "./Items/guns/AssultRifle.js";
-import { RPG } from "./Items/guns/RPG.js";
-import { RayGun } from "./Items/guns/RayGun.js";
-import { Player } from "./worldEntities/player.js";
-import { unwrap } from "../engine/util.js";
-import { G_CONFIG } from "./CONSTANTS.js";
+import { GameEngine } from "../../../engine/gameengine.js";
+import { ForceDraw, Vec2 } from "../../../engine/types.js";
+import { ImagePath } from "../../../engine/assetmanager.js";
+import { Entity, EntityID } from "../../../engine/Entity.js";
+import { AssultRifle } from "../../Items/guns/AssultRifle.js";
+import { RPG } from "../../Items/guns/RPG.js";
+import { RayGun } from "../../Items/guns/RayGun.js";
+import { Player } from "../../worldEntities/player.js";
+import { unwrap } from "../../../engine/util.js";
+import { G_CONFIG } from "../../CONSTANTS.js";
 
 interface ArmoryItem {
     id: string;

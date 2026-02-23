@@ -8,9 +8,7 @@ import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
-import { ArmoryUI } from "./ArmoryUI.js";
-import { G_CONFIG } from "./CONSTANTS.js";
-
+import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 export class UILayer extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
@@ -138,17 +136,5 @@ export class UILayer extends ForceDraw implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
-        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
-        // DEBUG: To see the visualization of the Shop UI (WILL DELETE LATERRRRR)
-        if (keys['l'] && !this.lWasPressed) {
-            this.shop.isOpen = !this.shop.isOpen;
-        }
-        this.lWasPressed = keys['l'];
-
-        if (keys['p'] && G_CONFIG.ENABLE_DEBUG_KEYS && !this.pWasPressed) {
-            this.armory.isOpen = !this.armory.isOpen;
-            player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state
-        }
-        this.pWasPressed = keys['p'];
     }
 }

@@ -29,7 +29,7 @@ import { unwrap } from "../engine/util.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
-import { ArmoryUI } from "./ArmoryUI.js";
+import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { IntroScreen } from "./IntroScreen.js";
 
 
