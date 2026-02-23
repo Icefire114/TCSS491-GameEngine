@@ -6,12 +6,15 @@ import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { DecorationSpawner } from "../../DecorationSpanwer.js";
+import { DecorationSpawner } from "../../worldDeco/DecorationSpanwer.js";
 import { BoxTrigger } from "../../Triggers/BoxTrigger.js";
 import { ChristmasTree } from "../../worldDeco/ChristmasTree.js";
 import { Player } from "../player.js";
+import { Armory } from "./Armory.js";
 import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 import { Shop } from "./Shop.js";
+import { SafeZoneNotification } from "./SafeZoneNotification.js";
+import { DecoFactory } from "../../worldDeco/DecorationFactory.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -23,28 +26,32 @@ export class SafeZone implements Entity {
     removeFromWorld: boolean = false;
     readonly size: Vec2 = new Vec2(140, 50);
 
-    constructor(pos: Vec2, endX: number) {
+    //Safezone Notification Setting
+    private zoneLevel: number;
+    private hasNotified: boolean = false;
+
+    constructor(pos: Vec2, endX: number, zoneLevel: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = Vec2.compAdd(pos, new Vec2(5, 0));
         this.size = new Vec2(endX - pos.x - 5, this.size.y);
         console.log(`Created SafeZone with size ${this.size}`);
 
-        GameEngine.g_INSTANCE.addEntity(
-            new BoxTrigger(
-                Vec2.compAdd(this.position, new Vec2(this.size.x - 5, 0)),
-                new Vec2(1, this.size.y),
-                ["player"],
-                true,
-                (e: Entity) => {
-                    this.onPlayerExitSafeZone(e as Player);
-                }
-            ), DrawLayer.DEFAULT
-        );
+        // Tracking safezone Level
+        this.zoneLevel = zoneLevel;
 
         GameEngine.g_INSTANCE.addEntity(
             new SafeZoneTurretWall(
                 Vec2.compAdd(this.position, new Vec2(5, 0)),
-                this
+                this,
+                "enter"
+            ), DrawLayer.WORLD_DECORATION
+        );
+
+        GameEngine.g_INSTANCE.addEntity(
+            new SafeZoneTurretWall(
+                Vec2.compSub(new Vec2(this.position.x + this.size.x, this.position.y), new Vec2(25, 0)),
+                this,
+                "exit"
             ), DrawLayer.WORLD_DECORATION
         );
 
@@ -57,6 +64,17 @@ export class SafeZone implements Entity {
         GameEngine.g_INSTANCE.addEntity(
             new Shop(
                 Vec2.compAdd(this.position, new Vec2(this.size.x / 2 + 30, 0))
+            ), DrawLayer.WORLD_DECORATION
+        );
+
+        GameEngine.g_INSTANCE.addEntity(
+            new Armory(
+                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 - 30, 0))
+            ), DrawLayer.WORLD_DECORATION
+        );
+
+        GameEngine.g_INSTANCE.addEntity(
+            DecoFactory.createFireBarrel(Vec2.compAdd(this.position, new Vec2(52, 0))
             ), DrawLayer.WORLD_DECORATION
         );
     }
@@ -86,7 +104,7 @@ export class SafeZone implements Entity {
         }
     }
 
-    private onPlayerExitSafeZone(ent: Player): void {
+    onPlayerExitSafeZone(): void {
         console.log("Player exited the SafeZone!");
         // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
     }
@@ -95,6 +113,17 @@ export class SafeZone implements Entity {
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
+
+        // Triggering a notfication to occur once we eneter
+        if (!this.hasNotified) {
+            // Spawn the UI Notification
+            GameEngine.g_INSTANCE.addEntity(
+                new SafeZoneNotification(this.zoneLevel),
+                999 as DrawLayer // Ensurign it draws above everything
+            );
+            this.hasNotified = true;
+        }
+
 
         // Cleanup zombies
         for (let ent of GameEngine.g_INSTANCE.getAllZombies()) {
@@ -114,5 +143,6 @@ export class SafeZone implements Entity {
         this.cleanupEntByTag("SafeZone");
         this.cleanupEntByTag("SafeZoneTurretWall");
         this.cleanupEntByTag("Shop");
+        this.cleanupEntByTag("Armory");
     }
 }

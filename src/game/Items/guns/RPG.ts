@@ -3,12 +3,24 @@ import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { RPGRocket } from "../../worldEntities/bullets/RPGRocket.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Vec2 } from "../../../engine/types.js";
+import { Player } from "../../worldEntities/player.js";
 
 export class RPG extends Gun {
 
-    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
-    ammoBox = 10;
+    /**
+     * RPG components
+     */
+    static TAG: string = "RPG";
+    static DAMAGE: number = 100;
+    static FIRE_RATE: number = 2;
+    static RELOAD_TIME: number = 3;
+    static MAGE_SIZE: number = 1;
+    static SPAWN_AMMO: number = 10;
+
+    public sprite: ImagePath = new ImagePath("res/img/guns/RPG/Shot.png");
+    public ammoBox = 10;
+    public equipped = false;
+    public unlocked = false;
 
     animator = new Animator(
             [
@@ -43,42 +55,37 @@ export class RPG extends Gun {
             ]
         );
     
-    constructor(position: Vec2) {
-        super("RPG", //tag
-            10, //ammo
-            1, //magSize
-            2, //fireRate
-            3, //reloadTime
-            position
+    constructor() {
+        super(RPG.TAG,
+            RPG.SPAWN_AMMO,
+            RPG.MAGE_SIZE,
+            RPG.FIRE_RATE,
+            RPG.RELOAD_TIME,
         );
 
-        this.synchroizeAttackFrames();
+        this.syncFrames();
     }
 
-    synchroizeAttackFrames(): void {
-        // Get the attack animation info
-        const attackAnimInfo = this.animator['spriteSheet'][AnimationState.ATTACK];
-        if (!attackAnimInfo) return;
-        
-        // Calculate desired animation duration based on fire rate
-        const shotCooldownSeconds = this.getShotCooldown() / 1000; // convert ms to seconds
-        
-        // Calculate how long the animation naturally takes at base speed
-        const baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
-        
-        // Calculate speed multiplier needed
-        const speedMultiplier = baseAnimDuration / shotCooldownSeconds;
-        
-        // Update the animation speed
-        attackAnimInfo.animationSpeed = speedMultiplier;
+    /**
+     * Call if you want to change reload time or fire rate. 
+     */
+    public syncFrames(): void {
+        this.animator.synchroizeFrames(RPG.FIRE_RATE, AnimationState.ATTACK);
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-        const muzzleDistance = 3;
-        const verticleOffset = 0.8; 
-                
-        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
-        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RPGRocket(muzzleX, muzzleY, targetX, targetY);
+     /**
+     * 
+     * @returns A bullet spawned at the muzzle of the gun
+     */
+    protected createBullet(): Bullet {
+        const localOffsetX = 1.0;  // along the gun barrel direction
+        const localOffsetY = -0.2;   // perpendicular to the gun
+
+        const originX = this.position.x + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
+        const originY = this.position.y + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
+
+        const muzzleX = originX + Math.cos(this.travelAngle);
+        const muzzleY = originY + Math.sin(this.travelAngle);
+        return new RPGRocket(originX, originY, this.travelAngle);
     }
 }

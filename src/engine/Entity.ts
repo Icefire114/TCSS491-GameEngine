@@ -32,6 +32,7 @@ export type Entity = {
      * @param keys A map of key names to whether they're pressed or not.
      * @param deltaTime The time in seconds since the last frame.
      * @param clickCoords The coordinates of the last click.
+     * @param mouse The position of the mouse.
      */
-    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void;
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords?: Vec2 | null, mouse?: Vec2 | null): void;
 };

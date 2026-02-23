@@ -2,7 +2,7 @@ import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer, Vec2 } from "../engine/types.js";
-import { ShaderEngine } from "../engine/WebGL/WebGL.js";
+import { WebGL } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./zombies/BasicZombie.js";
 import { G_CONFIG } from "./CONSTANTS.js";
@@ -12,7 +12,7 @@ import { ExplodingZombie } from "./zombies/ExplodingZombie.js";
 import { FastZombie } from "./zombies/FastZombie.js";
 import { GiantZombie } from "./zombies/GiantZombie.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
-import { InstantHealthItem } from "./Items/InstantHealth.js";
+import { InstantHealthPickupBuff } from "./Items/InstantHealthPickupBuff.js";
 import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
 import { Mountain } from "./worldEntities/mountain.js";
 import { Player } from "./worldEntities/player.js";
@@ -23,13 +23,14 @@ import { Bush } from "./worldDeco/Bush.js";
 import { ChristmasTree } from "./worldDeco/ChristmasTree.js";
 import { Rock } from "./worldDeco/Rock.js";
 import { Tree } from "./worldDeco/Tree.js";
-import { WorldSpawner } from "./WorldSpawner.js";
-import { DecorationSpawner } from "./DecorationSpanwer.js";
+import { WorldSpawner } from "./worldEntities/WorldSpawner.js";
+import { DecorationSpawner } from "./worldDeco/DecorationSpanwer.js";
 import { unwrap } from "../engine/util.js";
-import { ShopUI } from "./ShopUI.js";
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
-
+import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
+import { IntroScreen } from "./IntroScreen.js";
 
 
 /**
@@ -48,6 +49,8 @@ ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRay.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRay.png");
 
 
 
@@ -80,10 +83,14 @@ ASSET_MANAGER.queueDownload("res/img/items/rifle.png");
 ASSET_MANAGER.queueDownload("res/img/items/bomb.png");
 ASSET_MANAGER.queueDownload("res/img/items/boots.png");
 ASSET_MANAGER.queueDownload("res/img/items/AmmoBox.png");
+ASSET_MANAGER.queueDownload("res/img/items/assult_rifle.png");
+ASSET_MANAGER.queueDownload("res/img/items/rpg.png");
+ASSET_MANAGER.queueDownload("res/img/items/ray_gun.png");
 
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
 ASSET_MANAGER.queueDownload("res/img/guns/RPG/Shot.png");
+ASSET_MANAGER.queueDownload("res/img/guns/ray_gun/Shot.png");
 ASSET_MANAGER.queueDownload("res/img/guns/IdleGun.png");
 
 // === Bullet Assets ===
@@ -91,6 +98,8 @@ ASSET_MANAGER.queueDownload("res/img/ammo/RifleBullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGRocket.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGExplode.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/Lazer.png");
+
 
 
 // === SKY Background Assets ===
@@ -131,6 +140,13 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/crate.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/testArmory.png");
+
+// === Shader Assets ===
+ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
+
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
@@ -143,26 +159,25 @@ ASSET_MANAGER.downloadAll((errorCount, successCount) => {
 })
 
 function main() {
-    if (!ShaderEngine.isWebGL2Supported() || !G_CONFIG.NEW_RENDERER) {
-        console.warn(`WebGL2 Unsupported or disabled NEW_RENDERER=${G_CONFIG.NEW_RENDERER}!`);
-        if (G_CONFIG.NEW_RENDERER) {
-            alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
-        } else {
-            alert("[!] WebGL support has been disabled! Lets hope things are feature flagged correctly :)");
-        }
+    if (!WebGL.isWebGL2Supported()) {
+        console.warn(`WebGL2 Unsupported!`);
+        alert("[!] WebGL2 is not supported! Some features may not work correctly! And assets may not be displayed correctly!");
     } else {
         console.log("WebGL2 Supported!");
+        WebGL.initWebGL(ASSET_MANAGER);
     }
 
 
     try {
-        gameEngine.addUniqueEntity(new Player(), DrawLayer.PLAYER);
+        GameEngine.g_INSTANCE.addUniqueEntity(new Player(new Vec2(55, 0)), DrawLayer.PLAYER);
         gameEngine.positionScreenOnEnt(unwrap(gameEngine.getUniqueEntityByTag("player")), 0.15, 0.65);
+        gameEngine.snapViewportToFollowedEnt();
         background.start();
         //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
-        gameEngine.addUniqueEntity(new UILayer(shopUI), DrawLayer.UI_LAYER);
+        const armoryUI: ArmoryUI = gameEngine.addUniqueEntity(new ArmoryUI(), DrawLayer.UI_LAYER) as ArmoryUI;
+        gameEngine.addUniqueEntity(new UILayer(shopUI, armoryUI), DrawLayer.UI_LAYER);
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
 
@@ -198,7 +213,7 @@ function main() {
 
 
             gameEngine.addEntity(new BuffEntity(
-                new InstantHealthItem(),
+                new InstantHealthPickupBuff(),
                 new Animator(
                     [
                         [
@@ -347,7 +362,13 @@ function main() {
             ), DrawLayer.WORLD_DECORATION);
         }
 
-        gameEngine.start();
+        // Drawing our intro screen at the top, and will called gameengine start to start the geame
+        gameEngine.addUniqueEntity(new IntroScreen(() => {
+            gameEngine.start();
+        }), 999 as DrawLayer);
+
+        // Update loop is going, but intro is the one that calls the gameengine.start
+        gameEngine.loop();
     } catch (e) {
         console.error(`Engine has encounted an uncaught error! ${e}`);
         alert(`Engine has encounted an uncaught error! ${e}`);

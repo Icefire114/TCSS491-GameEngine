@@ -22,7 +22,10 @@
         script.type = 'module';
 
         const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
+        if (!window.chrome) {
+            alert("Browsers other than Chrome are not supported, and have been seen to have performance issues, please use Chrome")
+        }
+
         script.src = isDev ? './build/game/main.js' : './bundle.js';
         document.body.appendChild(script);
     </script>

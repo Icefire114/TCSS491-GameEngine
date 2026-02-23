@@ -12,6 +12,6 @@ export class ShieldRestorePickupItem implements Buff {
     onApply(): void {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Could not find player entity!") as Player;
 
-        player.shield = Math.min(player.maxShield, player.shield + 25);
+        player.health = player.health + 25;
     }
 }

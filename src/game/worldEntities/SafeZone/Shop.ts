@@ -6,7 +6,7 @@ import { Collidable, Collider } from "../../../engine/physics/Collider.js";
 import { Vec2 } from "../../../engine/types.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
-import { ShopUI } from "../../ShopUI.js";
+import { ShopUI } from "./ShopUI.js";
 import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
 
@@ -54,11 +54,17 @@ export class Shop implements Entity, Collidable {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
+        const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         UI.drawOpenShopPrompt = this.isPlayerTouching();
         if (UI.drawOpenShopPrompt && keys['e']) {
-            const shop_ui: ShopUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("shop_ui")) as ShopUI;
             shop_ui.isOpen = !shop_ui.isOpen;
+            player.uiOpen = shop_ui.isOpen;
             keys['e'] = false;
+        }
+        if (!UI.drawOpenShopPrompt && shop_ui.isOpen) {
+            shop_ui.isOpen = false;
+            player.uiOpen = shop_ui.isOpen;
         }
     }
 }

@@ -2,14 +2,14 @@ import { ImagePath } from "../engine/assetmanager.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
-import { Vec2 } from "../engine/types.js";
+import { ForceDraw, Vec2 } from "../engine/types.js";
 import { unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
-import { ShopUI } from "./ShopUI.js";
-
-export class UILayer implements Entity {
+import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
+import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
+export class UILayer extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
 
@@ -20,18 +20,29 @@ export class UILayer implements Entity {
     removeFromWorld: boolean = false;
     drawEnterSZPrompt: boolean = false;
     drawOpenShopPrompt: boolean = false;
+    drawOpenArmoryPrompt: boolean = false;
+    drawExitSZPrompt: boolean = false;
 
     // Shop UI Properties
     private shop: ShopUI;
     private lWasPressed: boolean = false;
 
+    // Armory UI Properties
+    private armory: ArmoryUI;
+    private pWasPressed: boolean = false;
 
-    constructor(shop: ShopUI) {
+
+    constructor(shop: ShopUI, armory: ArmoryUI) {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.shop = shop;
+        this.armory = armory;
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        // Doesnt draw anything unless Intros creen is gone
+        if (game.getUniqueEntityByTag("intro_screen")) return;
+
         const player: Player = unwrap(game.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
         ctx.save();
@@ -70,21 +81,21 @@ export class UILayer implements Entity {
         }
 
         //draw player health on top right corner of the screen
-        if (player.health < 100) {
+        if (player.infection < 100) {
             ctx.fillStyle = "green";
-        } else if (player.health < 200) {
+        } else if (player.infection < 200) {
             ctx.fillStyle = "orange";
         } else {
             ctx.fillStyle = "red";
         }
         ctx.font = "30px Arial";
-        ctx.fillText(`Health: ${player.health}%`, ctx.canvas.width - 200, 40);
+        ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
         //console.log(`Player Health: ${player.health}`);
 
         //draw player shield below health
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "rgb(255, 60, 0)";
         ctx.font = "30px Arial";
-        ctx.fillText(`Shield: ${player.shield}%`, ctx.canvas.width - 200, 80);
+        ctx.fillText(`Health: ${player.health}`, ctx.canvas.width - 200, 80);
         //console.log(`Player Shield: ${player.shield}`);
 
         // draw total player weapon ammo below shield
@@ -118,15 +129,16 @@ export class UILayer implements Entity {
         } else if (this.drawOpenShopPrompt) {
             ctx.fillStyle = "black"
             ctx.fillText("Press E to open/ close the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
+        } else if (this.drawOpenArmoryPrompt) {
+            ctx.fillStyle = "black"
+            ctx.fillText("Press E to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
+        } else if (this.drawExitSZPrompt) {
+            ctx.fillStyle = "black"
+            ctx.fillText("Press E to exit the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
         }
         ctx.restore();
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
-        // DEBUG: To see the visualization of the Shop UI (WILL DELETE LATERRRRR)
-        if (keys['l'] && !this.lWasPressed) {
-            this.shop.isOpen = !this.shop.isOpen;
-        }
-        this.lWasPressed = keys['l'];
+    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
     }
 }

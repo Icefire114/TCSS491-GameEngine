@@ -2,7 +2,6 @@ import { AnimationData } from "./Animator.js";
 import { GameEngine } from "./gameengine.js";
 import { Vec2 } from "./types.js";
 
-
 export class Renderer {
     private ctx: CanvasRenderingContext2D;
 
@@ -35,6 +34,32 @@ export class Renderer {
             screenPos.y,                                    // dstY
             screenSize.x,                                   // dstWidth
             screenSize.y                                    // dstHeight
+        );
+    }
+
+
+    public drawRawCanvasAtWorldPos(pos: Vec2, sprite: HTMLCanvasElement, forceScaleToSize?: Vec2): void {
+        const { screenPos, screenSize } = this.computeScreenRect(
+            pos,
+            {
+                // conputeScreenRect doesn't really NEED this, so we can just trick it :)
+                // this will undoubtably cause issues if I ever touch conputeScreenRect,
+                // and it will result at me calling myself names, but fuck it that's future me's problem
+                sprite: {} as HTMLImageElement,
+                frameWidth: sprite.width,
+                frameHeight: sprite.height,
+                frameCount: 1,
+                offsetX: 0
+            },
+            forceScaleToSize
+        );
+
+        this.ctx.drawImage(
+            sprite,
+            screenPos.x,        // dstX
+            screenPos.y,        // dstY
+            screenSize.x,       // dstWidth
+            screenSize.y        // dstHeight
         );
     }
 

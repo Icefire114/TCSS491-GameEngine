@@ -9,6 +9,8 @@ export class MultiPassShader {
     private height: number;
 
     constructor(imgElement: HTMLImageElement) {
+        console.log("[WebGL2] Creating new MultiPassShader");
+        
         this.width = imgElement.naturalWidth || imgElement.width;
         this.height = imgElement.naturalHeight || imgElement.height;
 

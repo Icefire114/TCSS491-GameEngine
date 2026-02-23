@@ -2,10 +2,12 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { MountainCollider } from "../../engine/physics/MountainCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
-import { DrawLayer, Vec2 } from "../../engine/types.js";
+import { DrawLayer, ForceDraw, Vec2 } from "../../engine/types.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
+import { RavineDeathZone } from "./RavineZone.js";
+import { unwrap } from "../../engine/util.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -13,7 +15,7 @@ export interface SafeZoneInfo {
     endX: number;
 }
 
-export class Mountain implements Entity {
+export class Mountain extends ForceDraw implements Entity {
     [x: string]: any;
     // Required identifcation used by the Game Engine
     tag: string = "mountain";
@@ -28,8 +30,8 @@ export class Mountain implements Entity {
     private rng: Rand;
 
     // Anchor Points Setup
-    private anchorPointsList: Vec2[] = [];
-    private lastAnchor: Vec2;
+    public anchorPointsList: Vec2[] = [];
+    public lastAnchor: Vec2;
 
     // Ravine Setup
     private isRavineSequence = false;
@@ -42,6 +44,8 @@ export class Mountain implements Entity {
     private lastRavineEndX = 0;
     private ravineCooldown = 150;
     private ravineStartShowing = 150;
+    private ravineLeftWallX: number = 0;
+    private ravineRightWallX: number = 0;
 
     // Plain Setup (Level Checkpoint)
     private flatSequenceOn = false;
@@ -58,15 +62,25 @@ export class Mountain implements Entity {
     private minDistanceBetweenZones = 2000;
     private maxDistanceBetweenZones = 3500;
 
+    // Used to handle the background of the ravine 
+    private completedRavines: {
+        startAnchorX: number;
+        endAnchorX: number;
+    }[] = [];
+    private ravineStartAnchorX: number = 0;
+
+
+
     /**
      * Initalizing the moutain entity.
      */
     constructor(seed: string) {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.rng = new Rand(seed);
 
         // Initialize the staring anchor
-        const startingAnchorPoint = { x: -50, y: 0 };
+        const startingAnchorPoint = { x: -100, y: 0 };
         this.anchorPointsList.push(startingAnchorPoint);
         this.lastAnchor = startingAnchorPoint;
 
@@ -97,6 +111,9 @@ export class Mountain implements Entity {
         while (this.anchorPointsList.length > 0 && this.anchorPointsList[0].x < cleanupThreshold) {
             this.anchorPointsList.shift();
         }
+
+        // Drawing ravine background
+        this.drawRavines(ctx, game, scale);
 
         // Drawing the moutain 
         this.drawMoutain(ctx, game, scale);
@@ -219,7 +236,7 @@ export class Mountain implements Entity {
      * Method to generate anchor situation.
      * Either normal, ravine, or flat. 
      */
-    generatingAnchor() {
+    public generatingAnchor() {
         // Check weren't in a ravin sequence
         if (this.isRavineSequence) {
             this.generateRavineAnchor();
@@ -293,6 +310,7 @@ export class Mountain implements Entity {
      * Setup for a staring a ravine sequence anchor
      */
     startRavineSequence() {
+        this.ravineStartAnchorX = this.lastAnchor.x;
         this.isRavineSequence = true;
         this.ravineStep = 0;
         this.ravineBaseY = this.lastAnchor.y;
@@ -315,6 +333,7 @@ export class Mountain implements Entity {
                 y += 0;
                 break;
             case 1: // The ravine drop
+                this.ravineLeftWallX = x;
                 x += 3;
                 y += 5000;
                 break;
@@ -323,6 +342,7 @@ export class Mountain implements Entity {
                 y += 0;
                 break;
             case 3: // Rising up from the ravine
+                this.ravineRightWallX = x;
                 x += 1;
                 y = this.ravineBaseY;
                 break;
@@ -331,6 +351,27 @@ export class Mountain implements Entity {
                 y = this.ravineBaseY + this.slopeBeforeRavine;
                 this.isRavineSequence = false;
                 this.lastRavineEndX = x;
+
+                // Handles the background of the ravine 
+                this.completedRavines.push({
+                    startAnchorX: this.ravineStartAnchorX,
+                    endAnchorX: x,
+                });
+
+                // Spawning the Ravine Death Zone Entity
+                const wallTopY = this.ravineBaseY;
+                const wallBottomY = this.ravineBaseY + 5000;
+                GameEngine.g_INSTANCE.addEntity(
+                    new RavineDeathZone(
+                        this.ravineLeftWallX,
+                        this.ravineRightWallX,
+                        wallTopY,
+                        wallBottomY,
+                        1,
+                        15
+                    ),
+                    DrawLayer.BACKGROUND
+                );
                 break;
         }
 
@@ -371,8 +412,11 @@ export class Mountain implements Entity {
             this.flatSequenceOn = false;
             this.flatEndX = x;
 
+            // Keeping count the # that safezone is in and passing it to safezone itself
+            const zoneIndex = this.safeZones.length + 1;
+
             // Drawing the safezone here
-            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX + 5)), this.flatEndX);
+            const safeZoneEntity = new SafeZone(new Vec2(this.tempSafeZoneStartX, this.getHeightAt(this.tempSafeZoneStartX + 5)), this.flatEndX, zoneIndex);
             GameEngine.g_INSTANCE.addEntity(safeZoneEntity, DrawLayer.WORLD_DECORATION);
 
             // updating our safezone tracking with specific info
@@ -534,5 +578,62 @@ export class Mountain implements Entity {
             }
         }
         return false;
+    }
+
+    /**
+     * Drawing the backbackground of a ravine  
+     */
+    drawRavines(ctx: CanvasRenderingContext2D, game: GameEngine, scale: number) {
+        for (const ravine of this.completedRavines) {
+            const player = unwrap(game.getUniqueEntityByTag("player"));
+            if (ravine.startAnchorX < player.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT * 2
+                || ravine.endAnchorX > player.position.x + GameEngine.WORLD_UNITS_IN_VIEWPORT * 2
+            ) {
+                continue;
+            }
+
+            // Were looking  where terrain suddenly drops (ravine left edge)
+            let leftWorldX = ravine.startAnchorX;
+            for (let x = ravine.startAnchorX; x <= ravine.endAnchorX; x += 1) {
+                const dy = this.getHeightAt(x + 1) - this.getHeightAt(x);
+                if (dy > 5) break; // steep drop detected
+                leftWorldX = x;
+            }
+
+            // Were looking  where terrain suddenly drops (ravine right edge)
+            let rightWorldX = ravine.endAnchorX;
+            for (let x = ravine.endAnchorX; x >= ravine.startAnchorX; x -= 1) {
+                const dy = this.getHeightAt(x - 1) - this.getHeightAt(x);
+                if (dy > 5) break; // steep drop detected (going backwards)
+                rightWorldX = x;
+            }
+
+            const leftX = (leftWorldX - game.viewportX) * scale;
+            const rightX = (rightWorldX - game.viewportX) * scale;
+            const leftY = (this.getHeightAt(leftWorldX) - game.viewportY) * scale;
+            const rightY = (this.getHeightAt(rightWorldX) - game.viewportY) * scale;
+
+            if (rightX < 0 || leftX > ctx.canvas.width) continue;
+
+            const topY = Math.min(leftY, rightY);
+            const canvasH = ctx.canvas.height;
+
+            // Gradient background
+            const grad = ctx.createLinearGradient(0, topY, 0, canvasH);
+            grad.addColorStop(0, "#C2D4E6");
+            grad.addColorStop(0.08, "#7a9db5");
+            grad.addColorStop(0.3, "#2a5a7a");
+            grad.addColorStop(0.7, "#0d2a40");
+            grad.addColorStop(1, "#000000");
+
+            ctx.beginPath();
+            ctx.moveTo(leftX, canvasH);
+            ctx.lineTo(leftX, leftY);
+            ctx.lineTo(rightX, rightY);
+            ctx.lineTo(rightX, canvasH);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
     }
 }

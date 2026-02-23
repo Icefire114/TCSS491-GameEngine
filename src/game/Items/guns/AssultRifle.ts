@@ -3,21 +3,34 @@ import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { RifleBullet } from "../../worldEntities/bullets/RifleBullet.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Vec2 } from "../../../engine/types.js";
+import { Player } from "../../worldEntities/player.js";
 
 export class AssultRifle extends Gun {
 
-    sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
-    ammoBox = 60;
+    /**
+     * Assult Rifle components
+     */
+    static TAG: string = "AssultRifle";
+    static DAMAGE: number = 30;
+    static FIRE_RATE: number = 5;
+    static RELOAD_TIME: number = 2;
+    static MAG_SIZE: number = 30;
+    static SPAWN_AMMO: number = 120;
+
+    public sprite: ImagePath = new ImagePath("res/img/guns/assult_rifle/Shot.png");
+    public ammoBox = 60;
+    public equipped = true;
+    public unlocked = true;
 
     animator = new Animator(
         [
             [ 
                 {
-                    sprite: new ImagePath("res/img/guns/assult_rifle/Shot.png"),
+                    sprite: this.sprite,
                     frameCount: 4,
                     frameHeight: 20,
-                    frameWidth: 64,
+                    frameWidth: 66,
+                    offestX: 4,
                     fireOnFrame: 2
                 },
                 AnimationState.ATTACK
@@ -43,44 +56,38 @@ export class AssultRifle extends Gun {
         ]
     );
 
-    constructor(position: Vec2) {
-        super("AssultRifle", //tag
-            120, //ammo
-            30, //magSize
-            10, //fireRate
-            2, //reloadTime
-            position
+    constructor() {
+        super(AssultRifle.TAG, 
+            AssultRifle.SPAWN_AMMO, 
+            AssultRifle.MAG_SIZE, 
+            AssultRifle.FIRE_RATE, 
+            AssultRifle.RELOAD_TIME, 
         );
 
-        this.synchroizeAttackFrames();
+        this.syncFrames();
     }
 
-    synchroizeAttackFrames(): void {
-        // Get the attack animation info
-        const attackAnimInfo = this.animator['spriteSheet'][AnimationState.ATTACK];
-        if (!attackAnimInfo) return;
-        
-        // Calculate desired animation duration based on fire rate
-        const shotCooldownSeconds = this.getShotCooldown() / 1000; // convert ms to seconds
-        
-        // Calculate how long the animation naturally takes at base speed
-        const baseAnimDuration = attackAnimInfo.frameCount / this.animator['ANIMATION_FPS'];
-        
-        // Calculate speed multiplier needed
-        const speedMultiplier = baseAnimDuration / shotCooldownSeconds;
-        
-        // Update the animation speed
-        attackAnimInfo.animationSpeed = speedMultiplier;
+    /**
+     * Call if you want to change reload time or fire rate. 
+     */
+    public syncFrames(): void {
+        this.animator.synchroizeFrames(AssultRifle.FIRE_RATE, AnimationState.ATTACK);
     }
 
-    protected createBullet(startX: number, startY: number, targetX: number, targetY: number): Bullet {
-    
-        const muzzleDistance = 3.5;
-        const verticleOffset = 0.8; 
-        
-        const muzzleX = startX + Math.cos(this.travelAngle) * muzzleDistance;
-        const muzzleY = startY + Math.sin(this.travelAngle) * muzzleDistance + verticleOffset;
-        return new RifleBullet(muzzleX, muzzleY, targetX, targetY);
+    /**
+     * 
+     * @returns A bullet spawned at the muzzle of the gun.
+     */
+    protected createBullet(): Bullet {
+        const localOffsetX = 1.0;  // along the gun barrel direction
+        const localOffsetY = -0.2;   // perpendicular to the gun
+
+        const originX = this.position.x + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
+        const originY = this.position.y + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
+
+        const muzzleX = originX + Math.cos(this.travelAngle);
+        const muzzleY = originY + Math.sin(this.travelAngle);
+        return new RifleBullet(originX, originY, this.travelAngle);
     }
 
 }

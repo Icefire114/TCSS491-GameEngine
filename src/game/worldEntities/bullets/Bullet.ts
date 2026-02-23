@@ -11,55 +11,49 @@ import { unwrap } from "../../../engine/util.js";
 import { Zombie } from "../../zombies/Zombie.js";
 
 export abstract class Bullet implements Entity, Collidable {
+    /**
+     * Angle at which the projectile is facing/traveling.
+     */
     protected travelAngle: number;
-    tag: string;
-    id: EntityID;
 
-    velocity: Vec2 = new Vec2();
-    position: Vec2 = new Vec2();
+    /**
+     * abstract properties
+     */
     abstract physicsCollider: BoxCollider;
     abstract sprite: ImagePath;
-    removeFromWorld: boolean = false;
-    damage: number;
-
-    speed: number; // world units per second
     abstract animator: Animator;
 
-    constructor(tag: string, startX: number, startY: number, endX: number, endY: number, speed: number, damage: number) {
+    abstract damage: number;
+    protected abstract onEnemyHit(zombie: Entity): void;
+    protected abstract onTerrainHit(): void;
+    protected abstract shouldRemoveOnHit(): boolean;
+
+    public tag: string;
+    public id: EntityID;
+    public velocity: Vec2 = new Vec2();
+    public position: Vec2 = new Vec2();
+    public removeFromWorld: boolean = false;
+
+    constructor(tag: string, startX: number, startY: number, angle: number) {
         this.tag = tag;
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        this.speed = speed;
-        this.damage = damage;
+
 
         this.position.x = startX;
         this.position.y = startY;
 
-        // direction
-        const dir = new Vec2(endX - startX, endY - startY);
-
-        // normalize (guard against zero length)
-        const length = Math.hypot(dir.x, dir.y);
-        if (length <= 1e-6) {
-            dir.x = 1;
-            dir.y = 0;
-        } else {
-            dir.x /= length;
-            dir.y /= length;
-        }
-
-
-        this.velocity.x = dir.x * this.speed;
-        this.velocity.y = dir.y * this.speed;
-
-        this.travelAngle = Math.atan2(dir.y, dir.x);
-        console.log(`${this.tag} created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
-
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        this.velocity.x = Math.cos(angle) * 100 + player.velocity.x;
+        this.velocity.y = Math.sin(angle) * 100 + player.velocity.y;
+        this.travelAngle = angle;
     }
 
+    /**
+    * Draw the projectile.
+    */
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         ctx.save();
 
-        const meterInPixels = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
@@ -73,13 +67,15 @@ export abstract class Bullet implements Entity, Collidable {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        // move the bullet
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
 
         // ---------- Collision with terrain ----------
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
-                this.onTerrainHit(mountain);
+                this.onTerrainHit();
                 // console.log(`${this.tag} hit the mountain`);
             }
         }
@@ -89,35 +85,19 @@ export abstract class Bullet implements Entity, Collidable {
         //console.log(`zombies in world: ${zombies.length}`);
         for (const zombie of zombies) {
             if (this.physicsCollider.collides(this, zombie) && zombie.health > 0) {
-                this.onEnemyHit(zombie, zombies);
+                this.onEnemyHit(zombie);
                 // console.log(`${this.tag} hit a zombie`);
             }
         }
 
-        // Move the bullet
-
-        const playerVelocity = player.velocity;
-        if (playerVelocity.x > 15) {
-            this.position.x += this.velocity.x * deltaTime * playerVelocity.x / 20;
-            this.position.y += this.velocity.y * deltaTime * playerVelocity.x / 20;
-        } else {
-            this.position.x += this.velocity.x * deltaTime;
-            this.position.y += this.velocity.y * deltaTime;
-        }
-
+        // remove if offscreen
         if (
             this.position.x < GameEngine.g_INSTANCE.viewportX - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.x > GameEngine.g_INSTANCE.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.y < GameEngine.g_INSTANCE.viewportY - GameEngine.WORLD_UNITS_IN_VIEWPORT ||
             this.position.y > GameEngine.g_INSTANCE.viewportY + GameEngine.WORLD_UNITS_IN_VIEWPORT + GameEngine.WORLD_UNITS_IN_VIEWPORT
         ) {
-
             this.removeFromWorld = true;
         }
     }
-
-    protected abstract onEnemyHit(zombie: Entity, allEnemies: Entity[]): void;
-    protected abstract onTerrainHit(mountain: Entity): void;
-    protected abstract shouldRemoveOnHit(): boolean;
-
 }

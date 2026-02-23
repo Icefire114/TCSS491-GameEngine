@@ -6,27 +6,25 @@ import { DrawLayer } from "../../../engine/types.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { Bullet } from "./Bullet.js";
 import { Explosion } from "./Explosion.js";
+import { RPG } from "../../Items/guns/RPG.js";
 
 /**
  * @author JK
  * @description The Bullet class.
  */
 export class RPGRocket extends Bullet {
-    tag: string = "RPGRocket";
 
-    physicsCollider = new BoxCollider(6, 2);
-    sprite: ImagePath = new ImagePath("res/img/ammo/RPGRocket.png");
-    removeFromWorld: boolean = false;
-    damage: number = 100;
-    explosionRadius: number = 20; // world units
-
-    speed: number = 100 // world units per second
+    public tag: string = "RPGRocket";
+    public physicsCollider = new BoxCollider(6, 2);
+    public sprite: ImagePath = new ImagePath("res/img/ammo/RPGRocket.png");
+    public removeFromWorld: boolean = false;
+    public damage: number = RPG.DAMAGE;
 
     animator: Animator = new Animator(
         [
             [
                 {
-                    sprite: new ImagePath("res/img/ammo/RPGRocket.png"),
+                    sprite: this.sprite,
                     frameCount: 1,
                     frameHeight: 8,
                     frameWidth: 42,
@@ -38,16 +36,12 @@ export class RPGRocket extends Bullet {
         { x: 6, y: 1 }
     );
 
-
-    constructor(startX: number, startY: number, endX: number, endY: number) {
-        super("RPGRocket", startX, startY, endX, endY, 100, 30);
-
-        //this.position.x += this.velocity.x * 0.04;
-        //this.position.y += this.velocity.y * 0.5;
-        console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
+    constructor(startX: number, startY: number, angle: number) {
+        super("RPGRocket", startX, startY, angle);
+        //console.log(`Bullet created at (${this.position.x}, ${this.position.y}) towards (${endX}, ${endY}) with velocity (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);
     }
 
-    protected onEnemyHit(target: Entity, allEnemies: Entity[]): void {
+    protected onEnemyHit(target: Entity): void {
         const explosion = new Explosion(this.position.x, this.position.y, this.damage);
         GameEngine.g_INSTANCE.addEntity(explosion, DrawLayer.of(3));
 
@@ -56,7 +50,7 @@ export class RPGRocket extends Bullet {
         }
     }
 
-    onTerrainHit(mountain: Entity): void {
+    onTerrainHit(): void {
         const explosion = new Explosion(this.position.x, this.position.y, this.damage);
         GameEngine.g_INSTANCE.addEntity(explosion, DrawLayer.of(3));
 
