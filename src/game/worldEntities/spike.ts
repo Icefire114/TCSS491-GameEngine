@@ -5,6 +5,8 @@ import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { Vec2 } from "../../engine/types.js";
 import { AnimationState, Animator } from "../../engine/Animator.js";
+import { unwrap } from "../../engine/util.js";
+import { Mountain } from "./mountain.js";
 
 
 /**
@@ -47,6 +49,8 @@ export class Spike implements Entity {
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
         this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+        this.position.y = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain | undefined)
+            .getHeightAt(this.position.x);
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
