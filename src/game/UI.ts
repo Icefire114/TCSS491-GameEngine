@@ -9,6 +9,7 @@ import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 export class UILayer extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
@@ -140,5 +141,11 @@ export class UILayer extends ForceDraw implements Entity {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
+         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        if (keys['p'] && G_CONFIG.UNLOCK_ALL_GUNS && !this.pWasPressed) {
+            this.armory.isOpen = !this.armory.isOpen;
+            player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state
+        }
+        this.pWasPressed = keys['p'];
     }
 }

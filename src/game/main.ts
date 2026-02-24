@@ -51,8 +51,11 @@ ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Recharge.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/shotRPG.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRPG.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/RPGDead.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/ReloadRay.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/IdleRay.png");
+ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/DeadRay.png");
+
 
 
 

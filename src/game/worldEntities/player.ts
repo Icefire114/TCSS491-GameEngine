@@ -153,6 +153,15 @@ export class Player implements Entity, Collidable {
                     frameWidth: 128,
                 },
                 AnimationState.RELOAD
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/RPGDead.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.DEATH
             ]
         ]
     );
@@ -186,6 +195,15 @@ export class Player implements Entity, Collidable {
                     frameWidth: 128,
                 },
                 AnimationState.RELOAD
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/soldiers/Soldier_1/DeadRay.png"),
+                    frameCount: 4,
+                    frameHeight: 128,
+                    frameWidth: 128,
+                },
+                AnimationState.DEATH
             ]
         ]
     );
