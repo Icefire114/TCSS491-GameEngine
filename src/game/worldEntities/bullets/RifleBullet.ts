@@ -25,8 +25,8 @@ export class RifleBullet extends Bullet {
                 {
                     sprite: this.sprite,
                     frameCount: 1,
-                    frameHeight: 28,
-                    frameWidth: 36,
+                    frameHeight: 162,
+                    frameWidth: 955,
                     offestX: 0
                 },
                 AnimationState.IDLE

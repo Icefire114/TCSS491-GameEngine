@@ -69,12 +69,12 @@ export class SafeZone implements Entity {
 
         GameEngine.g_INSTANCE.addEntity(
             new Armory(
-                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 - 30, 0))
+                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 - 25, 0))
             ), DrawLayer.WORLD_DECORATION
         );
 
         GameEngine.g_INSTANCE.addEntity(
-            DecoFactory.createFireBarrel(Vec2.compAdd(this.position, new Vec2(52, 0))
+            DecoFactory.createFireBarrel(Vec2.compAdd(this.position, new Vec2(58, 0))
             ), DrawLayer.WORLD_DECORATION
         );
     }

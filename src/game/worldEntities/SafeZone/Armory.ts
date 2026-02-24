@@ -9,6 +9,7 @@ import { ArmoryUI } from "./ArmoryUI.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
+import { AnimationState, Animator } from "../../../engine/Animator.js";
 
 export class Armory implements Entity, Collidable {
     public tag: string = "Armory";
@@ -16,9 +17,24 @@ export class Armory implements Entity, Collidable {
     public position: Vec2;
     public velocity: Vec2 = new Vec2();
     public physicsCollider: BoxCollider;
-    public sprite: ImagePath = new ImagePath("res/img/safe_zone/testArmory.png");
+    public sprite: ImagePath = new ImagePath("res/img/safe_zone/armory.png");
     public removeFromWorld: boolean = false;
-    private size: Vec2 = new Vec2(10, 15);
+    private size: Vec2 = new Vec2(20, 20);
+
+    private animator = new Animator(
+        [
+            [
+                {
+                    sprite: this.sprite,
+                    frameCount: 10,
+                    frameWidth: 158,
+                    frameHeight: 200,
+                },
+                AnimationState.IDLE
+            ]
+        ],
+        this.size
+    )
 
     constructor(pos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -27,11 +43,12 @@ export class Armory implements Entity, Collidable {
     }
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
-        game.renderer.drawRawSpriteAtWorldPos(
-            this.position,
-            game.getSprite(this.sprite),
-            this.size
-        );
+        // game.renderer.drawRawSpriteAtWorldPos(
+        //     this.position,
+        //     game.getSprite(this.sprite),
+        //     this.size
+        // );
+        this.animator.drawCurrentAnimFrameAtPos(this.position);
 
         if (G_CONFIG.DRAW_SAFEZONE_BB) {
             game.renderer.drawRectAtWorldPos(
@@ -50,6 +67,8 @@ export class Armory implements Entity, Collidable {
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
+
         const UI: UILayer = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER")) as UILayer;
         const armory_ui: ArmoryUI = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui")) as ArmoryUI;
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;

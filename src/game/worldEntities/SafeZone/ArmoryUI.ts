@@ -104,8 +104,8 @@ export class ArmoryUI extends ForceDraw implements Entity {
             reloadTime: AssultRifle.RELOAD_TIME,
             magSize: AssultRifle.MAG_SIZE,
             ammoSpritePath: "res/img/ammo/RifleBullet.png",
-            frameWidth: 360,
-            frameHeight: 121,
+            frameWidth: 955,
+            frameHeight: 162,
         },
         {
             id: RPG.TAG,
@@ -123,9 +123,9 @@ export class ArmoryUI extends ForceDraw implements Entity {
             fireRate: RayGun.FIRE_RATE,
             reloadTime: RayGun.RELOAD_TIME,
             magSize: RayGun.MAG_SIZE,
-            ammoSpritePath: "res/img/ammo/Lazer.png",
-            frameWidth: 121,
-            frameHeight: 95,
+            ammoSpritePath: "res/img/ammo/SingleLazer.png",
+            frameWidth: 210,
+            frameHeight: 91,
         }
     ];
 

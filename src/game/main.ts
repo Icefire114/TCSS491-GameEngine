@@ -101,6 +101,7 @@ ASSET_MANAGER.queueDownload("res/img/ammo/test_bullet.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGRocket.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGExplode.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/Lazer.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/SingleLazer.png");
 
 
 
@@ -142,7 +143,7 @@ ASSET_MANAGER.queueDownload("res/img/world_deco/crate.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
-ASSET_MANAGER.queueDownload("res/img/safe_zone/testArmory.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/armory.png");
 
 // === Shader Assets ===
 ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
