@@ -31,6 +31,8 @@ import { ShockwaveBombItem } from "./Items/ShockwaveBombItem.js";
 import { JumpBoostItem } from "./Items/JumpBoostItem.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { IntroScreen } from "./IntroScreen.js";
+import { BossArena } from "./worldEntities/BossArena.js"
+
 
 
 /**
@@ -180,6 +182,10 @@ function main() {
         gameEngine.addUniqueEntity(new UILayer(shopUI, armoryUI), DrawLayer.UI_LAYER);
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
+
+        //testing boss arena
+        //todo: fix background problems with boss arena
+        gameEngine.addEntity(new BossArena(100,250), DrawLayer.DEFAULT);
 
         if (G_CONFIG.CREATE_TESTING_ENTS) {
             gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);

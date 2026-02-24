@@ -632,7 +632,12 @@ export class Player implements Entity, Collidable {
 
 
         // ---------- Speed limits ----------
-        if (!inSafeZone) {
+        // check if "boss_arena" exists and check if player is inside the boundary
+        // if player is inside arena, player can move left and right
+        const inBossArena = GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena").length > 0 &&
+            (GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena")[0] as any).isActive;
+
+        if (!inSafeZone && !inBossArena) {
             if (onGround) {
                 this.velocity.x = Math.max(Player.MIN_SPEED, this.velocity.x);
                 this.prevGroundSpeed = this.velocity.x;
@@ -640,6 +645,8 @@ export class Player implements Entity, Collidable {
                 this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed);
             }
         }
+
+
 
         this.velocity.x = Math.min(Player.MAX_SPEED, this.velocity.x);
 

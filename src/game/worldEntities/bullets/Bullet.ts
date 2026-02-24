@@ -9,6 +9,7 @@ import { Mountain } from "../mountain.js";
 import { Player } from "../player.js";
 import { unwrap } from "../../../engine/util.js";
 import { Zombie } from "../../zombies/Zombie.js";
+import { Boss } from "../Boss.js";
 
 export abstract class Bullet implements Entity, Collidable {
     /**
@@ -88,6 +89,12 @@ export abstract class Bullet implements Entity, Collidable {
                 this.onEnemyHit(zombie);
                 // console.log(`${this.tag} hit a zombie`);
             }
+        }
+
+        // ---------- Collision with boss ----------
+        const boss = GameEngine.g_INSTANCE.getUniqueEntityByTag("boss") as Boss;
+        if (boss && this.physicsCollider.collides(this, boss)) {
+            this.onEnemyHit(boss);
         }
 
         // remove if offscreen
