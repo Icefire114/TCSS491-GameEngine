@@ -185,9 +185,9 @@ function main() {
 
         //testing boss arena
         //todo: fix background problems with boss arena
-        gameEngine.addEntity(new BossArena(100,250), DrawLayer.DEFAULT);
 
         if (G_CONFIG.CREATE_TESTING_ENTS) {
+            gameEngine.addEntity(new BossArena(100, 250), DrawLayer.DEFAULT);
             gameEngine.addEntity(new ThrowerZombie({ x: 40, y: 0 }), DrawLayer.ZOMBIE);
             gameEngine.addEntity(new ExplodingZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
             gameEngine.addEntity(new GiantZombie({ x: 50, y: 0 }), DrawLayer.ZOMBIE);
