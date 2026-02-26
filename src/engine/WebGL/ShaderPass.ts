@@ -6,7 +6,7 @@ export class ShaderPass {
     protected framebuffer: WebGLFramebuffer | null = null;
     protected outputTexture: WebGLTexture | null = null;
     protected locations: any;
-    private unforms: Record<string, WebGLUniformLocation> = {};
+    private uniforms: Record<string, WebGLUniformLocation> = {};
 
 
     constructor(gl: WebGL2RenderingContext, fragmentShaderSource: string, w: number, h: number) {
@@ -87,19 +87,41 @@ export class ShaderPass {
         // Set custom uniforms
         for (const [name, value] of Object.entries(uniforms)) {
             let uniformLocation: WebGLUniformLocation | null = null;
-            if (name in this.unforms) {
-                uniformLocation = this.unforms[name];
+            if (name in this.uniforms) {
+                uniformLocation = this.uniforms[name];
             } else {
                 uniformLocation = gl.getUniformLocation(this.program, name);
             }
             if (uniformLocation) {
-                uniforms[name] = uniformLocation;
-                if (Array.isArray(value)) {
-                    if (value.length === 2) gl.uniform2fv(uniformLocation, value as number[]);
-                    else if (value.length === 3) gl.uniform3fv(uniformLocation, value as number[]);
-                    else if (value.length === 4) gl.uniform4fv(uniformLocation, value as number[]);
-                } else {
-                    gl.uniform1f(uniformLocation, value as number);
+                this.uniforms[name] = uniformLocation;
+                if (value instanceof Float32Array) {
+                    gl.uniform1fv(uniformLocation, value);
+                } else if (Array.isArray(value)) {
+                    if (value.length === 0) continue;
+
+                    // Check if it's an array of arrays (vec2/vec3/vec4 array uniform)
+                    if (Array.isArray(value[0])) {
+                        const flat = new Float32Array((value as number[][]).flat());
+                        const vecSize = (value as number[][])[0].length;
+                        if (vecSize === 1) gl.uniform1fv(uniformLocation, flat);
+                        else if (vecSize === 2) gl.uniform2fv(uniformLocation, flat);
+                        else if (vecSize === 3) gl.uniform3fv(uniformLocation, flat);
+                        else if (vecSize === 4) gl.uniform4fv(uniformLocation, flat);
+                    } else if (typeof value[0] === 'bigint') {
+                        gl.uniform1iv(uniformLocation, (value as bigint[]).map(Number));
+                    } else {
+                        // Existing flat array handling (single vec2/3/4)
+                        const len = value.length;
+                        if (len === 1) gl.uniform1fv(uniformLocation, value as number[]);
+                        else if (len === 2) gl.uniform2fv(uniformLocation, value as number[]);
+                        else if (len === 3) gl.uniform3fv(uniformLocation, value as number[]);
+                        else if (len === 4) gl.uniform4fv(uniformLocation, value as number[]);
+                    }
+                } else if (typeof value === 'bigint') {
+                    gl.uniform1i(uniformLocation, Number(value));
+                }
+                else if (typeof value === 'number') {
+                    gl.uniform1f(uniformLocation, value);
                 }
             }
         }
