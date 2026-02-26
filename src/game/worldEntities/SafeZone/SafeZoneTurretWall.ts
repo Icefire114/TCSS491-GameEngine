@@ -60,7 +60,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
             frameCount: 1,
             offsetX: 0
         };
-        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW, currentAnim.sprite), "Did not find shader for given template");
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_AREA_LIGHT, currentAnim.sprite), "Did not find shader for given template");
 
         shader.render([
             // Snow shader uniforms
@@ -68,6 +68,12 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                 u_snowHeight: 0.2,
                 u_snowThickness: 0.8
             },
+            {
+                u_lightSize: 100,
+                u_lightPos: [171, 256],
+                u_lightColor: [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], // rgba
+                u_ambient: 0.95 //TODO: Change depending on time of day
+            }
         ]);
 
         game.renderer.drawRawCanvasAtWorldPos(

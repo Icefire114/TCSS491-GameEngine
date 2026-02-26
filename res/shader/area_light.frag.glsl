@@ -6,6 +6,8 @@ out vec4 fragColor;
 
 uniform sampler2D u_texture;
 
+/// The ambient light 0-1
+uniform float u_ambient;
 /// In pixels
 uniform float u_lightSize;
 /// In pixels (screen space)
@@ -35,11 +37,8 @@ void main() {
 
     float intensity = falloff * atten * u_lightColor.a;
 
-    // Small ambient term to prevent total black
-    float ambient = 0.15f;
-
     vec3 light = u_lightColor.rgb * intensity;
-    vec3 finalColor = texColor.rgb * (ambient + light);
+    vec3 finalColor = texColor.rgb * (u_ambient + light);
 
     fragColor = vec4(finalColor, texColor.a);
 }

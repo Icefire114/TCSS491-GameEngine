@@ -152,7 +152,7 @@ ASSET_MANAGER.queueDownload("res/img/safe_zone/armory.png");
 ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
-
+ASSET_MANAGER.queueDownload("res/shader/area_light.frag.glsl");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
