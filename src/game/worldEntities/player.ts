@@ -641,7 +641,9 @@ export class Player implements Entity, Collidable {
 
 
         // ---------- Gravity ----------
-        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
+        if (!this.isFlying) {
+            this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
+        }
 
         // ---------- Ground friction ----------
         if (onGround) {
