@@ -1,5 +1,5 @@
 #version 300 es
-precision mediump float;
+precision highp float;
 
 // --- uniforms -------------------------------------------------------
 uniform sampler2D u_image;
@@ -24,7 +24,7 @@ void main() {
 
     // Convert texture coordinates to centered position (-0.5 to 0.5)
     vec2 relPos = (v_texCoord - 0.5f) * 2.0f;
-    relPos = relPos + vec2(-0.4f, -v_texCoord.y * 0.9);
+    relPos = relPos + vec2(-0.4f, -v_texCoord.y * 0.9f);
     float edgeFade = dot(normalize(relPos), u_sunDirection);
     edgeFade = clamp(edgeFade, 0.0f, 1.0f);
     float alignment = dot(normalize(relPos), u_sunDirection);
