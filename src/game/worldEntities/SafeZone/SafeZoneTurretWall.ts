@@ -70,7 +70,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
             },
             {
                 u_lightSize: 100,
-                u_lightPos: [171, 256],
+                u_lightPos: [200, 172],
                 u_lightColor: [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], // rgba
                 u_ambient: 0.95 //TODO: Change depending on time of day
             }
