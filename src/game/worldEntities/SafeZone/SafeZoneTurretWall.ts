@@ -69,7 +69,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                 u_snowThickness: 0.8
             },
             {
-                u_lightCount: BigInt(2),
+                u_lightCount: 2n,
                 u_lightSize: [[100], [100]],
                 u_lightPos: [[200, 172], [200, 340]],
                 u_lightColor: [[0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0]], // rgba
