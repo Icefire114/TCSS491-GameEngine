@@ -62,56 +62,17 @@ export class SafeZoneTurretWall implements Entity, Collidable {
         };
         const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_AREA_LIGHT, currentAnim.sprite), "Did not find shader for given template");
 
-        type LightData = {
-            x: number, y: number, r: number, g: number, b: number, a: number, size: number
-        }
-        const MAX_LIGHTS = 8;
-        const lights: LightData[] = [
-            {
-                x: 200,
-                y: 172,
-                r: 0.83137254901961,
-                g: 0.0156862745098,
-                b: 0.0156862745098,
-                a: 1.0,
-                size: 100
-            }, {
-                x: 200,
-                y: 340,
-                r: 0.83137254901961,
-                g: 0.0156862745098,
-                b: 0.0156862745098,
-                a: 1.0,
-                size: 100
-            }
-        ]
-        const sizes = new Float32Array(MAX_LIGHTS);
-        const positions = new Float32Array(MAX_LIGHTS * 2);
-        const colors = new Float32Array(MAX_LIGHTS * 4);
-
-        for (let i = 0; i < lights.length; i++) {
-            positions[i * 2 + 0] = lights[i].x;
-            positions[i * 2 + 1] = lights[i].y;
-            sizes[i] = lights[i].size;
-
-            colors[i * 4 + 0] = lights[i].r;
-            colors[i * 4 + 1] = lights[i].g;
-            colors[i * 4 + 2] = lights[i].b;
-            colors[i * 4 + 3] = lights[i].a;
-        }
         shader.render([
             // Snow shader uniforms
             {
                 u_snowHeight: 0.2,
                 u_snowThickness: 0.8
             },
-            // Area light uniforms
             {
-                u_lightCount: [Math.min(MAX_LIGHTS, lights.length)],
-                u_ambient: ['f', 0.95], //TODO: Change depending on time of day
-                u_lightSize: ['', sizes],
-                u_lightPos: ['', positions],
-                u_lightColor: ['', colors],
+                u_lightSize: 100,
+                u_lightPos: [200, 172],
+                u_lightColor: [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], // rgba
+                u_ambient: 0.95 //TODO: Change depending on time of day
             }
         ]);
 

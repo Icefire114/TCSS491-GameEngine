@@ -91,44 +91,17 @@ export class ShaderPass {
                 uniformLocation = this.unforms[name];
             } else {
                 uniformLocation = gl.getUniformLocation(this.program, name);
+            }
+            if (uniformLocation) {
                 uniforms[name] = uniformLocation;
-            }
-            if (uniformLocation == null) continue;
-            if (value instanceof Float32Array) {
-                if (value.length % 4 === 0) {
-                    gl.uniform4fv(uniformLocation, value);
-                } else if (value.length % 3 === 0) {
-                    gl.uniform3fv(uniformLocation, value);
-                } else if (value.length % 2 === 0) {
-                    gl.uniform2fv(uniformLocation, value);
+                if (Array.isArray(value)) {
+                    if (value.length === 2) gl.uniform2fv(uniformLocation, value as number[]);
+                    else if (value.length === 3) gl.uniform3fv(uniformLocation, value as number[]);
+                    else if (value.length === 4) gl.uniform4fv(uniformLocation, value as number[]);
                 } else {
-                    gl.uniform1fv(uniformLocation, value);
+                    gl.uniform1f(uniformLocation, value as number);
                 }
-            } else if (Array.isArray(value)) {
-                switch (value.length) {
-                    case 2:
-                        gl.uniform2fv(uniformLocation, value);
-                        break;
-                    case 3:
-                        gl.uniform3fv(uniformLocation, value);
-                        break;
-                    case 4:
-                        gl.uniform4fv(uniformLocation, value);
-                        break;
-                    default:
-                        gl.uniform1fv(uniformLocation, value);
-                }
-            } else if (typeof value === "number") {
-                gl.uniform1f(uniformLocation, value);
-            } else {
-                console.error(`Unknown type for uniform ${name}: ${value}`);
             }
-
-            if (Array.isArray(value)) {
-            } else {
-
-            }
-
         }
 
         // Draw
