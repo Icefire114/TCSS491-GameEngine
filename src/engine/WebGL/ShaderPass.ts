@@ -6,6 +6,7 @@ export class ShaderPass {
     protected framebuffer: WebGLFramebuffer | null = null;
     protected outputTexture: WebGLTexture | null = null;
     protected locations: any;
+    private unforms: Record<string, WebGLUniformLocation> = {};
 
 
     constructor(gl: WebGL2RenderingContext, fragmentShaderSource: string, w: number, h: number) {
@@ -85,14 +86,20 @@ export class ShaderPass {
 
         // Set custom uniforms
         for (const [name, value] of Object.entries(uniforms)) {
-            const location = gl.getUniformLocation(this.program, name);
-            if (location) {
+            let uniformLocation: WebGLUniformLocation | null = null;
+            if (name in this.unforms) {
+                uniformLocation = this.unforms[name];
+            } else {
+                uniformLocation = gl.getUniformLocation(this.program, name);
+            }
+            if (uniformLocation) {
+                uniforms[name] = uniformLocation;
                 if (Array.isArray(value)) {
-                    if (value.length === 2) gl.uniform2fv(location, value as number[]);
-                    else if (value.length === 3) gl.uniform3fv(location, value as number[]);
-                    else if (value.length === 4) gl.uniform4fv(location, value as number[]);
+                    if (value.length === 2) gl.uniform2fv(uniformLocation, value as number[]);
+                    else if (value.length === 3) gl.uniform3fv(uniformLocation, value as number[]);
+                    else if (value.length === 4) gl.uniform4fv(uniformLocation, value as number[]);
                 } else {
-                    gl.uniform1f(location, value as number);
+                    gl.uniform1f(uniformLocation, value as number);
                 }
             }
         }
