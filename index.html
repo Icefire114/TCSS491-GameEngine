@@ -45,6 +45,7 @@
       <!-- Controls Page -->
       <div id="panel-controls" class="content-panel">
         <h2>TACTICAL CONTROLS</h2>
+        <div class="panel-rule"></div>
         <div class="controls-grid">
           <div class="ctrl-row"><div class="ctrl-key">W A S D</div><div class="ctrl-desc">Move Player</div></div>
           <div class="ctrl-row"><div class="ctrl-key">MOUSE</div><div class="ctrl-desc">Aim</div></div>
@@ -58,11 +59,20 @@
       <!-- Info Page -->
       <div id="panel-about" class="content-panel">
         <h2>Info Page</h2>
-        <p>The world has fallen to an unknown biological anomaly. You're a stranded snowboarder on Crystal Mountain. Survive the descent, pick up resources, and eliminate hostile biologicals.</p>
-        <br>
-        <p>TCSS491 Game Project.</p>
-        <br>
-        <p>Made by Phalen G, Mani S. M., Joshua K, James E</p>
+        <div class="panel-rule"></div>
+        <div class="about-body">
+          <p class="about-lead">STEEP: Crystal Mountain</p>
+          <p>The world has fallen to an unknown biological anomaly. You're a stranded snowboarder on Crystal Mountain. Survive the descent, pick up resources, and eliminate hostile biologicals.</p>
+          <p class="about-lead">Development Command</p>
+          <p>2026 - TCSS491 Game Project </p>
+        </div>
+        <div class="about-stats">
+          VERSION <span>0.1.0-ALPHA</span>
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          ENGINE <span>NATIVE CANVAS</span>
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          TEAM <span>PHALEN G · MANI S · JOSHUA K · JAMES E</span>
+        </div>
       </div>
 
         <!-- The canvas corner design -->
@@ -105,7 +115,6 @@
       if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
     }
   </script>
-  </div>
 </body>
 
 </html>
