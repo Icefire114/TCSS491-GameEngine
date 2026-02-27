@@ -32,6 +32,7 @@ import { JumpBoostItem } from "./Items/JumpBoostItem.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { IntroScreen } from "./IntroScreen.js";
 import { BossArena } from "./worldEntities/BossArena.js"
+import { PauseScreen } from "./Pausescreen.js";
 
 
 
@@ -367,6 +368,10 @@ function main() {
                 )
             ), DrawLayer.WORLD_DECORATION);
         }
+
+        // Handldes our pause screen 
+        gameEngine.addUniqueEntity(new PauseScreen(), 998 as DrawLayer);
+
 
         // Drawing our intro screen at the top, and will called gameengine start to start the geame
         gameEngine.addUniqueEntity(new IntroScreen(() => {
