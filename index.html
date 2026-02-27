@@ -27,13 +27,43 @@
       <div class="gameTitle-sub">TCSS491</div>
     </div>
     <div class="statusSymbol">OUTBREAK ACTIVE</div>
+
+    <!-- Our differnet tabs-->
+    <nav id="game-nav">
+      <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
+      <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
+    <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
+  </nav>
   </header>
   
   <!-- Centered Canvas -->
-  <div id="canvas-container">
-    <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
-  </div>
-  
+<div id="canvas-container">
+
+  <!-- Content Page -->
+  <div id="panel-controls" class="content-panel">
+    <h2>TACTICAL CONTROLS</h2>
+    <div class="controls-grid">
+      <div class="ctrl-row"><div class="ctrl-key">W A S D</div><div class="ctrl-desc">Move Player</div></div>
+      <div class="ctrl-row"><div class="ctrl-key">MOUSE</div><div class="ctrl-desc">Aim</div></div>
+      <div class="ctrl-row"><div class="ctrl-key">LMB</div><div class="ctrl-desc">Shoot</div></div>
+      <div class="ctrl-row"><div class="ctrl-key">R</div><div class="ctrl-desc">Reload Magazine</div></div>
+      <div class="ctrl-row"><div class="ctrl-key">E</div><div class="ctrl-desc">Interact</div></div>
+      <div class="ctrl-row"><div class="ctrl-key">ESC</div><div class="ctrl-desc">Pause System</div></div>
+    </div>
+  </div>  
+
+  <!-- Info Page -->
+  <div id="panel-about" class="content-panel">  
+    <h2>Info Page</h2>
+    <p>The world has fallen to an unknown biological anomaly. Your a stranded snowboarder on Crystal Moutain. Survive the travel, pick up any resources, and eliminate hostile biologicals.</p>
+    <br>
+    <p>TCSS491 Game Project. </p>
+    <br>
+    <p>Made by Phalen G, Mani S. M., Joshua K, James E</p>
+  </div>  
+  <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
+</div>
+
     <script>
         const script = document.createElement('script');
         script.type = 'module';
@@ -46,6 +76,15 @@
         script.src = isDev ? './build/game/main.js' : './bundle.js';
         document.body.appendChild(script);
     </script>
+  <script>
+    // Handles switching between the different content panels when clicking on the nav items
+    function setNav(el, target) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+      if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
+    }
+  </script>
 </body>
 
 </html>
