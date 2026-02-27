@@ -20,7 +20,20 @@
 </head>
 
 <body>
-    <!-- Only AI could come up with something this jank-->
+  <!-- STEEP Header -->
+  <header id="game-header">
+    <div>
+      <div class="gameTitle">STEEP</div>
+      <div class="gameTitle-sub">TCSS491</div>
+    </div>
+    <div class="statusSymbol">OUTBREAK ACTIVE</div>
+  </header>
+  
+  <!-- Centered Canvas -->
+  <div id="canvas-container">
+    <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
+  </div>
+  
     <script>
         const script = document.createElement('script');
         script.type = 'module';
@@ -33,8 +46,6 @@
         script.src = isDev ? './build/game/main.js' : './bundle.js';
         document.body.appendChild(script);
     </script>
-    <canvas id="gameCanvas" width="1280" height="720" style="background: white; border: 1px solid black" tabindex="0"
-        autofocus></canvas>
 </body>
 
 </html>

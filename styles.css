@@ -6,7 +6,72 @@ html, body {
   padding: 0;
   background: #060810;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  color: #dce8f0;
 }
+
+/* Header Styles */
+#game-header {
+  width: 100%;
+  max-width: 1280px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #7ab0cc;
+  background: rgba(8, 12, 20, 0.96);
+  box-sizing: border-box;
+}
+
+.gameTitle {
+  font-family: 'Teko', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  color: #a8d4ed;
+  text-shadow: 0 0 18px rgba(168, 212, 237, 0.35);
+  text-transform: uppercase;
+}
+
+.gameTitle-sub {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: #2a4a5a;
+  margin-top: 2px;
+}
+
+.statusSymbol {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  padding: 4px 12px;
+  text-transform: uppercase;
+  background: rgba(192, 57, 43, 0.05);
+}
+
+/* Setup to have canvas center */
+#canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+}
+
+canvas#gameCanvas {
+  display: block;
+  background: white;
+  border: 1px solid #2a4a5a;
+  outline: none;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Using Google Fonts  */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@400;500;600;700&display=swap');
