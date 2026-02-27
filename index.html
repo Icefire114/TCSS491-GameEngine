@@ -31,13 +31,7 @@
           <div class="gameTitle">STEEP</div>
           <div class="logo-rule"></div>
         </div>
-
-        <!-- Infomration in middle of the top header -->
-        <div class="header-center">
-          <div class="tagline">A Zombie Survival</div>
-          <div class="tagline-sub">The world has fallen. &nbsp;You have not.</div>
-        </div>
-
+        
         <!-- fLashign OutBreak Active sign-->
         <div class="status-cluster">
           <div class="statusSymbol">OUTBREAK ACTIVE</div>
@@ -61,7 +55,16 @@
 
     <!-- Canvas + Panels -->
     <div id="canvas-container">
-      
+      <!-- Loading Overlay -->
+      <div id="loading-overlay">
+        <div class="load-title">
+          LOADING<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+        </div>
+        <div class="load-bar-wrap"><div class="load-bar"></div></div>
+        <div class="load-percent" id="load-percent">0%</div> 
+        <div class="load-status" id="load-status-text">Initializing engine…</div>
+      </div>
+          
       <!-- Controls Page -->
       <div id="panel-controls" class="content-panel">
         <h2>TACTICAL CONTROLS</h2>
@@ -150,5 +153,45 @@
     tick(); 
     setInterval(tick, 1000);
   </script>
+
+ <!-- Loading Screen Handler -->
+<script>
+  window.addEventListener('load', function() {
+    const overlay = document.getElementById('loading-overlay');
+    const statusText = document.getElementById('load-status-text');
+    const percentText = document.getElementById('load-percent');  // ← Add this
+    const bar = document.querySelector('.load-bar');
+
+    const steps = [
+      { pct: 12,  delay: 200,  msg: 'Loading terrain data…' },
+      { pct: 28,  delay: 600,  msg: 'Loading terrain data…' },
+      { pct: 31,  delay: 150,  msg: 'Spawning hostiles…' },
+      { pct: 55,  delay: 800,  msg: 'Spawning hostiles…' },
+      { pct: 62,  delay: 200,  msg: 'Calibrating weapons…' },
+      { pct: 63,  delay: 500,  msg: 'Calibrating weapons…' },
+      { pct: 80,  delay: 400,  msg: 'Establishing comms…' },
+      { pct: 85,  delay: 700,  msg: 'Establishing comms…' },
+      { pct: 94,  delay: 300,  msg: 'All systems nominal.' },
+      { pct: 100, delay: 400,  msg: 'All systems nominal.' },
+    ];
+
+    let i = 0;
+    function next() {
+      if (i >= steps.length) {
+        setTimeout(() => overlay.classList.add('hidden'), 500);
+        return;
+      }
+      const step = steps[i++];
+      bar.style.width = step.pct + '%';
+      percentText.textContent = step.pct + '%';
+      percentText.style.animation = 'none';
+      void percentText.offsetWidth;
+      percentText.style.animation = 'percentPulse 0.3s ease';
+      setTimeout(next, step.delay);
+    }
+    next();
+  });
+</script>
+</script>
 </body>
 </html>
