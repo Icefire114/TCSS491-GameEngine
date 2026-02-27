@@ -20,72 +20,82 @@
 </head>
 
 <body>
+  <div class="nv-vignette"></div>
   <div id="shell">
 
-  <!-- STEEP Header -->
-  <header id="game-header">
-    <div>
-      <div class="gameTitle">STEEP</div>
-      <div class="gameTitle-sub">TCSS491</div>
+    <!-- STEEP Header -->
+    <header id="game-header">
+      <div>
+        <div class="gameTitle">STEEP</div>
+        <div class="gameTitle-sub">TCSS491</div>
+      </div>
+      <div class="statusSymbol">OUTBREAK ACTIVE</div>
+
+      <!-- Our different tabs -->
+      <nav id="game-nav">
+        <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
+        <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
+        <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
+      </nav>
+    </header>
+
+    <!-- Canvas + Panels -->
+    <div id="canvas-container">
+
+      <!-- Controls Page -->
+      <div id="panel-controls" class="content-panel">
+        <h2>TACTICAL CONTROLS</h2>
+        <div class="controls-grid">
+          <div class="ctrl-row"><div class="ctrl-key">W A S D</div><div class="ctrl-desc">Move Player</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">MOUSE</div><div class="ctrl-desc">Aim</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">LMB</div><div class="ctrl-desc">Shoot</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">R</div><div class="ctrl-desc">Reload Magazine</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">E</div><div class="ctrl-desc">Interact</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">ESC</div><div class="ctrl-desc">Pause System</div></div>
+        </div>
+      </div>
+
+      <!-- Info Page -->
+      <div id="panel-about" class="content-panel">
+        <h2>Info Page</h2>
+        <p>The world has fallen to an unknown biological anomaly. You're a stranded snowboarder on Crystal Mountain. Survive the descent, pick up resources, and eliminate hostile biologicals.</p>
+        <br>
+        <p>TCSS491 Game Project.</p>
+        <br>
+        <p>Made by Phalen G, Mani S. M., Joshua K, James E</p>
+      </div>
+
+        <!-- The canvas corner design -->
+        <div id="canvas-wrap">
+        <div class="corner-tl"></div>
+        <div class="corner-tr"></div>
+        <div class="corner-bl"></div>
+        <div class="corner-br"></div>
+        <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
+      </div>
     </div>
-    <div class="statusSymbol">OUTBREAK ACTIVE</div>
 
-    <!-- Our differnet tabs-->
-    <nav id="game-nav">
-      <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
-      <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
-    <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
-  </nav>
-  </header>
-  
-  <!-- Centered Canvas -->
-<div id="canvas-container">
+    <!-- Footer -->
+    <footer id="game-footer">
+      <div class="footer-center">
+        <div class="pulse-dot"></div>
+        <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; CHROME REQUIRED</div>
+      </div>
+    </footer>
 
-  <!-- Content Page -->
-  <div id="panel-controls" class="content-panel">
-    <h2>TACTICAL CONTROLS</h2>
-    <div class="controls-grid">
-      <div class="ctrl-row"><div class="ctrl-key">W A S D</div><div class="ctrl-desc">Move Player</div></div>
-      <div class="ctrl-row"><div class="ctrl-key">MOUSE</div><div class="ctrl-desc">Aim</div></div>
-      <div class="ctrl-row"><div class="ctrl-key">LMB</div><div class="ctrl-desc">Shoot</div></div>
-      <div class="ctrl-row"><div class="ctrl-key">R</div><div class="ctrl-desc">Reload Magazine</div></div>
-      <div class="ctrl-row"><div class="ctrl-key">E</div><div class="ctrl-desc">Interact</div></div>
-      <div class="ctrl-row"><div class="ctrl-key">ESC</div><div class="ctrl-desc">Pause System</div></div>
-    </div>
-  </div>  
-
-  <!-- Info Page -->
-  <div id="panel-about" class="content-panel">  
-    <h2>Info Page</h2>
-    <p>The world has fallen to an unknown biological anomaly. Your a stranded snowboarder on Crystal Moutain. Survive the travel, pick up any resources, and eliminate hostile biologicals.</p>
-    <br>
-    <p>TCSS491 Game Project. </p>
-    <br>
-    <p>Made by Phalen G, Mani S. M., Joshua K, James E</p>
-  </div>  
-  <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
-</div>
-
-<!-- Bottom of the page -->
-<footer id="game-footer">
-  <div class="footer-center">
-    <div class="pulse-dot"></div>
-    <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; CHROME REQUIRED</div>
   </div>
-</footer>
 
-    <script>
-        const script = document.createElement('script');
-        script.type = 'module';
+  <script>
+    const script = document.createElement('script');
+    script.type = 'module';
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!window.chrome) {
+      alert("Browsers other than Chrome are not supported, and have been seen to have performance issues, please use Chrome");
+    }
+    script.src = isDev ? './build/game/main.js' : './bundle.js';
+    document.body.appendChild(script);
+  </script>
 
-        const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (!window.chrome) {
-            alert("Browsers other than Chrome are not supported, and have been seen to have performance issues, please use Chrome")
-        }
-
-        script.src = isDev ? './build/game/main.js' : './bundle.js';
-        document.body.appendChild(script);
-    </script>
   <script>
     // Handles switching between the different content panels when clicking on the nav items
     function setNav(el, target) {
