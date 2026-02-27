@@ -55,13 +55,15 @@ html, body {
 }
 
 /* Setup to have canvas center */
-#canvas-container {
+#shell {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  height: 100vh;
   width: 100%;
-  max-width: 1280px;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 canvas#gameCanvas {
@@ -148,6 +150,46 @@ canvas#gameCanvas {
   text-transform: uppercase;
   font-size: .9rem;
 }
+
+#game-footer {
+  width: 100%;
+  max-width: 1280px;
+  background: rgba(8, 12, 20, 0.96);
+  border: 1px solid #2a4a5a;
+  border-top: 2px solid #7ab0cc;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 9px 22px;
+  box-sizing: border-box;
+}
+
+.footer-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7ab0cc;
+  box-shadow: 0 0 6px rgba(122, 176, 204, 0.8);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.6); }
+}
+
+.build-info {
+  font-size: .85rem;
+  letter-spacing: 0.12em;
+  color: rgba(220, 232, 240, 0.25);
+}
+
 
 /* Using Google Fonts  */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@400;500;600;700&display=swap');

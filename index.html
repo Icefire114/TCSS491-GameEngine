@@ -20,6 +20,8 @@
 </head>
 
 <body>
+  <div id="shell">
+
   <!-- STEEP Header -->
   <header id="game-header">
     <div>
@@ -64,6 +66,14 @@
   <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
 </div>
 
+<!-- Bottom of the page -->
+<footer id="game-footer">
+  <div class="footer-center">
+    <div class="pulse-dot"></div>
+    <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; CHROME REQUIRED</div>
+  </div>
+</footer>
+
     <script>
         const script = document.createElement('script');
         script.type = 'module';
@@ -85,6 +95,7 @@
       if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
     }
   </script>
+  </div>
 </body>
 
 </html>
