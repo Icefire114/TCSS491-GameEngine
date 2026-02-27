@@ -95,7 +95,7 @@ export class BossArena implements Entity {
         // --- Boss health bar HUD ---
         if (!this.boss) return;
 
-        const pct     = this.boss.currentHealth / this.boss.maxHealth;
+        const pct     = this.boss.health / 1500;
         const barW    = ctx.canvas.width * 0.5; 
         const barH    = 22;
         const barX    = (ctx.canvas.width - barW) / 2;
@@ -117,6 +117,6 @@ export class BossArena implements Entity {
         ctx.fillStyle  = "white";
         ctx.font       = "bold 13px Arial";
         ctx.textAlign  = "center";
-        ctx.fillText(`BOSS  ${this.boss.currentHealth} / ${this.boss.maxHealth}`, ctx.canvas.width / 2, barY + 11);
+        ctx.fillText(`BOSS  ${Math.ceil(this.boss.health)} / 1500`, ctx.canvas.width / 2, barY + 11); // <-- CHANGE THIS LINE
     }
 }
