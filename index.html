@@ -1,22 +1,19 @@
 ﻿<!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <title>TCSS491-GameEngine</title>
-
+  <meta charset="utf-8">
+  <title>TCSS491-GameEngine</title>
     <!-- Linking our css to our html-->
-    <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css">
 
-
-    <script type="importmap">
-    {
-        "imports": {
-            "rand-seed": "https://cdn.skypack.dev/rand-seed"
-        }
+  <!-- Importing our random seed library-->
+  <script type="importmap">
+  {
+    "imports": {
+      "rand-seed": "https://cdn.skypack.dev/rand-seed"
     }
-    </script>
-
+  }
+  </script>
 </head>
 
 <body>
@@ -25,23 +22,46 @@
 
     <!-- STEEP Header -->
     <header id="game-header">
-      <div>
-        <div class="gameTitle">STEEP</div>
-        <div class="gameTitle-sub">TCSS491</div>
-      </div>
-      <div class="statusSymbol">OUTBREAK ACTIVE</div>
+      <!-- Line under the Title -->
+      <div class="header-accent"></div>
 
-      <!-- Our different tabs -->
-      <nav id="game-nav">
-        <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
-        <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
-        <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
-      </nav>
+      <!-- The header title on the top left-->
+      <div class="header-top">
+        <div class="logo-block">
+          <div class="gameTitle">STEEP</div>
+          <div class="logo-rule"></div>
+        </div>
+
+        <!-- Infomration in middle of the top header -->
+        <div class="header-center">
+          <div class="tagline">A Zombie Survival</div>
+          <div class="tagline-sub">The world has fallen. &nbsp;You have not.</div>
+        </div>
+
+        <!-- fLashign OutBreak Active sign-->
+        <div class="status-cluster">
+          <div class="statusSymbol">OUTBREAK ACTIVE</div>
+        </div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="header-bottom">
+        <nav id="game-nav">
+          <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
+          <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
+          <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
+        </nav>
+
+        <!-- Clock on the top right -->
+        <div class="nav-readouts">
+          <span>TIME&nbsp;<span class="rval" id="clock">--:--:--</span></span>
+        </div>
+      </div>
     </header>
 
     <!-- Canvas + Panels -->
     <div id="canvas-container">
-
+      
       <!-- Controls Page -->
       <div id="panel-controls" class="content-panel">
         <h2>TACTICAL CONTROLS</h2>
@@ -64,7 +84,7 @@
           <p class="about-lead">STEEP: Crystal Mountain</p>
           <p>The world has fallen to an unknown biological anomaly. You're a stranded snowboarder on Crystal Mountain. Survive the descent, pick up resources, and eliminate hostile biologicals.</p>
           <p class="about-lead">Development Command</p>
-          <p>2026 - TCSS491 Game Project </p>
+          <p>2026 - TCSS491 Game Project</p>
         </div>
         <div class="about-stats">
           VERSION <span>0.1.0-ALPHA</span>
@@ -75,8 +95,8 @@
         </div>
       </div>
 
-        <!-- The canvas corner design -->
-        <div id="canvas-wrap">
+      <!-- Canvas -->
+      <div id="canvas-wrap">
         <div class="corner-tl"></div>
         <div class="corner-tr"></div>
         <div class="corner-bl"></div>
@@ -89,12 +109,13 @@
     <footer id="game-footer">
       <div class="footer-center">
         <div class="pulse-dot"></div>
-        <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; CHROME REQUIRED</div>
+        <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; TCSS 491 &nbsp;·&nbsp; CHROME REQUIRED</div>
       </div>
     </footer>
 
-  </div>
+  </div> 
 
+  <!-- Game Engine Loader -->
   <script>
     const script = document.createElement('script');
     script.type = 'module';
@@ -106,6 +127,7 @@
     document.body.appendChild(script);
   </script>
 
+  <!-- Navigation Handler -->
   <script>
     // Handles switching between the different content panels when clicking on the nav items
     function setNav(el, target) {
@@ -115,6 +137,18 @@
       if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
     }
   </script>
-</body>
 
+  <!-- Clock Handler -->
+  <script>
+    function tick() {
+      const d = new Date();
+      document.getElementById('clock').textContent =
+        d.getHours().toString().padStart(2,'0') + ':' +
+        d.getMinutes().toString().padStart(2,'0') + ':' +
+        d.getSeconds().toString().padStart(2,'0');
+    }
+    tick(); 
+    setInterval(tick, 1000);
+  </script>
+</body>
 </html>

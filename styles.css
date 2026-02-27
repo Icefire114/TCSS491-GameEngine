@@ -19,41 +19,73 @@ html, body {
 #game-header {
   width: 100%;
   max-width: 1280px;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: rgba(6, 10, 18, 0.98);
+  border: 1px solid #1a3344;
   border-bottom: 2px solid #7ab0cc;
-  background: rgba(8, 12, 20, 0.96);
   box-sizing: border-box;
+  position: relative;
 }
 
 .gameTitle {
   font-family: 'Teko', sans-serif;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 700;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.32em;
   color: #a8d4ed;
-  text-shadow: 0 0 18px rgba(168, 212, 237, 0.35);
+  text-shadow: 0 0 24px rgba(168,212,237,.4), 0 0 60px rgba(122,176,204,.1);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.tagline {
+  font-family: 'Teko', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: rgba(168,212,237,.25);
   text-transform: uppercase;
 }
 
-.gameTitle-sub {
-  font-size: 0.6rem;
+.tagline-sub {
+  font-size: 0.8rem;
   letter-spacing: 0.2em;
-  color: #2a4a5a;
-  margin-top: 2px;
+  color: rgba(220,232,240,.15);
+  text-transform: uppercase;
 }
 
 .statusSymbol {
-  font-size: 0.6rem;
+  display: inline-flex;         
+  align-items: center;         
+  justify-content: center;       
+  gap: 8px;                   
+  text-align: center;
+  font-size: 0.9rem;
   letter-spacing: 0.18em;
   color: #c0392b;
-  border: 1px solid rgba(192, 57, 43, 0.4);
-  padding: 4px 12px;
+  border: 1px solid rgba(192,57,43,.4);
+  padding: 6px 14px;
   text-transform: uppercase;
-  background: rgba(192, 57, 43, 0.05);
+  background: rgba(192,57,43,.05);
+  animation: blink 2.8s step-end infinite;
 }
+
+.status-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusSymbol::before { content: '▶ '; font-size: 0.5rem; }
+@keyframes blink { 62%, 68% { opacity: 0; } }
+
 
 /* Setup to have canvas center */
 #shell {
@@ -78,26 +110,33 @@ canvas#gameCanvas {
   outline: none;
 }
 
-
 /* Nav tabs */
 #game-nav {
   display: flex;
-  gap: 4px;
-  margin-top: 8px;
+  align-items: stretch;
 }
 
 .nav-item {
-  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 24px;
   cursor: pointer;
-  letter-spacing: .15em;
+  letter-spacing: .22em;
   color: #2a4a5a;
   border-bottom: 2px solid transparent;
-  transition: color .15s;
+  border-right: 1px solid rgba(122,176,204,.06);
+  transition: color .15s, background .15s;
+  font-family: 'Teko', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  user-select: none;
 }
-
-.nav-item:hover { color: #dce8f0; }
+.nav-item:hover { color: #dce8f0; background: rgba(122,176,204,.04); }
 .nav-item.active {
   color: #a8d4ed;
+  background: rgba(122,176,204,.06);
   border-bottom: 2px solid #7ab0cc;
 }
 
@@ -108,7 +147,6 @@ canvas#gameCanvas {
   max-width: 1280px;
   margin: 15px 0;  
 }
-
 
 .content-panel {
   display: none;
@@ -286,3 +324,49 @@ body::after {
 }
 
 .about-stats span { color: #a8d4ed; margin-left: 6px; }
+
+.header-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #7ab0cc 30%, #a8d4ed 50%, #7ab0cc 70%, transparent);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 22px 8px;
+  border-bottom: 1px solid rgba(122,176,204,.08);
+}
+
+.logo-block { display: flex; flex-direction: column; }
+
+
+/* ── Nav bar ── */
+.header-bottom {
+  display: flex;
+  align-items: stretch;
+  height: 38px;
+  padding: 0 4px;
+}
+
+.nav-readouts {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 0 18px;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  color: #2a4a5a;
+  border-left: 1px solid rgba(122,176,204,.08);
+}
+.rval { color: #a8d4ed; margin-left: 3px; }
+
+.logo-rule {
+  height: 2px;
+  background: linear-gradient(90deg, #7ab0cc, transparent);
+  margin-top: 3px;
+  width: 100%;
+}
