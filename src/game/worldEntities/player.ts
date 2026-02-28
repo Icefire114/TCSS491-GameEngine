@@ -737,7 +737,7 @@ export class Player implements Entity, Collidable {
             // ---------- Collision with Zombies ----------
             const zombies: Entity[] = GameEngine.g_INSTANCE.getEntitiesByTag("BasicZombie");
             for (const zombie of zombies) {
-                if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable()) {
+                if (this.physicsCollider.collides(this, zombie) && !this.isInvulnerable() && (zombie as Zombie).health > 0) {
                     this.damagePlayer(2, "Infection");
                     this.iTime = this.iDuration; // start invulnerability time
                 }
