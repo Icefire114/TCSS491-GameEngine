@@ -3,7 +3,7 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { ForceDraw, Vec2 } from "../engine/types.js";
-import { unwrap } from "../engine/util.js";
+import { clamp, unwrap } from "../engine/util.js";
 import { Buff, BuffType, TempBuff } from "./Items/Buff.js";
 import { ItemType } from "./Items/Item.js";
 import { Player } from "./worldEntities/player.js";
@@ -32,6 +32,9 @@ export class UILayer extends ForceDraw implements Entity {
     private armory: ArmoryUI;
     private pWasPressed: boolean = false;
 
+    private m_healthBarEndCap: ImagePath = new ImagePath("res/img/ui/health_bar_endcap.png");
+    private m_healthBarMidPiece: ImagePath = new ImagePath("res/img/ui/health_bar_midpiece.png");
+    private m_healthBarStart: ImagePath = new ImagePath("res/img/ui/health_bar_startcap.png");
 
     constructor(shop: ShopUI, armory: ArmoryUI) {
         super();
@@ -81,23 +84,7 @@ export class UILayer extends ForceDraw implements Entity {
             ctx.restore();
         }
 
-        //draw player health on top right corner of the screen
-        if (player.infection < 100) {
-            ctx.fillStyle = "green";
-        } else if (player.infection < 200) {
-            ctx.fillStyle = "orange";
-        } else {
-            ctx.fillStyle = "red";
-        }
-        ctx.font = "30px Arial";
-        ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
-        //console.log(`Player Health: ${player.health}`);
-
-        //draw player shield below health
-        ctx.fillStyle = "rgb(255, 60, 0)";
-        ctx.font = "30px Arial";
-        ctx.fillText(`Health: ${player.health}`, ctx.canvas.width - 200, 80);
-        //console.log(`Player Shield: ${player.shield}`);
+        this.drawPlayerHealthAndInfectionBar(ctx, player);
 
         // draw total player weapon ammo below shield
         ctx.fillStyle = "black";
@@ -140,8 +127,46 @@ export class UILayer extends ForceDraw implements Entity {
         ctx.restore();
     }
 
+    private drawPlayerHealthAndInfectionBar(ctx: CanvasRenderingContext2D, player: Player): void {
+        // if (player.infection < 100) {
+        //     ctx.fillStyle = "green";
+        // } else if (player.infection < 200) {
+        //     ctx.fillStyle = "orange";
+        // } else {
+        //     ctx.fillStyle = "red";
+        // }
+        // ctx.font = "30px Arial";
+        // ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
+
+        // ctx.fillStyle = "rgb(255, 60, 0)";
+        // ctx.font = "30px Arial";
+        // ctx.fillText(`Health: ${player.health}`, ctx.canvas.width - 200, 80);
+
+
+        const endcapSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarEndCap);
+        const midSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarMidPiece);
+        const startSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarStart);
+
+        const playerHP = player.health;
+        const playerHPPercent = playerHP / player.maxHealth;
+        let neededMidPieces = Math.ceil(clamp(player.maxHealth / 10, 10, 60));
+
+        ctx.drawImage(endcapSprite, ctx.canvas.width - 35, 15);
+        ctx.drawImage(midSprite, ctx.canvas.width - 35 - endcapSprite.width, 15);
+        for (let i = 1; i <= neededMidPieces; i++) {
+            ctx.drawImage(midSprite, ctx.canvas.width - 35 - midSprite.width * i, 15);
+        }
+        ctx.drawImage(startSprite, ctx.canvas.width - 35 - midSprite.width * (neededMidPieces + 1), 15);
+
+        const pixelsWeCanFill = (neededMidPieces - 1) * midSprite.width;
+        ctx.fillStyle = "rgb(212, 0, 0)";
+        ctx.fillRect(ctx.canvas.width - 19, 18, -1 * pixelsWeCanFill * playerHPPercent, 32);
+        console.log(playerHPPercent, neededMidPieces);
+
+    }
+
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
-         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         if (keys['p'] && G_CONFIG.UNLOCK_ALL_GUNS && !this.pWasPressed) {
             this.armory.isOpen = !this.armory.isOpen;
             player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state

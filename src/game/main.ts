@@ -13,7 +13,7 @@ import { FastZombie } from "./zombies/FastZombie.js";
 import { GiantZombie } from "./zombies/GiantZombie.js";
 import { InfectionImmunityItem } from "./Items/InfectionImmunity.js";
 import { InstantHealthPickupBuff } from "./Items/InstantHealthPickupBuff.js";
-import { ShieldRestorePickupItem } from "./Items/ShieldRestore.js";
+import { ShieldRestorePickupItem } from "./Items/ShieldBoost.js";
 import { Mountain } from "./worldEntities/mountain.js";
 import { Player } from "./worldEntities/player.js";
 import { Spike } from "./worldEntities/spike.js";
@@ -153,6 +153,11 @@ ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/area_light.frag.glsl");
+
+// === UI Assets ===
+ASSET_MANAGER.queueDownload("res/img/ui/health_bar_endcap.png");
+ASSET_MANAGER.queueDownload("res/img/ui/health_bar_midpiece.png");
+ASSET_MANAGER.queueDownload("res/img/ui/health_bar_startcap.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
