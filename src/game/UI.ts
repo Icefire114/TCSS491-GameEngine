@@ -138,11 +138,6 @@ export class UILayer extends ForceDraw implements Entity {
         // ctx.font = "30px Arial";
         // ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
 
-        // ctx.fillStyle = "rgb(255, 60, 0)";
-        // ctx.font = "30px Arial";
-        // ctx.fillText(`Health: ${player.health}`, ctx.canvas.width - 200, 80);
-
-
         const endcapSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarEndCap);
         const midSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarMidPiece);
         const startSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarStart);
