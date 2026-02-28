@@ -1,5 +1,5 @@
 import { InfectionImmunityItem } from "./InfectionImmunity.js";
-import { ShieldRestorePickupItem } from "./ShieldRestore.js";
+import { ShieldRestorePickupItem } from "./ShieldBoost.js";
 import { InstantHealthPickupBuff } from "./InstantHealthPickupBuff.js";
 import { AmmoRestore } from "./AmmoRestore.js";
 import { Animator, AnimationState } from "../../engine/Animator.js";

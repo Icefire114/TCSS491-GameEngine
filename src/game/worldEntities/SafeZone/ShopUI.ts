@@ -5,7 +5,7 @@ import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Player } from "../player.js";
 import { AmmoRestore } from "../../Items/AmmoRestore.js";
 import { InstantHealthPickupBuff } from "../../Items/InstantHealthPickupBuff.js";
-import { ShieldRestorePickupItem } from "../../Items/ShieldRestore.js";
+import { ShieldRestorePickupItem } from "../../Items/ShieldBoost.js";
 import { Buff } from "../../Items/Buff.js";
 
 interface ShopItem {
@@ -61,7 +61,7 @@ export class ShopUI extends ForceDraw implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "Boots health\nby 25 points.\n(Can exceed max health)",
+            description: "Boots max health\nby 25 points.",
             cost: 150,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
