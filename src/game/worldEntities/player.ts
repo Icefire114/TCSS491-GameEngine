@@ -484,6 +484,16 @@ export class Player implements Entity, Collidable {
                     break;
                 case "Health":
                     this.health = Math.max(0, this.health - damage);
+                    if (this.health <= 0) {
+                        this.dead = true;
+                        GameEngine.g_INSTANCE.addUniqueEntity(
+                            new DeathScreen(this.position.x, this.position.y, () => {
+                                // in order to reset, refresh windows! 
+                                window.location.reload();
+                            }, "ravine"), //TODO FIXME: Should be another kind of death screen for reaching 0 hp
+                            998 as DrawLayer  // just below intro screen layer
+                        );
+                    }
                     break;
             }
         }
