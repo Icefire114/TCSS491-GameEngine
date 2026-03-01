@@ -32,6 +32,10 @@ import { JumpBoostItem } from "./Items/JumpBoostItem.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { IntroScreen } from "./IntroScreen.js";
 import { BossArena } from "./worldEntities/BossArena.js"
+import { BackgroundLayer } from "./worldBackground/BackgroundLayer.js";
+import { ForegroundLayer } from "./worldBackground/ForegroundLayer.js";
+import { SkyLayer } from "./worldBackground/SkyLayer.js";
+import { DayNightCycle } from "./worldBackground/DayNightCycle.js";
 
 
 
@@ -41,7 +45,6 @@ import { BossArena } from "./worldEntities/BossArena.js"
 
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine(ASSET_MANAGER);
-const background = new Background();
 ASSET_MANAGER.queueDownload("res/img/player_new.png");
 ASSET_MANAGER.queueDownload("res/img/snowboard.png");
 ASSET_MANAGER.queueDownload("res/img/soldiers/Soldier_1/Idle.png");
@@ -178,8 +181,39 @@ function main() {
         GameEngine.g_INSTANCE.addUniqueEntity(new Player(new Vec2(55, 0)), DrawLayer.PLAYER);
         gameEngine.positionScreenOnEnt(unwrap(gameEngine.getUniqueEntityByTag("player")), 0.15, 0.65);
         gameEngine.snapViewportToFollowedEnt();
-        background.start();
-        //gameEngine.addUniqueEntity(new Background("res/img/Plan 5.png", 150), DrawLayer.BACKGROUND);
+        gameEngine.addUniqueEntity(new DayNightCycle(
+            [
+            new ImagePath("res/img/background/sky/sun.png"),
+            new ImagePath("res/img/background/sky/moon.png")
+            ]
+        ), DrawLayer.BACKGROUND);
+        gameEngine.addUniqueEntity(new SkyLayer(
+            0,
+            [
+            new ImagePath("res/img/background/background/day.png"),
+            new ImagePath("res/img/background/background/night.png")
+            ]
+        ), DrawLayer.SKY);
+        gameEngine.addUniqueEntity(new BackgroundLayer(
+            0.3,
+            [
+            new ImagePath("res/img/background/middleground/middle1.png"),
+            new ImagePath("res/img/background/middleground/middle2.png"),
+            new ImagePath("res/img/background/middleground/middle3.png"),
+            new ImagePath("res/img/background/middleground/middle4.png"),
+            new ImagePath("res/img/background/middleground/middle5.png")
+            ]
+        ), DrawLayer.BACKGROUND);
+        gameEngine.addUniqueEntity(new ForegroundLayer(
+            0.8,
+            [
+            new ImagePath("res/img/background/foreground/fore1.png"),
+            new ImagePath("res/img/background/foreground/fore2.png"),
+            new ImagePath("res/img/background/foreground/fore3.png"),
+            new ImagePath("res/img/background/foreground/fore4.png"),
+            new ImagePath("res/img/background/foreground/fore5.png")
+            ]
+        ), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
         const armoryUI: ArmoryUI = gameEngine.addUniqueEntity(new ArmoryUI(), DrawLayer.UI_LAYER) as ArmoryUI;
