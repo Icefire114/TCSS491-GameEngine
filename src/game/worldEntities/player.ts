@@ -18,6 +18,7 @@ import { AssultRifle } from "../Items/guns/AssultRifle.js";
 import { DeathScreen } from "../DeathScreen.js";
 import { RavineDeathZone } from "./RavineZone.js";
 import { RayGun } from "../Items/guns/RayGun.js";
+import { UILayer } from "../UI.js";
 
 
 export type DamageType = "Infection" | "Health";
@@ -232,6 +233,7 @@ export class Player implements Entity, Collidable {
 
     // players max health (smash bros health system where 0% is min infection)
     minInfection: number = 0;
+    maxInfection: number = 200;
     maxHealth: number = 100;
 
     // Flying cheat
@@ -467,9 +469,11 @@ export class Player implements Entity, Collidable {
                         death *= this.hitMultiplier;
                         console.log(`Adjusted death chance: ${death.toFixed(2)}`);
 
-                        if (death >= 150) { // chance of death increases with health%
+                        if (death >= 170 || this.infection >= this.maxInfection) { // chance of death increases with infection%
                             //console.log(`Player has died!`);
                             this.dead = true;
+                            // hack to force the UI to refresh when the player dies, showing what their infection is at
+                            (GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER") as UILayer).draw(GameEngine.g_INSTANCE['ctx'], GameEngine.g_INSTANCE);
 
                             // The Check if we need a death screen
                             GameEngine.g_INSTANCE.addUniqueEntity(
@@ -485,6 +489,8 @@ export class Player implements Entity, Collidable {
                 case "Health":
                     this.health = Math.max(0, this.health - damage);
                     if (this.health <= 0) {
+                        // hack to force the UI to refresh when the player dies, showing what health is at
+                        (GameEngine.g_INSTANCE.getUniqueEntityByTag("UI_LAYER") as UILayer).draw(GameEngine.g_INSTANCE['ctx'], GameEngine.g_INSTANCE);
                         this.dead = true;
                         GameEngine.g_INSTANCE.addUniqueEntity(
                             new DeathScreen(this.position.x, this.position.y, () => {

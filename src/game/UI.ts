@@ -35,6 +35,9 @@ export class UILayer extends ForceDraw implements Entity {
     private m_healthBarEndCap: ImagePath = new ImagePath("res/img/ui/health_bar_endcap.png");
     private m_healthBarMidPiece: ImagePath = new ImagePath("res/img/ui/health_bar_midpiece.png");
     private m_healthBarStart: ImagePath = new ImagePath("res/img/ui/health_bar_startcap.png");
+    private m_infBarEnd: ImagePath = new ImagePath("res/img/ui/infection_bar_end.png");
+    private m_infBarMid: ImagePath = new ImagePath("res/img/ui/infection_bar_mid.png");
+    private m_infBarStart: ImagePath = new ImagePath("res/img/ui/infection_bar_start.png");
 
     constructor(shop: ShopUI, armory: ArmoryUI) {
         super();
@@ -128,16 +131,7 @@ export class UILayer extends ForceDraw implements Entity {
     }
 
     private drawPlayerHealthAndInfectionBar(ctx: CanvasRenderingContext2D, player: Player): void {
-        // if (player.infection < 100) {
-        //     ctx.fillStyle = "green";
-        // } else if (player.infection < 200) {
-        //     ctx.fillStyle = "orange";
-        // } else {
-        //     ctx.fillStyle = "red";
-        // }
-        // ctx.font = "30px Arial";
-        // ctx.fillText(`Infection: ${player.infection}%`, ctx.canvas.width - 200, 40);
-
+        /// === Health Bar ===
         const endcapSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarEndCap);
         const midSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarMidPiece);
         const startSprite = GameEngine.g_INSTANCE.getSprite(this.m_healthBarStart);
@@ -153,11 +147,46 @@ export class UILayer extends ForceDraw implements Entity {
         }
         ctx.drawImage(startSprite, ctx.canvas.width - 35 - midSprite.width * (neededMidPieces + 1), 15);
 
+        // this is so fucking wrong, but it just works so im not touching it.
         const pixelsWeCanFill = (neededMidPieces - 1) * midSprite.width;
         ctx.fillStyle = "rgb(212, 0, 0)";
         ctx.fillRect(ctx.canvas.width - 19, 18, -1 * pixelsWeCanFill * playerHPPercent, 32);
-        console.log(playerHPPercent, neededMidPieces);
 
+        /// === Infection Bar ===
+        const infection_bar_end = GameEngine.g_INSTANCE.getSprite(this.m_infBarEnd);
+        const infection_bar_mid = GameEngine.g_INSTANCE.getSprite(this.m_infBarMid);
+        const infection_bar_start = GameEngine.g_INSTANCE.getSprite(this.m_infBarStart);
+        ctx.drawImage(infection_bar_end, ctx.canvas.width - 35, 55);
+        ctx.drawImage(infection_bar_mid, ctx.canvas.width - 35 - infection_bar_end.width, 55);
+        for (let i = 1; i < 10; i++) {
+            ctx.drawImage(infection_bar_mid, ctx.canvas.width - 35 - infection_bar_mid.width * i, 55);
+        }
+        ctx.drawImage(infection_bar_start, ctx.canvas.width - 35 - (infection_bar_mid.width * 9) - infection_bar_start.width, 55);
+
+        console.log(player.infection);
+
+        const infBarPixelsWeCanFill = (infection_bar_end.width - 3 + (infection_bar_mid.width * 9) + (infection_bar_start.width - 43));
+        const fillRatio = player.infection / player.maxInfection;
+        const totalFill = infBarPixelsWeCanFill * fillRatio;
+
+        const startX = ctx.canvas.width - 25;
+        // ctx.fillStyle = "white";
+        // ctx.fillRect(startX, 60, -infBarPixelsWeCanFill, 18);
+
+        // Draw red segment (80%–100% zone)
+        const redFill = Math.max(0, totalFill - infBarPixelsWeCanFill * 0.80);
+        ctx.fillStyle = "red";
+        ctx.fillRect(startX, 60, -redFill, 18);
+
+        // Draw orange on top (50%–80% zone), overwriting red in that range
+        const orangeFill = Math.min(totalFill, infBarPixelsWeCanFill * 0.80);
+        ctx.fillStyle = "orange";
+        ctx.fillRect(startX, 60, -orangeFill, 18);
+
+        // Draw green on top (0%–50% zone)
+        const greenFill = Math.min(totalFill, infBarPixelsWeCanFill * 0.50);
+        ctx.fillStyle = "green";
+        ctx.fillRect(startX, 60, -greenFill, 18);
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {

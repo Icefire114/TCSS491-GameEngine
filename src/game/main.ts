@@ -158,6 +158,9 @@ ASSET_MANAGER.queueDownload("res/shader/area_light.frag.glsl");
 ASSET_MANAGER.queueDownload("res/img/ui/health_bar_endcap.png");
 ASSET_MANAGER.queueDownload("res/img/ui/health_bar_midpiece.png");
 ASSET_MANAGER.queueDownload("res/img/ui/health_bar_startcap.png");
+ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_end.png");
+ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_mid.png");
+ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_start.png");
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
