@@ -15,6 +15,7 @@ import { SafeZoneTurretWall } from "./SafeZoneTurretWall.js";
 import { Shop } from "./Shop.js";
 import { SafeZoneNotification } from "./SafeZoneNotification.js";
 import { DecoFactory } from "../../worldDeco/DecorationFactory.js";
+import { Background } from "../../worldBackground/Background.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -113,7 +114,7 @@ export class SafeZone implements Entity {
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
-
+        Background.randomizeIndex(5);
         // Triggering a notfication to occur once we eneter
         if (!this.hasNotified) {
             // Spawn the UI Notification
