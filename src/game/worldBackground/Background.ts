@@ -3,22 +3,24 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { ImagePath } from "../../engine/assetmanager.js";
 import { unwrap } from "../../engine/util.js";
+import { Player } from "../worldEntities/player.js";
 
 
 export abstract class Background implements Entity, ForceDraw{
 
     parallaxSpeed: number;
     spritePaths: ImagePath[];
+    static currentSpriteIndex = 0;
     
 
     public id: EntityID;
-    public player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"));
+    public player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
     tag: string;
 
     position: Vec2 = new Vec2();
     velocity: Vec2 = new Vec2();
     physicsCollider: null = null;
-    sprite: ImagePath;
+    sprite = null;
     removeFromWorld: boolean = false;
     worldWidth = GameEngine.WORLD_UNITS_IN_VIEWPORT;
     // startY: number;
@@ -28,8 +30,6 @@ export abstract class Background implements Entity, ForceDraw{
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         
         this.parallaxSpeed = parallaxSpeed;
-
-        this.sprite = spritePaths[0];
         this.spritePaths = spritePaths;
         // this.startY = 30;
     }
@@ -42,7 +42,7 @@ export abstract class Background implements Entity, ForceDraw{
         const intro = game.getUniqueEntityByTag("intro_screen") as any;
         const blendAlpha = intro ? intro.getAlpha() : 0;
 
-        const sprite  = game.getSprite(this.sprite);
+        const sprite  = game.getSprite(this.spritePaths[Background.currentSpriteIndex]);
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const w = this.worldWidth * scale;
@@ -81,5 +81,9 @@ export abstract class Background implements Entity, ForceDraw{
             ctx.fillStyle = blueGrad;
             ctx.fillRect(0, 0, W, H);
         }
+    }
+
+    static randomizeIndex(spriteCount: number) {
+        Background.currentSpriteIndex = Math.floor(Math.random() * spriteCount);
     }
 }

@@ -15,6 +15,10 @@ export class SkyLayer extends Background {
         this.nightSprite = spritePaths[1];
     }
 
+    update(keys: { [key: string]: boolean; }, deltaTime: number): void {
+        this.position = this.player.position;
+    }
+
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         const dayNight = game.getUniqueEntityByTag("DayNightCycle") as DayNightCycle;
         const intro = game.getUniqueEntityByTag("intro_screen") as any;
@@ -30,20 +34,13 @@ export class SkyLayer extends Background {
         const screenY = ctx.canvas.height;
 
         // Always draw day sky fully opaque as the base
-    ctx.globalAlpha = 1;
-    ctx.drawImage(daySprite, 0, screenY - h, w, h);
+        ctx.globalAlpha = 1;
+        ctx.drawImage(daySprite, 0, screenY - h, w, h);
 
-    // Blend night sky on top based on time of day
-    ctx.globalAlpha = dayNight.timeOfDayAlpha;
-    ctx.drawImage(nightSprite, 0, screenY - h, w, h);
-
-
-    ctx.globalAlpha = 1;
-
-        // ctx.globalAlpha = this.dayNightCycle.timeOfDayAlpha;
-        // ctx.drawImage(daySprite,  0, screenY - h, w, h);
-        // ctx.drawImage(nightSprite,  0, screenY - h, w, h);
-        // ctx.globalAlpha = 1;
+        // Blend night sky on top based on time of day
+        ctx.globalAlpha = dayNight.timeOfDayAlpha;
+        ctx.drawImage(nightSprite, 0, screenY - h, w, h);
+        ctx.globalAlpha = 1;
 
         this.blueSmokeDrawing(ctx, blendAlpha);
     }
