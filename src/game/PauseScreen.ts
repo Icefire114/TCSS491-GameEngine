@@ -12,8 +12,8 @@ type MenuItem = {
 export class PauseScreen extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "pause_screen";
-    position: Vec2    = new Vec2();
-    velocity: Vec2    = new Vec2();
+    position: Vec2 = new Vec2();
+    velocity: Vec2 = new Vec2();
     physicsCollider: Collider | null = null;
     sprite: ImagePath | null = null;
     removeFromWorld: boolean = false;
@@ -23,10 +23,10 @@ export class PauseScreen extends ForceDraw implements Entity {
     private upWasPressed: boolean = false;
     private downWasPressed: boolean = false;
     private enterWasPressed: boolean = false;
-    private selectedIndex:   number  = 0;
-    
+    private selectedIndex: number = 0;
+
     // Transititon settings
-    private fadeAlpha: number  = 0;
+    private fadeAlpha: number = 0;
     private readonly FADE_SPEED = 8; // alpha/sec
 
     private readonly MENU_ITEMS: MenuItem[] = [
@@ -44,11 +44,11 @@ export class PauseScreen extends ForceDraw implements Entity {
      */
     private open(game: GameEngine): void {
         this.selectedIndex = 0;
-        this.fadeAlpha     = 0;
+        this.fadeAlpha = 0;
         game.pause();
     }
 
-    
+
     /**
      * Handles pause menu when close  logic 
      */
@@ -57,7 +57,7 @@ export class PauseScreen extends ForceDraw implements Entity {
         game.resume();
     }
 
-    update(keys:{ [key: string]: boolean }, dt: number, _click: { x: number; y: number } | null, _mouse: { x: number; y: number } | null): void {
+    update(keys: { [key: string]: boolean }, dt: number, _click: { x: number; y: number } | null, _mouse: { x: number; y: number } | null): void {
         const game = GameEngine.g_INSTANCE;
 
         // If game phase is in intro screen, dont show pause 
@@ -72,30 +72,30 @@ export class PauseScreen extends ForceDraw implements Entity {
     /**
      * Toggle pause with escape 
      */
-    handlePauseToggle(keys:{ [key: string]: boolean}, game: GameEngine, dt: number) {
-         // Toggle pause with ESC 
+    handlePauseToggle(keys: { [key: string]: boolean }, game: GameEngine, dt: number) {
+        // Toggle pause with ESC 
         const escDown = !!keys["Escape"];
         if (escDown && !this.escWasPressed) {
             if (game.isPaused()) {
                 this.close(game);
             } else {
                 this.open(game);
-            }   
+            }
         }
 
         this.escWasPressed = escDown;
 
         if (!game.isPaused()) return;
 
-         // Animation fade in
+        // Animation fade in
         this.fadeAlpha = Math.min(1, this.fadeAlpha + this.FADE_SPEED * dt);
     }
 
     /**
      * Hanldes the pause menu navigation keys 
      */
-    handlePauseNav(keys:{ [key: string]: boolean}) {
-         // Using arrow or WASD for pause menu nav
+    handlePauseNav(keys: { [key: string]: boolean }) {
+        // Using arrow or WASD for pause menu nav
         const upDown = !!(keys["ArrowUp"] || keys["w"] || keys["W"]);
         if (upDown && !this.upWasPressed) {
             this.selectedIndex =
@@ -113,7 +113,7 @@ export class PauseScreen extends ForceDraw implements Entity {
     /**
      * Handle when the player choose an option
      */
-    handleOptionSelection(keys:{ [key: string]: boolean}, game: GameEngine) {
+    handleOptionSelection(keys: { [key: string]: boolean }, game: GameEngine) {
         // Confirm by pressing enter
         const enterDown = !!(keys["Enter"] || keys[" "]);
         if (enterDown && !this.enterWasPressed) {
@@ -145,7 +145,7 @@ export class PauseScreen extends ForceDraw implements Entity {
         this.drawDivier(ctx, panelX, panelY, panelW)
         this.drawPauseMenuOptions(ctx, W, panelY, panelX, panelW);
         this.drawFooterText(ctx, W, panelY, panelH);
-        ctx.restore(); 
+        ctx.restore();
     }
 
     /**
@@ -170,8 +170,8 @@ export class PauseScreen extends ForceDraw implements Entity {
         // Shadow / glow behind panel
         ctx.save();
         ctx.shadowColor = `rgba(35,197,246,0.18)`;
-        ctx.shadowBlur  = 56;
-        ctx.fillStyle   = "rgba(6, 10, 18, 0.97)";
+        ctx.shadowBlur = 56;
+        ctx.fillStyle = "rgba(6, 10, 18, 0.97)";
         this.drawRectangle(ctx, panelX, panelY, panelW, panelH, 12);
         ctx.fill();
         ctx.restore();
@@ -179,7 +179,7 @@ export class PauseScreen extends ForceDraw implements Entity {
         // Border
         ctx.save();
         ctx.strokeStyle = "rgba(35,197,246,0.14)";
-        ctx.lineWidth   = 2;
+        ctx.lineWidth = 2;
         this.drawRectangle(ctx, panelX, panelY, panelW, panelH, 12);
         ctx.stroke();
         ctx.restore();
@@ -195,13 +195,13 @@ export class PauseScreen extends ForceDraw implements Entity {
      */
     drawPauseMenuTitle(ctx: CanvasRenderingContext2D, W: number, panelY: number) {
         ctx.save();
-        ctx.font = "bold 76px 'Bebas Neue', 'Share Tech Mono', monospace"; 
+        ctx.font = "bold 76px 'Bebas Neue', 'Share Tech Mono', monospace";
         ctx.fillStyle = "#d8edf6";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.shadowColor = "rgba(35,197,246,0.5)";
         ctx.shadowBlur = 24;
-        ctx.fillText("PAUSED", W / 2, panelY + 98); 
+        ctx.fillText("PAUSED", W / 2, panelY + 98);
         ctx.restore();
     }
 
@@ -211,9 +211,9 @@ export class PauseScreen extends ForceDraw implements Entity {
     drawDivier(ctx: CanvasRenderingContext2D, panelX: number, panelY: number, panelW: number) {
         ctx.save();
         ctx.strokeStyle = "rgba(77,164,250,0.25)";
-        ctx.lineWidth   = 2;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(panelX + 40, panelY + 162);  
+        ctx.moveTo(panelX + 40, panelY + 162);
         ctx.lineTo(panelX + panelW - 40, panelY + 162);
         ctx.stroke();
         ctx.restore();
@@ -224,9 +224,9 @@ export class PauseScreen extends ForceDraw implements Entity {
     /**
      * Helps draw each of the options in the pause menu
      */
-    drawPauseMenuOptions(ctx: CanvasRenderingContext2D, W: number, panelY: number, panelX:number, panelW:number) {
-        const menuStartY = panelY + 220; 
-        const menuSpacing = 100;     
+    drawPauseMenuOptions(ctx: CanvasRenderingContext2D, W: number, panelY: number, panelX: number, panelW: number) {
+        const menuStartY = panelY + 220;
+        const menuSpacing = 100;
 
         this.MENU_ITEMS.forEach((item, idx) => {
             const optionY = menuStartY + idx * menuSpacing;
@@ -239,7 +239,7 @@ export class PauseScreen extends ForceDraw implements Entity {
                 ctx.shadowColor = "rgba(35,197,246,0.45)";
                 ctx.shadowBlur = 32;
                 ctx.fillStyle = "rgba(35,197,246,0.10)";
-                ctx.fillRect(panelX + 32, optionY - 32, panelW - 64, 64);  
+                ctx.fillRect(panelX + 32, optionY - 32, panelW - 64, 64);
                 ctx.restore();
                 ctx.fillStyle = "#23c5f6";
                 ctx.fillRect(panelX + 32, optionY - 32, 6, 64);
@@ -247,15 +247,15 @@ export class PauseScreen extends ForceDraw implements Entity {
 
             // menu options text 
             ctx.save();
-            ctx.font = `${selected ? "bold" : "normal"} 30px 'Share Tech Mono', 'Courier New', monospace`; 
+            ctx.font = `${selected ? "bold" : "normal"} 30px 'Share Tech Mono', 'Courier New', monospace`;
             ctx.fillStyle = selected ? "#e8f6ff" : "rgba(160,200,220,0.35)";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            
+
             // Text selected, change color
             if (selected) {
                 ctx.shadowColor = "rgba(35,197,246,0.7)";
-                ctx.shadowBlur  = 16;
+                ctx.shadowBlur = 16;
             }
             ctx.fillText(item.label, W / 2, optionY);
             ctx.restore();
@@ -266,9 +266,9 @@ export class PauseScreen extends ForceDraw implements Entity {
     /**
      * Draws the bottom text of the pause menu
      */
-    drawFooterText(ctx: CanvasRenderingContext2D, W: number, panelY:number, panelH:number) {
+    drawFooterText(ctx: CanvasRenderingContext2D, W: number, panelY: number, panelH: number) {
         ctx.save();
-        ctx.font = "18px 'Share Tech Mono', 'Courier New', monospace"; 
+        ctx.font = "18px 'Share Tech Mono', 'Courier New', monospace";
         ctx.fillStyle = "rgba(180, 220, 255, 0.75)";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";

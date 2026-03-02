@@ -36,7 +36,7 @@ import { BackgroundLayer } from "./worldBackground/BackgroundLayer.js";
 import { ForegroundLayer } from "./worldBackground/ForegroundLayer.js";
 import { SkyLayer } from "./worldBackground/SkyLayer.js";
 import { DayNightCycle } from "./worldBackground/DayNightCycle.js";
-import { PauseScreen } from "./Pausescreen.js";
+import { PauseScreen } from "./PauseScreen.js";
 
 
 
