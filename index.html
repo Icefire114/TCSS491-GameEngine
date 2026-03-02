@@ -1,36 +1,197 @@
 ﻿<!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <title>TCSS491-GameEngine</title>
+  <meta charset="utf-8">
+  <title>TCSS491-GameEngine</title>
+    <!-- Linking our css to our html-->
+  <link rel="stylesheet" href="styles.css">
 
-    <script type="importmap">
-    {
-        "imports": {
-            "rand-seed": "https://cdn.skypack.dev/rand-seed"
-        }
+  <!-- Importing our random seed library-->
+  <script type="importmap">
+  {
+    "imports": {
+      "rand-seed": "https://cdn.skypack.dev/rand-seed"
     }
-    </script>
-
+  }
+  </script>
 </head>
 
 <body>
-    <!-- Only AI could come up with something this jank-->
-    <script>
-        const script = document.createElement('script');
-        script.type = 'module';
+  <div class="nv-vignette"></div>
+  <div id="shell">
 
-        const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (!window.chrome) {
-            alert("Browsers other than Chrome are not supported, and have been seen to have performance issues, please use Chrome")
-        }
+    <!-- STEEP Header -->
+    <header id="game-header">
+      <!-- Line under the Title -->
+      <div class="header-accent"></div>
 
-        script.src = isDev ? './build/game/main.js' : './bundle.js';
-        document.body.appendChild(script);
-    </script>
-    <canvas id="gameCanvas" width="1280" height="720" style="background: white; border: 1px solid black" tabindex="0"
-        autofocus></canvas>
+      <!-- The header title on the top left-->
+      <div class="header-top">
+        <div class="logo-block">
+          <div class="gameTitle">STEEP</div>
+          <div class="logo-rule"></div>
+        </div>
+        
+        <!-- fLashign OutBreak Active sign-->
+        <div class="status-cluster">
+          <div class="statusSymbol">OUTBREAK ACTIVE</div>
+        </div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="header-bottom">
+        <nav id="game-nav">
+          <div class="nav-item active" onclick="setNav(this,'play')">PLAY</div>
+          <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
+          <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
+        </nav>
+
+        <!-- Clock on the top right -->
+        <div class="nav-readouts">
+          <span>TIME&nbsp;<span class="rval" id="clock">--:--:--</span></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Canvas + Panels -->
+    <div id="canvas-container">
+      <!-- Loading Overlay -->
+      <div id="loading-overlay">
+        <div class="load-title">
+          LOADING<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+        </div>
+        <div class="load-bar-wrap"><div class="load-bar"></div></div>
+        <div class="load-percent" id="load-percent">0%</div> 
+        <div class="load-status" id="load-status-text">Initializing engine…</div>
+      </div>
+          
+      <!-- Controls Page -->
+      <div id="panel-controls" class="content-panel">
+        <h2>TACTICAL CONTROLS</h2>
+        <div class="panel-rule"></div>
+        <div class="controls-grid">
+          <div class="ctrl-row"><div class="ctrl-key">W A S D</div><div class="ctrl-desc">Move Player</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">MOUSE</div><div class="ctrl-desc">Aim</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">LMB</div><div class="ctrl-desc">Shoot</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">R</div><div class="ctrl-desc">Reload Magazine</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">E</div><div class="ctrl-desc">Interact</div></div>
+          <div class="ctrl-row"><div class="ctrl-key">ESC</div><div class="ctrl-desc">Pause System</div></div>
+        </div>
+      </div>
+
+      <!-- Info Page -->
+      <div id="panel-about" class="content-panel">
+        <h2>Info Page</h2>
+        <div class="panel-rule"></div>
+        <div class="about-body">
+          <p class="about-lead">STEEP: Crystal Mountain</p>
+          <p>The world has fallen to an unknown biological anomaly. You're a stranded snowboarder on Crystal Mountain. Survive the descent, pick up resources, and eliminate hostile biologicals.</p>
+          <p class="about-lead">Development Command</p>
+          <p>2026 - TCSS491 Game Project</p>
+        </div>
+        <div class="about-stats">
+          VERSION <span>0.1.0-ALPHA</span>
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          ENGINE <span>NATIVE CANVAS</span>
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          TEAM <span>PHALEN G · MANI S · JOSHUA K · JAMES E</span>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div id="canvas-wrap">
+        <div class="corner-tl"></div>
+        <div class="corner-tr"></div>
+        <div class="corner-bl"></div>
+        <div class="corner-br"></div>
+        <canvas id="gameCanvas" width="1280" height="720" tabindex="0" autofocus></canvas>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="game-footer">
+      <div class="footer-center">
+        <div class="pulse-dot"></div>
+        <div class="build-info">BUILD v0.1 &nbsp;·&nbsp; TCSS 491 &nbsp;·&nbsp; CHROME REQUIRED</div>
+      </div>
+    </footer>
+
+  </div> 
+
+  <!-- Game Engine Loader -->
+  <script>
+    const script = document.createElement('script');
+    script.type = 'module';
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!window.chrome) {
+      alert("Browsers other than Chrome are not supported, and have been seen to have performance issues, please use Chrome");
+    }
+    script.src = isDev ? './build/game/main.js' : './bundle.js';
+    document.body.appendChild(script);
+  </script>
+
+  <!-- Navigation Handler -->
+  <script>
+    // Handles switching between the different content panels when clicking on the nav items
+    function setNav(el, target) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+      if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
+    }
+  </script>
+
+  <!-- Clock Handler -->
+  <script>
+    function tick() {
+      const d = new Date();
+      document.getElementById('clock').textContent =
+        d.getHours().toString().padStart(2,'0') + ':' +
+        d.getMinutes().toString().padStart(2,'0') + ':' +
+        d.getSeconds().toString().padStart(2,'0');
+    }
+    tick(); 
+    setInterval(tick, 1000);
+  </script>
+
+ <!-- Loading Screen Handler -->
+<script>
+  window.addEventListener('load', function() {
+    const overlay = document.getElementById('loading-overlay');
+    const statusText = document.getElementById('load-status-text');
+    const percentText = document.getElementById('load-percent');  // ← Add this
+    const bar = document.querySelector('.load-bar');
+
+    const steps = [
+      { pct: 12,  delay: 200,  msg: 'Loading terrain data…' },
+      { pct: 28,  delay: 600,  msg: 'Loading terrain data…' },
+      { pct: 31,  delay: 150,  msg: 'Spawning hostiles…' },
+      { pct: 55,  delay: 800,  msg: 'Spawning hostiles…' },
+      { pct: 62,  delay: 200,  msg: 'Calibrating weapons…' },
+      { pct: 63,  delay: 500,  msg: 'Calibrating weapons…' },
+      { pct: 80,  delay: 400,  msg: 'Establishing comms…' },
+      { pct: 85,  delay: 700,  msg: 'Establishing comms…' },
+      { pct: 94,  delay: 300,  msg: 'All systems nominal.' },
+      { pct: 100, delay: 400,  msg: 'All systems nominal.' },
+    ];
+
+    let i = 0;
+    function next() {
+      if (i >= steps.length) {
+        setTimeout(() => overlay.classList.add('hidden'), 500);
+        return;
+      }
+      const step = steps[i++];
+      bar.style.width = step.pct + '%';
+      percentText.textContent = step.pct + '%';
+      percentText.style.animation = 'none';
+      void percentText.offsetWidth;
+      percentText.style.animation = 'percentPulse 0.3s ease';
+      setTimeout(next, step.delay);
+    }
+    next();
+  });
+</script>
+</script>
 </body>
-
 </html>

@@ -35,6 +35,7 @@ export class GameEngine {
     private keys: { [key: string]: boolean };
     private options: { debugging: boolean };
     private running: boolean;
+    private paused:  boolean = false; 
     private timer: Timer;
     private clockTick: number;
     private assetManager: AssetManager;
@@ -42,6 +43,11 @@ export class GameEngine {
     private m_followPercenageX: number = 0.1;
     private m_followPercentageY: number = 0.5;
     private m_Renderer: Renderer;
+
+    // PUblic accessors so that we can tell what state the game phases we are in 
+    pause(): void { this.paused = true;  }
+    resume(): void { this.paused = false; }
+    isPaused(): boolean { return this.paused;  }
 
     // Reset Field
     public resetCallback: (() => void) | null = null;
@@ -268,6 +274,14 @@ export class GameEngine {
             this.ctx.restore();
         }
 
+        // Pause screen draws above everything except intro
+        const pauseEnt = this.uniqueEnts.get("pause_screen")?.[0];
+        if (pauseEnt && this.paused) {
+            this.ctx.save();
+            pauseEnt.draw(this.ctx, this);
+            this.ctx.restore();
+        }
+
         // Shows Colliders only if the game is actually running 
         if (G_CONFIG.DRAW_PHYSICS_COLLIDERS && this.running && !this.uniqueEnts.has("death_screen")) {
             const meterInPixelsX = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
@@ -326,19 +340,31 @@ export class GameEngine {
         if (!this.running) return;
 
         const updateStart = performance.now();
-        for (const set of this.ents.values()) {
-            for (const [entity] of set) {
-                if (!entity.removeFromWorld && entity.tag !== "intro_screen") {
-                    const t0 = performance.now();
-                    entity.update(this.keys, dt, this.click, this.mouse);
-                    const t = t0 - performance.now();
-                    if (t > 10) {
-                        console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
-                    }
 
+        // Handling the pause state
+        if (this.paused) {
+            // While paused: ONLY update the pause_screen so ESC/input still works
+            const pauseEnt = this.uniqueEnts.get("pause_screen")?.[0];
+            
+            if (pauseEnt && !pauseEnt.removeFromWorld) {
+                pauseEnt.update(this.keys, dt, this.click, this.mouse);
+            } 
+        } else {
+            for (const set of this.ents.values()) {
+                for (const [entity] of set) {
+                    if (!entity.removeFromWorld && entity.tag !== "intro_screen") {
+                        const t0 = performance.now();
+                        entity.update(this.keys, dt, this.click, this.mouse);
+                        const t = t0 - performance.now();
+                        if (t > 10) {
+                            console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
+                        }
+
+                    }
                 }
             }
         }
+
         const updateEnd = performance.now();
         const updateTime = updateEnd - updateStart;
         if (updateTime > 10) {

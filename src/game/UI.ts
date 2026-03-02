@@ -10,6 +10,18 @@ import { Player } from "./worldEntities/player.js";
 import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { G_CONFIG } from "./CONSTANTS.js";
+
+// Constants used for Panel layout - MODERATELY INCREASED SIZES
+const PANEL_W = 270;
+const PANEL_H = 230;
+const PANEL_PAD_X = 16;
+const PANEL_PAD_TOP = 16;
+const PANEL_MARGIN = 18;
+const PANEL_RADIUS = 7;
+const ROW_H = 42;
+const BAR_H = 6;
+const HUD_FONT = "'Share Tech Mono', 'Courier New', monospace";
+
 export class UILayer extends ForceDraw implements Entity {
     readonly id: EntityID;
     readonly tag: string = "UI_LAYER";
@@ -53,15 +65,33 @@ export class UILayer extends ForceDraw implements Entity {
         const player: Player = unwrap(game.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
 
         ctx.save();
-        // Collect TEMP_BUFFS
-        const tempBuffs: (Buff & TempBuff)[] = player.buffs.filter(
+
+        // Drawing the different parts of UI 
+        this.drawTempBuffs(ctx, game, player);
+        this.drawHUDPanel(ctx, player);
+        this.drawInteractionPrompt(ctx);
+
+        if (this.shop.isOpen) {
+            ctx.save();
+            this.shop.draw(ctx, game);
+            ctx.restore();
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Drawing the temp buffs UI  
+     */
+    private drawTempBuffs(ctx: CanvasRenderingContext2D, game: GameEngine, player: Player): void {
+        const tempBuffs = player.buffs.filter(
             (item) => item.type === BuffType.TEMP_BUFF
         ) as (Buff & TempBuff)[];
 
         // Draw TEMP_BUFFS in the top-right, 2% in from the left edge
         const margin = Math.round(ctx.canvas.width * 0.02);
-        const iconSize = 32; // adjust to your sprite size
-        const spacing = 4;
+        const iconSize = 40;
+        const spacing = 6;
         const buffBarLen = 4;
 
         tempBuffs.forEach((buff, idx) => {
@@ -80,53 +110,66 @@ export class UILayer extends ForceDraw implements Entity {
             const h = sprite.height;
             ctx.save();
             switch (item.type) {
-                // TODO: Find a better place to display these to the user (in a safe zone?)
                 case ItemType.GUN:
                     break;
             }
             ctx.restore();
         }
-
         this.drawPlayerHealthAndInfectionBar(ctx, player);
+    }
 
-        // draw total player weapon ammo below shield
-        ctx.fillStyle = "black";
-        ctx.font = "30px Arial";
-        ctx.fillText(`Ammo: ${player.weapon.ammoOnHand}`, ctx.canvas.width - 200, 120);
-        //console.log(`Player Total Ammo: ${player.ammoOnHand}`);
+    // Drawing the Hud Panel itself
 
-        // draw mag count below shield
-        ctx.fillStyle = "black";
-        ctx.font = "30px Arial";
-        ctx.fillText(`Mag: ${player.weapon.ammoInGun}/${player.weapon.magSize}`, ctx.canvas.width - 200, 160);
-        //console.log(`Player Ammo: ${player.ammo}`);
+    /**
+     * Handles in drawing all the hud pieces together
+     */
+    private drawHUDPanel(ctx: CanvasRenderingContext2D, player: Player): void {
+        // Panel Settings
+        const panelW = ctx.canvas.width;
+        const panelX = panelW - PANEL_W - PANEL_MARGIN;
+        const panelY = PANEL_MARGIN;
 
-        // draw currency below ammo
-        ctx.fillStyle = "gold";
-        ctx.font = "30px Arial";
-        ctx.fillText(`Currency: ${player.currency}`, ctx.canvas.width - 200, 200);
-        //console.log(`Player Currency: ${player.currency}`);
+        // Drawing all the parts and pieces for the panle
+        this.drawPanelBackground(ctx, panelX, panelY);
 
-        // Shop UI Drawing
-        if (this.shop.isOpen) {
-            ctx.save();
-            this.shop.draw(ctx, game);
-            ctx.restore();
-        }
+        this.drawInfectionStat(ctx, player, panelX, panelY);
+        this.drawHealthStat(ctx, player, panelX, panelY);
+        this.drawAmmoStat(ctx, player, panelX, panelY);
+        this.drawMagStat(ctx, player, panelX, panelY);
+        this.drawCurrencyStat(ctx, player, panelX, panelY);
+    }
 
-        if (this.drawEnterSZPrompt) {
-            ctx.fillStyle = "black"
-            ctx.fillText("Press E to enter the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
-        } else if (this.drawOpenShopPrompt) {
-            ctx.fillStyle = "black"
-            ctx.fillText("Press E to open/ close the Shop", ctx.canvas.width / 2, ctx.canvas.height - 30);
-        } else if (this.drawOpenArmoryPrompt) {
-            ctx.fillStyle = "black"
-            ctx.fillText("Press E to open/ close the Armory", ctx.canvas.width / 2, ctx.canvas.height - 30);
-        } else if (this.drawExitSZPrompt) {
-            ctx.fillStyle = "black"
-            ctx.fillText("Press E to exit the Safe Zone", ctx.canvas.width / 2, ctx.canvas.height - 30);
-        }
+    /**
+     * Handles drawing the panel background looks 
+     */
+    private drawPanelBackground(ctx: CanvasRenderingContext2D, panelX: number, panelY: number): void {
+        const panelRadius = PANEL_RADIUS;
+        ctx.save();
+
+        // panel drawing
+        ctx.beginPath();
+        ctx.moveTo(panelX + panelRadius, panelY);
+        ctx.lineTo(panelX + PANEL_W - panelRadius, panelY);
+        ctx.quadraticCurveTo(panelX + PANEL_W, panelY, panelX + PANEL_W, panelY + panelRadius);
+        ctx.lineTo(panelX + PANEL_W, panelY + PANEL_H - panelRadius);
+        ctx.quadraticCurveTo(panelX + PANEL_W, panelY + PANEL_H, panelX + PANEL_W - panelRadius, panelY + PANEL_H);
+        ctx.lineTo(panelX + panelRadius, panelY + PANEL_H);
+        ctx.quadraticCurveTo(panelX, panelY + PANEL_H, panelX, panelY + PANEL_H - panelRadius);
+        ctx.lineTo(panelX, panelY + panelRadius);
+        ctx.quadraticCurveTo(panelX, panelY, panelX + panelRadius, panelY);
+        ctx.closePath();
+
+        // The panel colors
+        ctx.fillStyle = "rgba(8, 12, 16, 0.82)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // A bar on the top 
+        ctx.fillStyle = "#4da4fa";
+        ctx.fillRect(panelX + panelRadius, panelY, PANEL_W - panelRadius * 2, 3);
+
         ctx.restore();
     }
 
@@ -189,12 +232,226 @@ export class UILayer extends ForceDraw implements Entity {
         ctx.fillRect(startX, 60, -greenFill, 18);
     }
 
-    update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void {
-        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
-        if (keys['p'] && G_CONFIG.UNLOCK_ALL_GUNS && !this.pWasPressed) {
-            this.armory.isOpen = !this.armory.isOpen;
-            player.uiOpen = this.armory.isOpen; // Set player's uiOpen state based on armory state
+    // Drawing all the different stats
+
+    /**
+     * Draw the Infection stats  
+     */
+    private drawInfectionStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        let color: string;
+        let barColor: string;
+
+        // Change color depending on the infection level 
+        if (player.infection < 50) {
+            color = "#27ae60"; barColor = "#2ecc71";
+        } else if (player.infection < 100) {
+            color = "#f39c12"; barColor = "#f39c12";
+        } else {
+            color = "#e74c3c"; barColor = "#e74c3c";
         }
-        this.pWasPressed = keys['p'];
+
+        // Drawing the stat itself 
+        this.drawStatRow(ctx, panelX, panelY, 0, "☣", "Infection", `${player.infection}%`, color, {
+            ratio: player.infection / 150,
+            fill: barColor,
+            background: "rgba(255,255,255,0.08)",
+        });
     }
+
+    /**
+     * Drawing the health stats  
+     */
+    private drawHealthStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        const ratio = player.health / 100;
+        let barColor;
+
+        // COlor change logic
+        if (ratio > 0.5) {
+            barColor = "#e74c3c";
+        } else if (ratio > 0.25) {
+            barColor = "#e67e22";
+        } else {
+            barColor = "#c0392b";
+        }
+
+        this.drawStatRow(ctx, panelX, panelY, 1, "❤︎⁠", "Health", `${player.health}`, "#ff4b36", {
+            ratio,
+            fill: barColor,
+            background: "rgba(255,255,255,0.08)",
+        });
+    }
+
+    /**
+     * Drawing the ammo stats  
+     */
+    private drawAmmoStat(ctx: CanvasRenderingContext2D, player: Player, px: number, py: number): void {
+        this.drawStatRow(ctx, px, py, 2, "◈", "Ammo", `${player.weapon.ammoOnHand}`, "rgba(220,230,240,0.9)");
+    }
+
+    /**
+     * Drawing the mag stats  
+     */
+    private drawMagStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        const ratio = player.weapon.ammoInGun / player.weapon.magSize;
+        const lowAmmo = ratio <= 0.4;
+        const color = lowAmmo ? "#f39c12" : "rgba(220,230,240,0.9)";
+        const barFill = lowAmmo ? "#f39c12" : "rgba(180,200,220,0.7)";
+
+        this.drawStatRow(
+            ctx, panelX, panelY, 3, "▣", "Mag",
+            `${player.weapon.ammoInGun} / ${player.weapon.magSize}`,
+            color,
+            { ratio, fill: barFill, background: "rgba(255,255,255,0.08)" }
+        );
+    }
+
+    /**
+     * Drawing the currency stats
+     */
+    private drawCurrencyStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        this.drawStatRow(ctx, panelX, panelY, 4, "◆", "Credits", `${player.currency}`, "#f1c40f");
+    }
+
+    /**
+     * Helper method to draw the stats so i don't have to repeat the code style and format for each stats 
+     */
+    private drawStatRow(
+        ctx: CanvasRenderingContext2D,
+        panelX: number,
+        panelY: number,
+        rowIndex: number,
+        statSymbol: string,
+        label: string,
+        value: string,
+        valueColor: string,
+        bar?: { ratio: number; fill: string; background: string }
+    ): void {
+        const rowY = panelY + PANEL_PAD_TOP + 14 + rowIndex * ROW_H;
+        const rightX = panelX + PANEL_W - PANEL_PAD_X;
+
+        // The icon for the stat
+        ctx.save();
+        ctx.font = `bold 20px ${HUD_FONT}`;
+        ctx.fillStyle = "rgba(255,255,255,0.30)";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(statSymbol, panelX + PANEL_PAD_X, rowY);
+        ctx.restore();
+
+        // Label
+        ctx.save();
+        ctx.font = `bold 13px ${HUD_FONT}`;
+        ctx.fillStyle = "rgba(200,210,220,0.65)";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label.toUpperCase(), panelX + PANEL_PAD_X + 26, rowY);
+        ctx.restore();
+
+        // Value
+        ctx.save();
+        ctx.font = `bold 18px ${HUD_FONT}`;
+        ctx.fillStyle = valueColor;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(value, rightX, rowY);
+        ctx.restore();
+
+        // If stats need a bar 
+        if (bar) {
+            // Bar setting
+            const barX = panelX + PANEL_PAD_X;
+            const barY = rowY + 12;
+            const barW = PANEL_W - PANEL_PAD_X * 2;
+            const filled = Math.round(barW * Math.max(0, Math.min(1, bar.ratio)));
+
+            // Drawing the bar out 
+            ctx.save();
+            ctx.fillStyle = bar.background;
+            ctx.fillRect(barX, barY, barW, BAR_H);
+            ctx.fillStyle = bar.fill;
+            ctx.fillRect(barX, barY, filled, BAR_H);
+            ctx.fillStyle = "rgba(255,255,255,0.15)";
+            ctx.fillRect(barX, barY, filled, 1.5);
+            ctx.restore();
+        }
+    }
+
+    /**
+     * Hanldes the interaction Prompt 
+     */
+    private drawInteractionPrompt(ctx: CanvasRenderingContext2D): void {
+        // The differnt types of prompts 
+        const promptMap: Record<string, string> = {
+            drawEnterSZPrompt: "Press  E  to enter the Safe Zone",
+            drawOpenShopPrompt: "Press  E  to open / close the Shop",
+            drawOpenArmoryPrompt: "Press  E  to open / close the Armory",
+            drawExitSZPrompt: "Press  E  to exit the Safe Zone",
+        };
+
+        for (const [flag, text] of Object.entries(promptMap)) {
+            if (!(this as any)[flag]) {
+                continue;
+            }
+            this.drawPrompt(ctx, text);
+            break; // Ensures that only one primpt at a time
+        }
+    }
+
+    /**
+     * Drawing the interactive prompt  
+     */
+    private drawPrompt(ctx: CanvasRenderingContext2D, text: string): void {
+        const W = ctx.canvas.width;
+        const H = ctx.canvas.height;
+
+        // Prompt Setting
+        ctx.font = `bold 16px ${HUD_FONT}`;
+        const textWdith = ctx.measureText(text).width;
+        const promptH = 38;
+        const promptW = textWdith + 38;
+        const promptX = (W - promptW) / 2;
+        const promptY = H - 64;
+
+        // Prompt background
+        ctx.save();
+        ctx.fillStyle = "rgba(8,12,16,0.85)";
+        ctx.strokeStyle = "rgba(255,255,255,0.20)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect?.(promptX, promptY, promptW, promptH, 5);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        // The [E] key symbol drawing
+        const keyW = 22;
+        const keyH = 22;
+        const keyX = promptX + 14;
+        const keyY = promptY + (promptH - keyH) / 2;
+        ctx.save();
+        ctx.fillStyle = "#4da4fa";
+        ctx.strokeStyle = "rgba(255,255,255,0.4)";
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(keyX, keyY, keyW, keyH);
+        ctx.strokeRect(keyX, keyY, keyW, keyH);
+        ctx.font = `bold 14px ${HUD_FONT}`;
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("E", keyX + keyW / 2, keyY + keyH / 2);
+        ctx.restore();
+
+        // Drawing the prompt text itself
+        const shortText = text.replace(/Press\s+E\s+to\s+/i, "to ");
+        ctx.save();
+        ctx.font = `bold 15px ${HUD_FONT}`;
+        ctx.fillStyle = "rgba(220,230,240,0.90)";
+
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(shortText, keyX + keyW + 10, promptY + promptH / 2);
+        ctx.restore();
+    }
+
+    update(keys: { [key: string]: boolean }, deltaTime: number, clickCoords: Vec2, mouse: Vec2 | null): void { }
 }

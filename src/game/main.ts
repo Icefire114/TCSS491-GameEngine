@@ -36,6 +36,7 @@ import { BackgroundLayer } from "./worldBackground/BackgroundLayer.js";
 import { ForegroundLayer } from "./worldBackground/ForegroundLayer.js";
 import { SkyLayer } from "./worldBackground/SkyLayer.js";
 import { DayNightCycle } from "./worldBackground/DayNightCycle.js";
+import { PauseScreen } from "./Pausescreen.js";
 
 
 
@@ -413,6 +414,10 @@ function main() {
                 )
             ), DrawLayer.WORLD_DECORATION);
         }
+
+        // Handldes our pause screen 
+        gameEngine.addUniqueEntity(new PauseScreen(), 998 as DrawLayer);
+
 
         // Drawing our intro screen at the top, and will called gameengine start to start the geame
         gameEngine.addUniqueEntity(new IntroScreen(() => {
