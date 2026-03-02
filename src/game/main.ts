@@ -116,6 +116,7 @@ ASSET_MANAGER.queueDownload("res/img/ammo/SingleLazer.png");
 // === SKY Background Assets ===
 ASSET_MANAGER.queueDownload("res/img/background/background/day.png");
 ASSET_MANAGER.queueDownload("res/img/background/background/night.png");
+ASSET_MANAGER.queueDownload("res/img/background/background/nightWLights.png");
 ASSET_MANAGER.queueDownload("res/img/background/sky/sun.png");
 ASSET_MANAGER.queueDownload("res/img/background/sky/moon.png");
 
@@ -201,7 +202,8 @@ function main() {
             0,
             [
             new ImagePath("res/img/background/background/day.png"),
-            new ImagePath("res/img/background/background/night.png")
+            new ImagePath("res/img/background/background/night.png"),
+            new ImagePath("res/img/background/background/nightWLights.png")
             ]
         ), DrawLayer.SKY);
         gameEngine.addUniqueEntity(new BackgroundLayer(
@@ -223,7 +225,7 @@ function main() {
             new ImagePath("res/img/background/foreground/fore4.png"),
             new ImagePath("res/img/background/foreground/fore5.png")
             ]
-        ), DrawLayer.BACKGROUND);
+        ), DrawLayer.FOREGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
         const shopUI: ShopUI = gameEngine.addUniqueEntity(new ShopUI(), DrawLayer.UI_LAYER) as ShopUI;
         const armoryUI: ArmoryUI = gameEngine.addUniqueEntity(new ArmoryUI(), DrawLayer.UI_LAYER) as ArmoryUI;

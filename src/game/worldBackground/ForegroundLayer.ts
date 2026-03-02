@@ -1,4 +1,3 @@
-import { EntityID } from "../../engine/Entity.js";
 import { Background } from "./Background.js";
 import { ImagePath } from "../../engine/assetmanager.js";
 

@@ -7,12 +7,14 @@ export class SkyLayer extends Background {
     static TAG: string = "SkyLayer";
     daySprite: ImagePath;
     nightSprite: ImagePath;
+    rareNightSprite: ImagePath;
 
     constructor(parallaxSpeed: number, spritePaths: ImagePath[]) {
         super(SkyLayer.TAG, spritePaths, parallaxSpeed);
 
         this.daySprite = spritePaths[0];
         this.nightSprite = spritePaths[1];
+        this.rareNightSprite = spritePaths[2];
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
@@ -25,7 +27,8 @@ export class SkyLayer extends Background {
         const blendAlpha = intro ? intro.getAlpha() : 0;
 
         const daySprite  = game.getSprite(this.daySprite);
-        const nightSprite = game.getSprite(this.nightSprite);
+        const nightSprite = game.getSprite(this.rareNightSprite)
+
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const w = this.worldWidth * scale;
