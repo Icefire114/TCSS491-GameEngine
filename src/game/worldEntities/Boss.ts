@@ -2,7 +2,7 @@ import { Animator } from "../../engine/Animator.js";
 import { ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 import { AnimationState } from "../../engine/Animator.js";

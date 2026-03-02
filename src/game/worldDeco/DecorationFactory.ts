@@ -1,5 +1,5 @@
 import { GameEngine } from "../../engine/gameengine.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { Bush } from "./Bush.js";
 import { Crate } from "./Crate.js";
 import { FireBarrel } from "./FireBarrel.js";

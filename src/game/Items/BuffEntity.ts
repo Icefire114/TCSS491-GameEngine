@@ -4,7 +4,7 @@ import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Collidable } from "../../engine/physics/Collider.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "../worldEntities/mountain.js";
 import { Buff } from "./Buff.js";
 

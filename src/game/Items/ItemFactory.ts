@@ -4,7 +4,7 @@ import { InstantHealthPickupBuff } from "./InstantHealthPickupBuff.js";
 import { AmmoRestore } from "./AmmoRestore.js";
 import { Animator, AnimationState } from "../../engine/Animator.js";
 import { ImagePath } from "../../engine/assetmanager.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { BuffEntity } from "./BuffEntity.js";
 
 export class ItemFactory {

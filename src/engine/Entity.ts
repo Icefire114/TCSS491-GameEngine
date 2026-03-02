@@ -1,7 +1,7 @@
 import { ImagePath } from "./assetmanager.js";
 import { GameEngine } from "./gameengine.js";
 import { Collider } from "./physics/Collider.js";
-import { Vec2 } from "./types.js";
+import { Vec2 } from "./Vec2.js";
 
 /**
  * Should be just `{entityTAG}#{UUID}`.

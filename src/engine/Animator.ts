@@ -2,7 +2,7 @@ import { Gun } from "../game/Items/guns/Gun.js";
 import { ImagePath } from "./assetmanager.js";
 import { GameEngine } from "./gameengine.js";
 import { Renderer } from "./Renderer.js";
-import { Vec2 } from "./types.js";
+import { Vec2 } from "./Vec2.js";
 import { unwrap } from "./util.js";
 
 export enum AnimationState {

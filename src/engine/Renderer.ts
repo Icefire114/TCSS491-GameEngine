@@ -1,6 +1,6 @@
 import { AnimationData } from "./Animator.js";
 import { GameEngine } from "./gameengine.js";
-import { Vec2 } from "./types.js";
+import { Vec2 } from "./Vec2.js";
 
 export class Renderer {
     private ctx: CanvasRenderingContext2D;

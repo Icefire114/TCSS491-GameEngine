@@ -5,7 +5,7 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Player } from "../worldEntities/player.js";
 import { unwrap } from "../../engine/util.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "../worldEntities/mountain.js";
 import { Zombie } from "./Zombie.js";
 

@@ -3,7 +3,7 @@ import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { DrawLayer } from "../../../engine/types.js";
-import { Vec2 } from "../../../engine/types.js";
+import { Vec2 } from "../../../engine/Vec2.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { DecorationSpawner } from "../../worldDeco/DecorationSpanwer.js";

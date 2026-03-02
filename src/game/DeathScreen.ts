@@ -1,7 +1,7 @@
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
-import { Vec2 } from "../engine/types.js";
+import { Vec2 } from "../engine/Vec2.js";
 
 export type DeathCause = "infection" | "ravine";
 

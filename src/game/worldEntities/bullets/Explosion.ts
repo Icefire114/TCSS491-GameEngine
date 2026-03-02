@@ -1,6 +1,6 @@
 import { Collidable } from "../../../engine/physics/Collider.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
-import { Vec2 } from "../../../engine/types.js";
+import { Vec2 } from "../../../engine/Vec2.js";
 import { AnimationState, Animator, AnimationEvent } from "../../../engine/Animator.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";

@@ -1,5 +1,5 @@
 import { Entity, EntityID } from "../../../engine/Entity.js";
-import { Vec2 } from "../../../engine/types.js";
+import { Vec2 } from "../../../engine/Vec2.js";
 
 export class SafeZoneNotification implements Entity {
     // Required info

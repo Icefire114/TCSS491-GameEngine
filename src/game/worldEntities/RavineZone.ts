@@ -2,7 +2,7 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { G_CONFIG } from "../CONSTANTS.js";
 
 // Types of hitbox for the walls

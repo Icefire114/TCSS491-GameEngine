@@ -1,6 +1,7 @@
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
-import { Vec2, DrawLayer } from "../../engine/types.js";
+import { DrawLayer } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 import { Player } from "./player.js";
 import { Boss } from "./Boss.js";
 

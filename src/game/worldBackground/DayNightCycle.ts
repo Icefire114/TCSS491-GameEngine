@@ -2,7 +2,7 @@ import { GameEngine } from "../../engine/gameengine.js";
 import { Background } from "./Background.js";
 import { ImagePath } from "../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
-import { Vec2 } from "../../engine/types.js";
+import { Vec2 } from "../../engine/Vec2.js";
 
 export class DayNightCycle implements Entity {
     id: EntityID;

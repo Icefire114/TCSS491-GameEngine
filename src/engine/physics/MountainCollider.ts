@@ -1,4 +1,4 @@
-import { Vec2 } from "../types.js";
+import { Vec2 } from "../Vec2.js";
 import { BoxCollider } from "./BoxCollider.js";
 import { Collider, Collidable } from "./Collider.js";
 

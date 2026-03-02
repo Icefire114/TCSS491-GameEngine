@@ -1,4 +1,4 @@
-import { Vec2 } from "../types.js";
+import { Vec2 } from "../Vec2.js";
 
 export interface Collidable {
     position: Vec2;

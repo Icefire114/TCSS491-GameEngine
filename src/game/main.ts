@@ -1,7 +1,8 @@
 import { AnimationState, Animator } from "../engine/Animator.js";
 import { AssetManager, ImagePath } from "../engine/assetmanager.js";
 import { GameEngine } from "../engine/gameengine.js";
-import { DrawLayer, Vec2 } from "../engine/types.js";
+import { DrawLayer } from "../engine/types.js";
+import { Vec2 } from "../engine/Vec2.js";
 import { WebGL } from "../engine/WebGL/WebGL.js";
 import { Background } from "./background.js";
 import { BasicZombie } from "./zombies/BasicZombie.js";
