@@ -7,7 +7,7 @@ import { Buff, BuffType, TempBuff } from "./Buff.js";
 export class JumpBoostItem implements Buff, TempBuff {
     type: BuffType = BuffType.TEMP_BUFF;
     tag: string = "JumpBoostApple";
-    sprite: ImagePath = new ImagePath("res/img/items/Apple.png");
+    sprite: ImagePath = new ImagePath("res/img/items/boots.png");
 
     startingDuration: number = 10;
     currentDuration: number = this.startingDuration;
