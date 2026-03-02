@@ -189,7 +189,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
     public update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2 | null, mouse: Vec2): void {
         if (!this.isOpen) return;
 
-        if (clickCoords) {
+        if (clickCoords && this.isOpen) {
             this.handleClick(clickCoords);
         }
 

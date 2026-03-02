@@ -134,13 +134,7 @@ export class ShopUI extends ForceDraw implements Entity {
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords?: Vec2 | null,): void {
         // Route clicks to shop UI when open
         if (this.isOpen && clickCoords) {
-            const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
-            if (canvas) {
-                const rect = canvas.getBoundingClientRect();
-                const canvasX = (clickCoords.x - rect.left) * (canvas.width / rect.width);
-                const canvasY = (clickCoords.y - rect.top) * (canvas.height / rect.height);
-                this.handleClick(canvasX, canvasY);
-            }
+            this.handleClick(clickCoords.x, clickCoords.y);
         }
 
 
