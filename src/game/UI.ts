@@ -206,8 +206,6 @@ export class UILayer extends ForceDraw implements Entity {
         }
         ctx.drawImage(infection_bar_start, ctx.canvas.width - 35 - (infection_bar_mid.width * 9) - infection_bar_start.width, 55);
 
-        console.log(player.infection);
-
         const infBarPixelsWeCanFill = (infection_bar_end.width - 3 + (infection_bar_mid.width * 9) + (infection_bar_start.width - 43));
         const fillRatio = player.infection / player.maxInfection;
         const totalFill = infBarPixelsWeCanFill * fillRatio;
