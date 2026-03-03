@@ -123,37 +123,41 @@ export abstract class Gun implements Entity {
     }
 
     public update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
+        console.log("mouse raw:", mouse.x, mouse.y);
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
         const shoulderY = player.position.y + this.SHOULDER_OFFSET_Y;
+
+        const dx = mouse.x - shoulderX;
+        const dy = mouse.y - shoulderY;
+        this.travelAngle = Math.atan2(dy, dx);
         
 
         // Convert incoming DOM client coords -> canvas pixels -> world coords.
         // Do not mutate clickCoords; compute mouseWorldX/Y and use them when spawning bullets.
-        let mouseWorldX: number | null = null;
-        let mouseWorldY: number | null = null;
-        const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
+        // let mouseWorldX: number | null = null;
+        // let mouseWorldY: number | null = null;
+        // const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
 
-        if (canvas && mouse) {
-            const rect = canvas.getBoundingClientRect();
-            // canvas pixel coords (account for CSS scaling)
-            const canvasPxX = (mouse.x - rect.left) * (canvas.width / rect.width);
-            const canvasPxY = (mouse.y - rect.top) * (canvas.height / rect.height);
+        // if (canvas && mouse) {
+        //     // canvas pixel coords (account for CSS scaling)
+        //     const canvasPxX = mouse.x * (canvas.width / canvas.getBoundingClientRect().width);
+        //     const canvasPxY = mouse.y * (canvas.height / canvas.getBoundingClientRect().height);
 
-            const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            // inverse of: screen = (world - viewport) * meterInPixels / zoom
-            mouseWorldX = (canvasPxX * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportX;
-            mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
+        //     const meterInPixels = canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+        //     // inverse of: screen = (world - viewport) * meterInPixels / zoom
+        //     mouseWorldX = (canvasPxX * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportX;
+        //     mouseWorldY = (canvasPxY * GameEngine.g_INSTANCE.zoom) / meterInPixels + GameEngine.g_INSTANCE.viewportY;
 
-            if (mouseWorldX !== null && mouseWorldY !== null) {
-                const dx = mouseWorldX - shoulderX;
-                const dy = mouseWorldY - shoulderY;
-                this.travelAngle = Math.atan2(dy, dx);
-            }
+        //     if (mouseWorldX !== null && mouseWorldY !== null) {
+        //         const dx = mouseWorldX - shoulderX;
+        //         const dy = mouseWorldY - shoulderY;
+        //         this.travelAngle = Math.atan2(dy, dx);
+        //     }
 
             this.position.x = shoulderX + Math.cos(this.travelAngle);
             this.position.y = shoulderY + Math.sin(this.travelAngle);
-        }
+        //}
 
         if (!player.uiOpen) {
             this.wantsToShoot = keys["Mouse0"] && this.canShoot();

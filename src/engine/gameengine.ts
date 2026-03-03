@@ -30,8 +30,11 @@ export class GameEngine {
     // a mapping of entity tags to a list of entities with that tag.
     private ents: Map<string, Set<[Entity, DrawLayer]>>;
     private uniqueEnts: Map<string, [Entity, DrawLayer]>;
-    private click: { x: number, y: number } | null;
-    private mouse: { x: number, y: number } | null;
+    // use world mouse/click for game logic and canvas mouse/click for UI elements
+    private worldClick: { x: number, y: number } | null;
+    private canvasClick: { x: number, y: number } | null;
+    private worldMouse: { x: number, y: number } | null;
+    private canvasMouse: { x: number, y: number } | null;
     private wheel: { x: number, y: number } | null;
     private keys: { [key: string]: boolean };
     private options: { debugging: boolean };
@@ -72,8 +75,10 @@ export class GameEngine {
         this.uniqueEnts = new Map<string, [Entity, DrawLayer]>();
 
         // Information on the input
-        this.click = { x: 0, y: 0 };
-        this.mouse = { x: 0, y: 0 };
+        this.worldClick = { x: 0, y: 0 };
+        this.canvasClick = { x: 0, y: 0 };
+        this.worldMouse = { x: 0, y: 0 };
+        this.canvasMouse = { x: 0, y: 0 };
         this.wheel = null;
         this.keys = {};
 
@@ -121,8 +126,8 @@ export class GameEngine {
         }
 
         const getXandY = (e: MouseEvent) => ({
-            x: e.clientX - (this.ctx?.canvas.getBoundingClientRect().left as number),
-            y: e.clientY - (this.ctx?.canvas.getBoundingClientRect().top as number)
+            x: e.clientX - this.ctx.canvas.getBoundingClientRect().left,
+            y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
         });
 
         // Unlock audio on first user interaction because browsers block audio until user interacts with the page
@@ -137,14 +142,14 @@ export class GameEngine {
             if (this.options.debugging) {
                 console.log("MOUSE_MOVE", getXandY(e));
             }
-            this.mouse = getXandY(e);
+            this.canvasMouse = getXandY(e);
         });
 
         this.ctx.canvas.addEventListener("click", e => {
             if (this.options.debugging) {
                 console.log("CLICK", getXandY(e));
             }
-            this.click = getXandY(e);
+            this.canvasClick = getXandY(e);
             unlockAudio();
         });
 
@@ -175,7 +180,7 @@ export class GameEngine {
                 console.log("RIGHT_CLICK", getXandY(e));
             }
             e.preventDefault(); // Prevent Context Menu
-            this.click = getXandY(e);
+            this.canvasClick = getXandY(e);
         });
 
         this.ctx.canvas.addEventListener("keydown", event => {
@@ -319,18 +324,31 @@ export class GameEngine {
     };
 
     update(dt: number) {
+        // convert canvas mouse/click to world mouse/click here so that we can get the most up to date viewport and zoom values
+        const meterInPixels = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+
+        if (this.canvasMouse && this.worldMouse) {
+            this.worldMouse.x = (this.canvasMouse.x * this.zoom) / meterInPixels + this.viewportX;
+            this.worldMouse.y = (this.canvasMouse.y * this.zoom) / meterInPixels + this.viewportY;
+        }
+
+        if (this.worldClick && this.canvasClick) {
+            this.worldClick.x = (this.canvasClick.x * this.zoom) / meterInPixels + this.viewportX;
+            this.worldClick.y = (this.canvasClick.y * this.zoom) / meterInPixels + this.viewportY;
+        }
+        
         // Ensure that intro screen is specfically only able to get update forinput and dismiss 
         const introEnt = this.uniqueEnts.get("intro_screen")?.[0];
         const deathEnt = this.uniqueEnts.get("death_screen")?.[0];
 
-        // Check for death screen udpates
+        // Check for death screen updates
         if (deathEnt && !deathEnt.removeFromWorld) {
-            deathEnt.update(this.keys, dt, this.mouse);
+            deathEnt.update(this.keys, dt, this.worldMouse);
         }
 
         // Checks for intro screen 
         if (introEnt && !introEnt.removeFromWorld) {
-            introEnt.update(this.keys, dt, this.mouse);
+            introEnt.update(this.keys, dt, this.worldMouse);
             if (introEnt.removeFromWorld) {
                 this.uniqueEnts.delete("intro_screen");
                 this.ents.get("intro_screen")?.clear();
@@ -348,14 +366,18 @@ export class GameEngine {
             const pauseEnt = this.uniqueEnts.get("pause_screen")?.[0];
             
             if (pauseEnt && !pauseEnt.removeFromWorld) {
-                pauseEnt.update(this.keys, dt, this.click, this.mouse);
+                pauseEnt.update(this.keys, dt, this.worldClick, this.worldMouse);
             } 
         } else {
             for (const set of this.ents.values()) {
                 for (const [entity] of set) {
                     if (!entity.removeFromWorld && entity.tag !== "intro_screen") {
                         const t0 = performance.now();
-                        entity.update(this.keys, dt, this.click, this.mouse);
+                        if (entity instanceof ForceDraw) {
+                            entity.update(this.keys, dt, this.canvasClick, this.canvasMouse);
+                        } else {
+                            entity.update(this.keys, dt, this.worldClick, this.worldMouse);
+                        }
                         const t = t0 - performance.now();
                         if (t > 10) {
                             console.warn(`Ent: ${entity.id} took ${t.toFixed(3)}ms to update!`);
@@ -386,7 +408,8 @@ export class GameEngine {
                 }
             }
         }
-        this.click = null;
+        this.worldClick = null;
+        this.canvasClick = null;
     };
 
     positionScreenOnEnt(e: Entity, percentageX: number, percentageY: number): void {
