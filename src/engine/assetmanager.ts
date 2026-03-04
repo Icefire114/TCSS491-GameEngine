@@ -72,6 +72,8 @@ export class AssetManager {
                     img.src = path;
                     this.m_imageCache[ResourcePath.of(path)] = img;
                     break;
+                case 'mp3':
+                case 'wav':
                 case 'ogg':
                     const audio: HTMLAudioElement = new Audio();
                     audio.addEventListener("loadeddata", () => {
@@ -112,31 +114,22 @@ export class AssetManager {
         return this.m_audioCache[path.asRaw()];
     };
 
-    playAudio(path: AudioPath): void {
-        console.log(`audio key: ${path.asRaw()}`);
-        console.log(`cache keys: ${Object.keys(this.m_audioCache)}`);
-        const audio = this.m_audioCache[path.asRaw()];
-        audio.currentTime = 0;
-        audio.play();
-    };
-
+    /**
+     * Call to mute or unmute all audio and sfx
+     */
     muteAudio(mute: boolean): void {
         for (const [key, audio] of Object.entries(this.m_audioCache)) {
             audio.muted = mute;
         }
     };
 
+    /**
+     * Call to adjust the volume of all audio and sfx
+     */
     adjustAudioVolume(volume: number): void {
         for (const [key, audio] of Object.entries(this.m_audioCache)) {
             audio.volume = volume;
         }
-    };
-
-    autoRepeatAudio(path: AudioPath): void {
-        const audio = this.m_audioCache[path.asRaw()];
-        audio.addEventListener("ended", () => {
-            audio.play();
-        });
     };
 };
 

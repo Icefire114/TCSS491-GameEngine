@@ -114,6 +114,17 @@ export class GameEngine {
         return unwrap(this.assetManager.getAudio(path), `Failed to get audio for ${path.asRaw()}!`);
     }
 
+    muteAudio(): void {
+        this.assetManager.muteAudio(true);
+    }
+
+    unmuteAudio(): void {
+        this.assetManager.muteAudio(false);
+    }
+
+    adjustAudioVolume(volume: number): void {
+        this.assetManager.adjustAudioVolume(volume);
+    }
 
     start() {
         this.running = true;
@@ -492,6 +503,7 @@ export class GameEngine {
             ) as Zombie[];
     };
 
+    // remove later
     startMusic(): void {
         const audioPath = new AudioPath("res/aud/game_music.ogg");
         const audio = this.getAudio(audioPath);
