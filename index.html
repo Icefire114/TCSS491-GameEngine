@@ -180,8 +180,16 @@
   <script>
     window.addEventListener('load', function () {
       const overlay = document.getElementById('loading-overlay');
+      
+      // Removes the line after the game starts
+      document.body.classList.add('game-active');
+      const vignette = document.querySelector('.nv-vignette');
+      if (vignette) {
+        vignette.style.display = 'none';
+      }
+
       const statusText = document.getElementById('load-status-text');
-      const percentText = document.getElementById('load-percent');  // ← Add this
+      const percentText = document.getElementById('load-percent');  
       const bar = document.querySelector('.load-bar');
 
       const steps = [

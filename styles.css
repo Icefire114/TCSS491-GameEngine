@@ -443,3 +443,9 @@ body::after {
   50% { transform: scale(1.05); opacity: 0.85; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+
+body.game-active::before,
+body.game-active::after {
+  display: none !important;
+}
