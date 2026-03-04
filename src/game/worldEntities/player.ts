@@ -46,6 +46,11 @@ export class Player implements Entity, Collidable {
     private prevGroundSpeed: number = 0;
 
     /**
+     * Snowboard rotation state
+     */
+    private boardRotation: number = 0;
+
+    /**
      * All weapons
      */
     private rpg: RPG;
@@ -341,6 +346,9 @@ export class Player implements Entity, Collidable {
 
             // ------------ Player Movement Logic -------------
             this.updateMovement(keys, deltaTime);
+            
+            // ------------ Snowboard Rotation Logic ----------
+            this.updateBoardRotation(deltaTime);
 
             // ------------- Player Collision Logic -------------
             this.updateCollisions();
@@ -393,11 +401,10 @@ export class Player implements Entity, Collidable {
     }
 
     /**
-     * Draws the snowboard underneath the player, rotated to match the slope of the mountain. 
+     * Draws the snowboard underneath the player, rotated using the dynamically calculated boardRotation.
      */
     public drawSnowboard(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         ctx.save();
-        const mountain: Mountain = game.getUniqueEntityByTag("mountain") as Mountain;
         const sprite = game.getSprite(this.snowBoardSprite);
 
         const player_width_in_world_units = 5;
@@ -408,20 +415,8 @@ export class Player implements Entity, Collidable {
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
 
-        const normal: Vec2 = mountain.getNormalAt(this.position.x);
-        const tan = new Vec2(normal.y, -normal.x);
-
-        // Ensure it points to the right (downhill)
-        if (tan.x < 0) {
-            tan.x *= -1;
-            tan.y *= -1;
-        }
-
-        // Angle in radians
-        const rotation = Math.atan2(tan.y, tan.x);
-
         ctx.translate(screenX, screenY - h + 5); // pivot at the sprite’s centre
-        ctx.rotate(rotation);                    // align +x with the tangent
+        ctx.rotate(this.boardRotation);          // align based on jumping/landing logic
         ctx.drawImage(
             sprite,
             -w / 2,
@@ -693,6 +688,39 @@ export class Player implements Entity, Collidable {
         // ---------- Integrate ----------
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
+    }
+
+    /**
+     * Updates the rotation of the snowboard. It freezes in the air and aligns as the player nears the ground
+     */
+    private updateBoardRotation(deltaTime: number): void {
+        const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+        if (!mountain) return;
+
+        const groundY = mountain.getHeightAt(this.position.x);
+        const distToGround = groundY - this.position.y;
+
+        const normal = mountain.getNormalAt(this.position.x);
+        const tan = new Vec2(normal.y, -normal.x);
+
+        // Ensure it points to the right (downhill)
+        if (tan.x < 0) {
+            tan.x *= -1;
+            tan.y *= -1;
+        }
+
+        const targetRotation = Math.atan2(tan.y, tan.x);
+        const ALIGN_THRESHOLD = 5; // Begins aligning when 5 units above ground
+
+        if (distToGround <= 0.2) {
+            // On the ground, it would Snap exactly to the slope
+            this.boardRotation = targetRotation;
+        } else if (distToGround <= ALIGN_THRESHOLD) {
+            // Close to the ground, then smoothly transition to the target angle
+            const lerpSpeed = 10;
+            this.boardRotation += (targetRotation - this.boardRotation) * Math.min(lerpSpeed * deltaTime, 1);
+        }
+        // If distToGround > ALIGN_THRESHOLD, do nothing (keeps last known angle)
     }
 
     /**
