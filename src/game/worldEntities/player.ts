@@ -385,6 +385,9 @@ export class Player implements Entity, Collidable {
     //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        if (!this.visible) {
+            return; 
+        }
         this.drawSnowboard(ctx, game);
         this.animator.drawCurrentAnimFrameAtPos(this.position);
     }
