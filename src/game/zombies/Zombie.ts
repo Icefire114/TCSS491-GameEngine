@@ -31,6 +31,11 @@ export abstract class Zombie implements Entity {
     abstract sprite: ImagePath;
     removeFromWorld: boolean = false;
 
+    // Handles when the zombie is in the ravine and is bouncing 
+    isBouncing: boolean = false;
+    bounceTimer: number = 0;
+
+    
     animator: Animator;
 
     constructor(tag: string, physicsCollider: BoxCollider, animator: Animator, attack_range: number, attack_cooldown: number, run_range: number, health: number, reward: number, walk_speed: number, run_speed: number, player_damage_amount: number, pos?: Vec2) {
@@ -77,6 +82,22 @@ export abstract class Zombie implements Entity {
         const currentTime = Date.now() / 1000;
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const mountain: Mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
+
+        // Handle when the zombie is bouncing and not follow player
+        if (this.isBouncing) {
+            this.bounceTimer -= deltaTime;
+            this.applyGravityAndCollision(deltaTime, mountain);
+            this.updatePosition(deltaTime);
+
+            // Only resume AI once back on the ground AND minimum bounce time has passed
+            const onGround = mountain && mountain.physicsCollider &&
+                            this.physicsCollider.collides(this, mountain);
+            if (onGround && this.bounceTimer <= 0) {
+                this.isBouncing = false;
+                this.velocity.x = 0;
+            }
+            return;
+        }
 
         // If player is dead, just fall and idle
         if (player.dead) {
