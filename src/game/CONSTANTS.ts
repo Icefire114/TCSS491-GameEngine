@@ -17,5 +17,7 @@ export const G_CONFIG = {
     // If true, enable cheats by pressing 'f' for free fly and 'k' to force death
     ENABLE_DEBUG_KEYS: true,
     // If true, player can access armory at anytime by pressing 'p', and can access all guns
-    UNLOCK_ALL_GUNS: true
+    UNLOCK_ALL_GUNS: true,
+    // If true, skip the intro cinematic and start the player in the game
+    SKIP_INTRO: true
 }

@@ -3,6 +3,7 @@ import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { Vec2 } from "../engine/Vec2.js";
 import { ImagePath } from "../engine/assetmanager.js";
+import { G_CONFIG } from "./CONSTANTS.js";
 
 // Snowflake particle for the blizzard
 interface Flake {
@@ -157,6 +158,23 @@ export class IntroScreen implements Entity {
 
 
     update(keys: { [key: string]: boolean }, dt: number, _click: Vec2): void {
+        // Bypass the intro 
+        if (G_CONFIG.SKIP_INTRO) {
+            // Make sure player is visible when skipping intro
+            const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as any;
+            if (player) player.visible = true; 
+
+            // kills the overaly
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.classList.add('hidden'); 
+            
+            // removes the intro screen and calls the onDismiss callback to start the game
+            this.removeFromWorld = true;
+            this.onDismiss();
+            return;
+        }
+
+
         // Pauses the intro animation from starting until the HTML loading overlay finishes
         const overlay = document.getElementById('loading-overlay');
         if (this.phase === Phase.TITLE && overlay && !overlay.classList.contains('hidden')) {
