@@ -140,7 +140,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 if (this.index < 0) {
                     this.index = this.items.length - 1;
                 }
-                AudioManager.playSFX(new AudioPath("res/aud/ui_click.ogg"), 0.3);
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiLeftBtn.ogg"));
                 //console.log(`leftButton`);
             },
             color: ArmoryUI.BG2_MAIN
@@ -153,6 +153,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 if (this.index >= this.items.length) {
                     this.index = 0;
                 }
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiRightBtn.ogg"));
                 //console.log(`rightButton`);
             },
             color: ArmoryUI.BG2_MAIN
@@ -164,6 +165,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                     const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
                     player.swapWeapon(this.items[this.index].id);
                     this.equipItem(this.items[this.index].id);
+                    AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiEquipBtn.ogg"));
                 }
             },
             color: ArmoryUI.BG2_MAIN

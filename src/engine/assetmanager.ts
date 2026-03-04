@@ -53,6 +53,7 @@ export class AssetManager {
                             if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
                         });
                     break;
+                case 'm4a':
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
