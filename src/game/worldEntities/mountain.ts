@@ -101,10 +101,8 @@ export class Mountain extends ForceDraw implements Entity {
         const viewportRightWorld = game.viewportX + GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
         // Generating anchor points ahead of the player by 3000 pixels
-        if (this.lastAnchor.x < viewportRightWorld) {
-            while (this.lastAnchor.x < viewportRightWorld + 3000) {
-                this.generatingAnchor();
-            }
+        while (this.lastAnchor.x < viewportRightWorld + 3000) {
+            this.generatingAnchor();
         }
 
         // If anchor point is beyound the Viewport screen, delete anchor points (after 300)
