@@ -116,7 +116,7 @@ export class PauseScreen extends ForceDraw implements Entity {
      */
     handleOptionSelection(keys: { [key: string]: boolean }, game: GameEngine) {
         // Confirm by pressing enter
-        const enterDown = !!(keys["Enter"] || keys[" "]);
+        const enterDown = !!(keys["Enter"]);
         if (enterDown && !this.enterWasPressed) {
             this.MENU_ITEMS[this.selectedIndex].action(game);
         }
