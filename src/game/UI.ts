@@ -12,7 +12,7 @@ import { ShopUI } from "./worldEntities/SafeZone/ShopUI.js";
 import { ArmoryUI } from "./worldEntities/SafeZone/ArmoryUI.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 
-// Constants used for Panel layout - MODERATELY INCREASED SIZES
+// Constants used for Panel layout
 const PANEL_W = 270;
 const PANEL_H = 230;
 const PANEL_PAD_X = 16;
@@ -20,7 +20,6 @@ const PANEL_PAD_TOP = 16;
 const PANEL_MARGIN = 18;
 const PANEL_RADIUS = 7;
 const ROW_H = 42;
-const BAR_H = 6;
 const HUD_FONT = "'Share Tech Mono', 'Courier New', monospace";
 
 export class UILayer extends ForceDraw implements Entity {
@@ -45,6 +44,7 @@ export class UILayer extends ForceDraw implements Entity {
     private armory: ArmoryUI;
     private pWasPressed: boolean = false;
 
+    // Phalen UI Inspo
     private m_healthBarEndCap: ImagePath = new ImagePath("res/img/ui/health_bar_endcap.png");
     private m_healthBarMidPiece: ImagePath = new ImagePath("res/img/ui/health_bar_midpiece.png");
     private m_healthBarStart: ImagePath = new ImagePath("res/img/ui/health_bar_startcap.png");
@@ -116,7 +116,7 @@ export class UILayer extends ForceDraw implements Entity {
             }
             ctx.restore();
         }
-        this.drawPlayerHealthAndInfectionBar(ctx, player);
+        // this.drawPlayerHealthAndInfectionBar(ctx, player);
     }
 
     // Drawing the Hud Panel itself
@@ -133,8 +133,8 @@ export class UILayer extends ForceDraw implements Entity {
         // Drawing all the parts and pieces for the panle
         this.drawPanelBackground(ctx, panelX, panelY);
 
+        this.drawHealthStat(ctx, player, panelX, panelY);   
         this.drawInfectionStat(ctx, player, panelX, panelY);
-        this.drawHealthStat(ctx, player, panelX, panelY);
         this.drawAmmoStat(ctx, player, panelX, panelY);
         this.drawMagStat(ctx, player, panelX, panelY);
         this.drawCurrencyStat(ctx, player, panelX, panelY);
@@ -161,14 +161,28 @@ export class UILayer extends ForceDraw implements Entity {
         ctx.closePath();
 
         // The panel colors
-        ctx.fillStyle = "rgba(8, 12, 16, 0.82)";
+        ctx.fillStyle = "rgba(10, 18, 32, 0.88)";
         ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+
+        // Subtle inner edge
+        const grad = ctx.createLinearGradient(panelX, panelY, panelX + PANEL_W, panelY + PANEL_H);
+        grad.addColorStop(0,   "rgba(77, 164, 250, 0.06)");
+        grad.addColorStop(0.5, "rgba(0,   0,   0,   0.00)");
+        grad.addColorStop(1,   "rgba(0, 210, 255, 0.04)");
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Blue-tinted border
+        ctx.strokeStyle = "rgba(77, 164, 250, 0.25)";
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         // A bar on the top 
-        ctx.fillStyle = "#4da4fa";
+        const topGrad = ctx.createLinearGradient(panelX + panelRadius, panelY, panelX + PANEL_W - panelRadius, panelY);
+        topGrad.addColorStop(0,   "#00c6ff");
+        topGrad.addColorStop(0.5, "#4da4fa");
+        topGrad.addColorStop(1,   "#0072ff");
+        ctx.fillStyle = topGrad;
         ctx.fillRect(panelX + panelRadius, panelY, PANEL_W - panelRadius * 2, 3);
 
         ctx.restore();
@@ -234,49 +248,30 @@ export class UILayer extends ForceDraw implements Entity {
     // Drawing all the different stats
 
     /**
-     * Draw the Infection stats  
+     * Drawing the health stats — UNCHANGED
      */
-    private drawInfectionStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
-        let color: string;
-        let barColor: string;
+    private drawHealthStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        const ratio = player.health / player.maxHealth;
 
-        // Change color depending on the infection level 
-        if (player.infection < 50) {
-            color = "#27ae60"; barColor = "#2ecc71";
-        } else if (player.infection < 100) {
-            color = "#f39c12"; barColor = "#f39c12";
-        } else {
-            color = "#e74c3c"; barColor = "#e74c3c";
-        }
-
-        // Drawing the stat itself 
-        this.drawStatRow(ctx, panelX, panelY, 0, "☣", "Infection", `${player.infection}%`, color, {
-            ratio: player.infection / 150,
-            fill: barColor,
-            background: "rgba(255,255,255,0.08)",
+        this.drawStatRow(ctx, panelX, panelY, 0, "❤︎⁠", "HP", "", "", {
+            ratio,
+            fill: "#e74c3c",
+            background: "#000000",
+            inline: true,
+            labelColor: "rgba(180, 40, 40, 0.85)"
         });
     }
 
     /**
      * Drawing the health stats  
      */
-    private drawHealthStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
-        const ratio = player.health / 100;
-        let barColor;
-
-        // COlor change logic
-        if (ratio > 0.5) {
-            barColor = "#e74c3c";
-        } else if (ratio > 0.25) {
-            barColor = "#e67e22";
-        } else {
-            barColor = "#c0392b";
-        }
-
-        this.drawStatRow(ctx, panelX, panelY, 1, "❤︎⁠", "Health", `${player.health}`, "#ff4b36", {
-            ratio,
-            fill: barColor,
-            background: "rgba(255,255,255,0.08)",
+    private drawInfectionStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
+        this.drawStatRow(ctx, panelX, panelY, 1, "☣", "INF", "", "", {
+            ratio: player.infection / player.maxInfection,
+            isInfection: true,
+            background: "#000000",
+            inline: true,
+            labelColor: "rgba(39, 174, 96, 0.85)"
         });
     }
 
@@ -284,23 +279,28 @@ export class UILayer extends ForceDraw implements Entity {
      * Drawing the ammo stats  
      */
     private drawAmmoStat(ctx: CanvasRenderingContext2D, player: Player, px: number, py: number): void {
-        this.drawStatRow(ctx, px, py, 2, "◈", "Ammo", `${player.weapon.ammoOnHand}`, "rgba(220,230,240,0.9)");
+        this.drawStatRow(ctx, px, py, 2, "◈", "Ammo", `${player.weapon.ammoOnHand}`, "#00d4ff", {
+            ratio: 1,
+            fill: "transparent",
+            background: "transparent",
+            labelColor: "rgba(0, 200, 240, 0.85)"
+        });
     }
 
     /**
      * Drawing the mag stats  
      */
     private drawMagStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
-        const ratio = player.weapon.ammoInGun / player.weapon.magSize;
-        const lowAmmo = ratio <= 0.4;
-        const color = lowAmmo ? "#f39c12" : "rgba(220,230,240,0.9)";
-        const barFill = lowAmmo ? "#f39c12" : "rgba(180,200,220,0.7)";
-
         this.drawStatRow(
             ctx, panelX, panelY, 3, "▣", "Mag",
             `${player.weapon.ammoInGun} / ${player.weapon.magSize}`,
-            color,
-            { ratio, fill: barFill, background: "rgba(255,255,255,0.08)" }
+            "#7ec8e3",
+            {
+                ratio: 1,
+                fill: "transparent",
+                background: "transparent",
+                labelColor: "rgba(100, 180, 220, 0.85)"
+            }
         );
     }
 
@@ -308,11 +308,17 @@ export class UILayer extends ForceDraw implements Entity {
      * Drawing the currency stats
      */
     private drawCurrencyStat(ctx: CanvasRenderingContext2D, player: Player, panelX: number, panelY: number): void {
-        this.drawStatRow(ctx, panelX, panelY, 4, "◆", "Credits", `${player.currency}`, "#f1c40f");
+        // Gold label + value
+        this.drawStatRow(ctx, panelX, panelY - 2, 4, "◆", "Credits", `${player.currency}`, "#ffd700", {
+            ratio: 1,
+            fill: "transparent",
+            background: "transparent",
+            labelColor: "rgba(220, 170, 0, 0.85)"
+        });
     }
 
     /**
-     * Helper method to draw the stats so i don't have to repeat the code style and format for each stats 
+     * Helper method to draw a stat row
      */
     private drawStatRow(
         ctx: CanvasRenderingContext2D,
@@ -323,54 +329,93 @@ export class UILayer extends ForceDraw implements Entity {
         label: string,
         value: string,
         valueColor: string,
-        bar?: { ratio: number; fill: string; background: string }
+        bar?: { ratio: number; fill?: string; isInfection?: boolean; background: string; inline?: boolean; labelColor?: string; symbolColor?: string }
     ): void {
         const rowY = panelY + PANEL_PAD_TOP + 14 + rowIndex * ROW_H;
         const rightX = panelX + PANEL_W - PANEL_PAD_X;
 
-        // The icon for the stat
+        const customColor = bar && bar.labelColor ? bar.labelColor : null;
+
+        // Icon
         ctx.save();
-        ctx.font = `bold 20px ${HUD_FONT}`;
-        ctx.fillStyle = "rgba(255,255,255,0.30)";
+        ctx.font = `bold 22px ${HUD_FONT}`;
+        ctx.fillStyle = customColor || "rgba(255,255,255,0.30)";
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.fillText(statSymbol, panelX + PANEL_PAD_X, rowY);
         ctx.restore();
 
-        // Label
+        // Label — now uses the stat's own accent color
         ctx.save();
-        ctx.font = `bold 13px ${HUD_FONT}`;
-        ctx.fillStyle = "rgba(200,210,220,0.65)";
+        ctx.font = `bold 20px ${HUD_FONT}`;
+        ctx.fillStyle = customColor || "rgba(200,210,220,0.65)";
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.fillText(label.toUpperCase(), panelX + PANEL_PAD_X + 26, rowY);
         ctx.restore();
 
         // Value
-        ctx.save();
-        ctx.font = `bold 18px ${HUD_FONT}`;
-        ctx.fillStyle = valueColor;
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-        ctx.fillText(value, rightX, rowY);
-        ctx.restore();
-
-        // If stats need a bar 
-        if (bar) {
-            // Bar setting
-            const barX = panelX + PANEL_PAD_X;
-            const barY = rowY + 12;
-            const barW = PANEL_W - PANEL_PAD_X * 2;
-            const filled = Math.round(barW * Math.max(0, Math.min(1, bar.ratio)));
-
-            // Drawing the bar out 
+        if (value !== "") {
             ctx.save();
+            ctx.font = `bold 18px ${HUD_FONT}`;
+            ctx.fillStyle = valueColor;
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.fillText(value, rightX, rowY);
+            ctx.restore();
+        }
+
+        // Bar
+        if (bar && bar.fill !== "transparent") {
+            let barX, barY, barW, barH;
+
+            if (bar.inline) {
+                barX = panelX + PANEL_PAD_X + 65;
+                barY = rowY - 15;
+                barW = PANEL_W - PANEL_PAD_X * 2 - 65;
+                barH = 25;
+            } else {
+                barX = panelX + PANEL_PAD_X;
+                barY = rowY + 16;
+                barW = PANEL_W - PANEL_PAD_X * 2;
+                barH = 6;
+            }
+
+            const totalFill = Math.round(barW * Math.max(0, Math.min(1, bar.ratio)));
+
+            ctx.save();
+
+            // Background track
             ctx.fillStyle = bar.background;
-            ctx.fillRect(barX, barY, barW, BAR_H);
-            ctx.fillStyle = bar.fill;
-            ctx.fillRect(barX, barY, filled, BAR_H);
+            ctx.fillRect(barX, barY, barW, barH);
+
+            // Segmented infection bar
+            if (bar.isInfection) {
+                const greenFill = Math.min(totalFill, barW * 0.50);
+                ctx.fillStyle = "#2ecc71";
+                ctx.fillRect(barX, barY, greenFill, barH);
+
+                if (totalFill > barW * 0.50) {
+                    const orangeFill = Math.min(totalFill - barW * 0.50, barW * 0.30);
+                    ctx.fillStyle = "#f39c12";
+                    ctx.fillRect(barX + barW * 0.50, barY, orangeFill, barH);
+                }
+
+                if (totalFill > barW * 0.80) {
+                    const redFill = Math.min(totalFill - barW * 0.80, barW * 0.20);
+                    ctx.fillStyle = "#e74c3c";
+                    ctx.fillRect(barX + barW * 0.80, barY, redFill, barH);
+                }
+            }
+            // Normal solid bar
+            else if (bar.fill) {
+                ctx.fillStyle = bar.fill;
+                ctx.fillRect(barX, barY, totalFill, barH);
+            }
+
+            // Highlight top edge
             ctx.fillStyle = "rgba(255,255,255,0.15)";
-            ctx.fillRect(barX, barY, filled, 1.5);
+            ctx.fillRect(barX, barY, totalFill, 1.5);
             ctx.restore();
         }
     }
@@ -405,9 +450,9 @@ export class UILayer extends ForceDraw implements Entity {
 
         // Prompt Setting
         ctx.font = `bold 16px ${HUD_FONT}`;
-        const textWdith = ctx.measureText(text).width;
+        const textWidth = ctx.measureText(text).width;
         const promptH = 38;
-        const promptW = textWdith + 38;
+        const promptW = textWidth + 38;
         const promptX = (W - promptW) / 2;
         const promptY = H - 64;
 
