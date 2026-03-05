@@ -276,13 +276,17 @@ export class Mountain extends ForceDraw implements Entity {
         // logic for ravine
         const pastSpawnPoint = currentX > this.ravineStartShowing;
         const coolDownRavine = currentX > (this.lastRavineEndX + this.ravineCooldown);
+        const currentSlope = Math.abs(this.lastAnchor.y - (this.anchorPointsList[this.anchorPointsList.length - 3]?.y ?? this.lastAnchor.y));
+        const isTerrainFlat = currentSlope < 30; // The lower, more strict it is to spawn
+
+        const notNearSafeZone = !this.isNearSafeZone(currentX, 300); // 300 unit buffer
 
         if (shouldSpawnFlat) {
             this.startFlatSequence();
             console.log(`Spawning SafeZone at x: ${currentX}`);
         }
         // We can only spawn a ravine if we're not in a safe zone
-        else if (pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
+        else if (pastSpawnPoint && coolDownRavine && isTerrainFlat && notNearSafeZone && this.rng.next() < 0.1) {
             this.startRavineSequence();
         }
         else {
