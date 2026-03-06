@@ -9,6 +9,8 @@ import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
 import { RavineDeathZone } from "./RavineZone.js";
 import { unwrap } from "../../engine/util.js";
+import { ShaderRegistry } from "../../engine/WebGL/ShaderRegistry.js";
+import { WebGL } from "../../engine/WebGL/WebGL.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -69,6 +71,8 @@ export class Mountain extends ForceDraw implements Entity {
         endAnchorX: number;
     }[] = [];
     private ravineStartAnchorX: number = 0;
+    private m_mountainCanvas: HTMLCanvasElement;
+    private m_mtnCanvasCtx: CanvasRenderingContext2D;
 
 
 
@@ -87,6 +91,11 @@ export class Mountain extends ForceDraw implements Entity {
 
         // Passing the anchor points array to the collider 
         this.physicsCollider = new MountainCollider(this.anchorPointsList);
+        this.m_mountainCanvas = document.createElement("canvas");
+        // same size as normal game canvas
+        this.m_mountainCanvas.width = 1280;
+        this.m_mountainCanvas.height = 720;
+        this.m_mtnCanvasCtx = unwrap(this.m_mountainCanvas.getContext("2d"), "Failed to get canvas for mountain rendering!");
     }
 
 
@@ -114,9 +123,24 @@ export class Mountain extends ForceDraw implements Entity {
         // Drawing ravine background
         this.drawRavines(ctx, game, scale);
 
-        // Drawing the moutain 
-        this.drawMoutain(ctx, game, scale);
+        this.m_mtnCanvasCtx.clearRect(0, 0, this.m_mountainCanvas.width, this.m_mountainCanvas.height);
+        // Drawing the moutain
+        this.drawMoutain(this.m_mtnCanvasCtx, game, scale);
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.TERRAIN, this.m_mountainCanvas));
+        shader.render([
+            // Snow shader uniforms
+            {
+                u_snowHeight: 1.0,
+                u_snowThickness: 0.8,
+                u_viewportOffset: [
+                    game.viewportX * 0.00000002,
+                    game.viewportY * 0.00000002
+                ]
+            },
+        ])
 
+
+        ctx.drawImage(shader.canvas, 0, 0);
         // Seeing anchor points
         if (G_CONFIG.DRAW_TERRAIN_ANCHOR_POINTS) {
             this.drawPoints(ctx, game, scale);
@@ -210,7 +234,7 @@ export class Mountain extends ForceDraw implements Entity {
 
     update(keys: { [key: string]: boolean; }, deltaTime: number): void {
         // USED TO DEBUG AND SEE THE SAFE ZONE
-        if (keys["T"]) {
+        if (G_CONFIG.ENABLE_DEBUG_KEYS && keys["t"]) {
             const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player");
 
             if (player) {

@@ -123,7 +123,7 @@ export abstract class Gun implements Entity {
     }
 
     public update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
-        console.log("mouse raw:", mouse.x, mouse.y);
+        // console.log("mouse raw:", mouse.x, mouse.y);
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
         const shoulderY = player.position.y + this.SHOULDER_OFFSET_Y;

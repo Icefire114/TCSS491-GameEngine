@@ -5,14 +5,15 @@ export class MultiPassShader {
     private gl: WebGL2RenderingContext;
     private passes: ShaderPass[] = [];
     private baseTexture: WebGLTexture;
+    private sourceCanvas: HTMLCanvasElement | null = null;
     private width: number;
     private height: number;
 
-    constructor(imgElement: HTMLImageElement) {
+    constructor(source: HTMLImageElement | HTMLCanvasElement) {
         console.log("[WebGL2] Creating new MultiPassShader");
-        
-        this.width = imgElement.naturalWidth || imgElement.width;
-        this.height = imgElement.naturalHeight || imgElement.height;
+
+        this.width = source instanceof HTMLCanvasElement ? source.width : source.naturalWidth || source.width;
+        this.height = source instanceof HTMLCanvasElement ? source.height : source.naturalHeight || source.height;
 
         this.canvas = document.createElement('canvas');
         this.canvas.width = this.width;
@@ -30,10 +31,13 @@ export class MultiPassShader {
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-        this.baseTexture = this.loadTexture(imgElement);
+        if (source instanceof HTMLCanvasElement) {
+            this.sourceCanvas = source;
+        }
+        this.baseTexture = this.loadTexture(source);
     }
 
-    private loadTexture(imgElement: HTMLImageElement): WebGLTexture {
+    private loadTexture(imgElement: HTMLImageElement | HTMLCanvasElement): WebGLTexture {
         const gl = this.gl;
         const texture = gl.createTexture()!;
 
@@ -55,6 +59,11 @@ export class MultiPassShader {
 
     render(uniformsPerPass: any[] = []): void {
         const gl = this.gl;
+        if (this.sourceCanvas !== null) {
+            gl.bindTexture(gl.TEXTURE_2D, this.baseTexture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.sourceCanvas);
+        }
+
         gl.viewport(0, 0, this.width, this.height);
 
         let currentTexture = this.baseTexture;

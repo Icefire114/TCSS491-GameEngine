@@ -9,7 +9,8 @@ export interface ShaderTemplate {
 
 
 export class ShaderRegistry {
-    private static registry: Map<string, ShaderTemplate> = new Map<string, ShaderTemplate>();
+    private static registry: Map<string, ShaderTemplate> = new Map();
+    private static canvasInstances: Map<string, MultiPassShader> = new Map();
 
     /**
      * 
@@ -17,14 +18,8 @@ export class ShaderRegistry {
      * @param shaders The fragment shader source code for each pass.
      */
     static registerPassesByName(name: string, shaders: string[]): void {
-        if (this.registry.has(name)) {
-            return;
-        } else {
-            this.registry.set(name, {
-                passes: shaders,
-                instances: new Map()
-            });
-        }
+        if (this.registry.has(name)) return;
+        this.registry.set(name, { passes: shaders, instances: new Map() });
     }
 
     /**
@@ -36,20 +31,30 @@ export class ShaderRegistry {
      * @returns The shader pass or `undefined` if the given shader name could 
      * not be found in the registry.
      */
-    static getShader(name: string, sprite: HTMLImageElement): MultiPassShader | undefined {
-        const template: ShaderTemplate | undefined = this.registry.get(name);
+    static getShader(name: string, source: HTMLImageElement | HTMLCanvasElement): MultiPassShader | undefined {
+        const template = this.registry.get(name);
         if (!template) {
-            return undefined;
-        }
-        const spriteSrc = sprite.src;
-        if (!template.instances.has(spriteSrc)) {
-            const shader: MultiPassShader = new MultiPassShader(sprite);
-            for (const pass of template.passes) {
-                shader.addPass(pass);
+            return undefined
+        };
+
+        // Canvas sources are keyed by shader name alone (one instance per shader)
+        if (source instanceof HTMLCanvasElement) {
+            const key = `canvas:${name}`;
+            if (!this.canvasInstances.has(key)) {
+                const shader = new MultiPassShader(source);
+                for (const pass of template.passes) shader.addPass(pass);
+                this.canvasInstances.set(key, shader);
             }
-            template.instances.set(spriteSrc, shader);
+            return this.canvasInstances.get(key);
         }
 
-        return template.instances.get(spriteSrc);
+        // Image sources keyed by src as before
+        const key = source.src;
+        if (!template.instances.has(key)) {
+            const shader = new MultiPassShader(source);
+            for (const pass of template.passes) shader.addPass(pass);
+            template.instances.set(key, shader);
+        }
+        return template.instances.get(key);
     }
 }
