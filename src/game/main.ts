@@ -209,7 +209,7 @@ ASSET_MANAGER.queueDownload("res/aud/sfx/player/death.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/player/land.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/player/land2.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/player/land3.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/player/snowboard.m4a");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/snowboard.mp3");
 
 // === Safezone SFX ===
 ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit.mp3");

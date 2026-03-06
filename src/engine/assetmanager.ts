@@ -98,6 +98,8 @@ export class AssetManager {
 
                     this.m_audioCache[ResourcePath.of(path)] = audio;
                     break;
+                default:
+                    throw new Error("Unkown asset type!");
             }
         }
     };
