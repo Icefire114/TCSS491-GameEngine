@@ -168,6 +168,63 @@ ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_end.png");
 ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_mid.png");
 ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_start.png");
 
+// === Audio Assets ===
+// === UI SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/menu/mainUiMenuBtns.ogg");
+
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiEquipBtn.ogg");
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiLeftBtn.ogg");
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiRightBtn.ogg");
+
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/shop/buy.wav");
+
+// === GUNS SFX ===
+// === Assult Rifle SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/reload.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/shoot2.wav");
+
+// === RPG SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/reload.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/explode.wav");
+
+/// === Ray Gun SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/reload.mp3");
+
+// === Item SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/ammoRestore.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/ammoRestore2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/instantHealth.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/jumpBoost.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost3.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/syringe.wav");
+
+// === Player SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/damaged.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/death.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/land.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/land2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/land3.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/snowboard.m4a");
+
+// === Safezone SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit3.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/notification.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/openCloseUi.ogg");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/shoot.mp3");
+
+// === Zombie SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/death.ogg");
+
+
+
+
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
     if (errorCount > 0) {
         console.error(`Error loading assets ${errorCount} of them failed to load!`);

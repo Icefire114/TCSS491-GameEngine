@@ -1,7 +1,7 @@
 import { GameEngine } from "../../../engine/gameengine.js";
 import { ForceDraw } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/Vec2.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { AssultRifle } from "../../Items/guns/AssultRifle.js";
 import { RPG } from "../../Items/guns/RPG.js";
@@ -9,6 +9,7 @@ import { RayGun } from "../../Items/guns/RayGun.js";
 import { Player } from "../../worldEntities/player.js";
 import { unwrap } from "../../../engine/util.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 interface ArmoryItem {
     id: string;
@@ -139,6 +140,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 if (this.index < 0) {
                     this.index = this.items.length - 1;
                 }
+                AudioManager.playSFX(new AudioPath("res/aud/ui_click.ogg"), 0.3);
                 //console.log(`leftButton`);
             },
             color: ArmoryUI.BG2_MAIN
