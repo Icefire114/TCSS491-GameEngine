@@ -25,6 +25,7 @@ jobs:
           npm ci
           npm run build:prod
           cp index.html build/
+          cp styles.css build/
           cp -r res/ build/res
           ls -la build
 
