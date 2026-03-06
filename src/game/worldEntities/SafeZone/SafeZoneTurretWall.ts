@@ -1,4 +1,4 @@
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
@@ -14,6 +14,7 @@ import { UILayer } from "../../UI.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { RifleBullet } from "../bullets/RifleBullet.js";
 import { SafeZone } from "./SafeZone.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export type SafeZoneWallType = "enter" | "exit";
 
@@ -130,6 +131,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                     const dy = z.position.y - turretTip.y;
                     const angle = Math.atan2(dy, dx);
                     GameEngine.g_INSTANCE.addEntity(new RifleBullet(turretTip.x, turretTip.y, angle), DrawLayer.BULLET);
+                    AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/shoot.wav'), 0.3);
                 }
             }
         } else {

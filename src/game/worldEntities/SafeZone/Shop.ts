@@ -1,4 +1,4 @@
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
@@ -9,6 +9,7 @@ import { G_CONFIG } from "../../CONSTANTS.js";
 import { ShopUI } from "./ShopUI.js";
 import { UILayer } from "../../UI.js";
 import { Player } from "../player.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export class Shop implements Entity, Collidable {
     tag: string = "Shop";
@@ -61,6 +62,7 @@ export class Shop implements Entity, Collidable {
             shop_ui.isOpen = !shop_ui.isOpen;
             player.uiOpen = shop_ui.isOpen;
             keys['e'] = false;
+            AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/openCloseUi.wav'), 0.4);
         }
         if (!UI.drawOpenShopPrompt && shop_ui.isOpen) {
             shop_ui.isOpen = false;

@@ -2,7 +2,8 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { Vec2 } from "../engine/Vec2.js";
-import { ImagePath } from "../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../engine/assetmanager.js";
+import { AudioManager } from "../engine/AudioManager.js";
 
 // Snowflake particle for the blizzard
 interface Flake {
@@ -169,6 +170,11 @@ export class IntroScreen implements Entity {
 
         // The Title Screen Phase
         if (this.phase === Phase.TITLE) {
+            const ctx = AudioManager.getAudioContext();
+            if (ctx.state === "suspended") {
+                ctx.resume();
+            }
+            AudioManager.playMusic(new AudioPath("res/aud/music/menu.ogg"), 0.4);
             this.tickFlakes(dt);
 
             // Intro input — Allowed only after the animation has hit its prompt (2.65 seconds)
@@ -182,6 +188,8 @@ export class IntroScreen implements Entity {
         }
 
         if (this.phase === Phase.TITLE_EXIT) {
+            AudioManager.stopMusic(new AudioPath("res/aud/music/menu.ogg"));
+            AudioManager.playOnce(new AudioPath("res/aud/sfx/intro/start1.wav"), 0.3);
             this.tickFlakes(dt);
             for (const zombie of this.cinemaZombies) {
                 zombie.frameTimer += dt;

@@ -8,6 +8,7 @@ import { G_CONFIG } from "../game/CONSTANTS.js";
 import { BoxCollider } from "./physics/BoxCollider.js";
 import { Renderer } from "./Renderer.js";
 import { Zombie } from "../game/zombies/Zombie.js";
+import { AudioManager } from "./AudioManager.js";
 
 export class GameEngine {
     /**
@@ -24,7 +25,6 @@ export class GameEngine {
 
     private static readonly FIXED_DT = 1 / GameEngine.TARGET_FPS;
     private accumulator = 0;
-    private audioUnlock = false;
 
     private ctx: CanvasRenderingContext2D;
     // a mapping of entity tags to a list of entities with that tag.
@@ -90,6 +90,7 @@ export class GameEngine {
         this.timer = new Timer();
         this.clockTick = 0;
         this.assetManager = assetManager;
+        AudioManager.init(this.assetManager);
 
         const canvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -110,20 +111,8 @@ export class GameEngine {
         return unwrap(this.assetManager.getImage(path), `Failed to get sprite for ${path.asRaw()}!`);
     }
 
-    getAudio(path: AudioPath): HTMLAudioElement {
+    getAudio(path: AudioPath): AudioBuffer {
         return unwrap(this.assetManager.getAudio(path), `Failed to get audio for ${path.asRaw()}!`);
-    }
-
-    muteAudio(): void {
-        this.assetManager.muteAudio(true);
-    }
-
-    unmuteAudio(): void {
-        this.assetManager.muteAudio(false);
-    }
-
-    adjustAudioVolume(volume: number): void {
-        this.assetManager.adjustAudioVolume(volume);
     }
 
     start() {
@@ -141,14 +130,6 @@ export class GameEngine {
             y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
         });
 
-        // Unlock audio on first user interaction because browsers block audio until user interacts with the page
-        const unlockAudio = () => {
-            if (this.audioUnlock) return;
-            this.audioUnlock = true;
-            this.startMusic();
-            console.log("Audio unlocked!");
-        };
-
         this.ctx.canvas.addEventListener("mousemove", e => {
             if (this.options.debugging) {
                 console.log("MOUSE_MOVE", getXandY(e));
@@ -161,7 +142,6 @@ export class GameEngine {
                 console.log("CLICK", getXandY(e));
             }
             this.canvasClick = getXandY(e);
-            unlockAudio();
         });
 
         this.ctx.canvas.addEventListener("mousedown", e => {
@@ -196,7 +176,6 @@ export class GameEngine {
 
         this.ctx.canvas.addEventListener("keydown", event => {
             this.keys[event.key] = true
-            unlockAudio();
         });
 
         this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
@@ -363,6 +342,7 @@ export class GameEngine {
             if (introEnt.removeFromWorld) {
                 this.uniqueEnts.delete("intro_screen");
                 this.ents.get("intro_screen")?.clear();
+                AudioManager.playMusic(new AudioPath("res/aud/music/game_music.ogg"), 0.5, 2);
             }
         }
 
@@ -501,15 +481,6 @@ export class GameEngine {
                 ([, v]) => [...v.values()]
                     .map(([ent]) => ent)
             ) as Zombie[];
-    };
-
-    // remove later
-    startMusic(): void {
-        const audioPath = new AudioPath("res/aud/game_music.ogg");
-        const audio = this.getAudio(audioPath);
-        audio.play();
-        audio.loop = true;
-        audio.volume = 0.2;
     };
 
     /**

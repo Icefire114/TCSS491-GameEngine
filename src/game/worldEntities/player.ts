@@ -1,4 +1,4 @@
-import { ImagePath } from "../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../engine/assetmanager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
@@ -20,9 +20,20 @@ import { DeathScreen } from "../DeathScreen.js";
 import { RavineDeathZone } from "./RavineZone.js";
 import { RayGun } from "../Items/guns/RayGun.js";
 import { UILayer } from "../UI.js";
+import { AudioManager } from "../../engine/AudioManager.js";
 
 
 export type DamageType = "Infection" | "Health";
+
+/**
+ * The players current state
+ */
+enum PlayerState {
+    IDLE,
+    SLIDING,
+    AIRBORNE,
+    JUMPING,
+}  
 
 /**
  * @author PG
@@ -42,6 +53,9 @@ export class Player implements Entity, Collidable {
     static GROUND_STICK_FORCE = 500;
     static JUMP_FORCE = -35;
     static SLOPE_GRAVITY_MULT = 1.2;
+
+    private prevState: PlayerState = PlayerState.IDLE;
+    private currentState: PlayerState = PlayerState.IDLE;
 
     private prevGroundSpeed: number = 0;
 
@@ -120,6 +134,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 13,
                     frameHeight: 128,
                     frameWidth: 128,
+                    fireOnFrame: 1,
                 },
                 AnimationState.RELOAD
             ],
@@ -153,6 +168,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 9,
                     frameHeight: 128,
                     frameWidth: 128,
+                    fireOnFrame: 1,
                 },
                 AnimationState.RELOAD
             ],
@@ -195,6 +211,7 @@ export class Player implements Entity, Collidable {
                     frameCount: 9,
                     frameHeight: 128,
                     frameWidth: 128,
+                    fireOnFrame: 1,
                 },
                 AnimationState.RELOAD
             ],
@@ -208,7 +225,7 @@ export class Player implements Entity, Collidable {
                 AnimationState.DEATH
             ]
         ]
-    );
+    ); 
 
     /**
      * entity component properties
@@ -277,7 +294,7 @@ export class Player implements Entity, Collidable {
     /**
      * The amount of currency the player has collected.
      */
-    public currency: number = 0;
+    public currency: number = 1000000000000;
 
     constructor(spawnPos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -349,6 +366,10 @@ export class Player implements Entity, Collidable {
             this.animator.updateAnimState(AnimationState.DEATH, deltaTime)
         }
 
+        if (this.prevState !== this.currentState) {
+            this.onStateChange();
+        }
+        // console.log(`Player State: ${PlayerState[this.currentState]}.  prev state was: ${PlayerState[this.prevState]}`);
     }
 
     /**
@@ -456,6 +477,10 @@ export class Player implements Entity, Collidable {
 
     damagePlayer(damage: number, damageType: DamageType): void {
         if (!G_CONFIG.GOD_MODE) {
+            AudioManager.playInstanceSFX(new AudioPath(
+                Math.random() > 0.5 ? 'res/aud/sfx/player/damaged.wav' 
+                : 'res/aud/sfx/player/damaged2.wav'), 0.3);
+
             // increase damage based on current health
             // Note: scaled damage is only applied to health, not shield
             const scalingFactor = 1 + (this.infection / 100);
@@ -471,6 +496,7 @@ export class Player implements Entity, Collidable {
                         console.log(`Adjusted death chance: ${death.toFixed(2)}`);
 
                         if (death >= 170 || this.infection >= this.maxInfection) { // chance of death increases with infection%
+                            this.playDeathSFX();
                             //console.log(`Player has died!`);
                             this.dead = true;
                             // hack to force the UI to refresh when the player dies, showing what their infection is at
@@ -592,6 +618,7 @@ export class Player implements Entity, Collidable {
             if (keys["w"] || keys[" "]) this.position.y -= FLY_SPEED * deltaTime;
             if (keys["s"]) this.position.y += FLY_SPEED * deltaTime;
         } else if (inSafeZone) {
+            this.currentState = PlayerState.IDLE;
             // Reset velocity when entering safe zone to avoid carrying momentum
             const SAFE_ZONE_SPEED = Player.MAX_SPEED * 0.85;
             const SAFE_ZONE_ACCEL = 120;
@@ -637,14 +664,27 @@ export class Player implements Entity, Collidable {
                 // --- Player input (ground only) ---
                 if (keys["d"]) {
                     this.velocity.x += Player.ACCELERATION * deltaTime;
+                    this.prevState = this.currentState;
+                    this.currentState = PlayerState.SLIDING;
                 }
 
                 if (keys["a"]) {
                     this.velocity.x -= Player.BRAKE_FORCE * deltaTime;
+                    this.prevState = this.currentState;
+                    this.currentState = PlayerState.SLIDING;
                 }
+
+                // used to set player idle state
+                if (!keys["a"] && !keys["d"]) {
+                    this.prevState = this.currentState;
+                    this.currentState = PlayerState.IDLE;
+                }
+
                 // ---------- Jump ----------
                 if ((keys["w"] || keys[" "]) && onGround) {
                     this.velocity.y = Player.JUMP_FORCE * this.jumpMultiplier;
+                    this.prevState = this.currentState;
+                    this.currentState = PlayerState.JUMPING;
                 }
 
                 // Stick player to terrain
@@ -653,6 +693,8 @@ export class Player implements Entity, Collidable {
                 // ---------- In air: no momentum gains ----------
                 const AIR_DRAG = 0.9995;
                 this.velocity.x *= AIR_DRAG;
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.AIRBORNE;
             }
         }
 
@@ -710,8 +752,8 @@ export class Player implements Entity, Collidable {
         if (mountain && mountain.physicsCollider) {
             if (this.physicsCollider.collides(this, mountain)) {
                 this.velocity.y = 0;
-            }
-        }
+            }  
+        } 
 
         // ---------- Collision with Items ----------
         const items = GameEngine.g_INSTANCE.getEntitiesByTag("ItemEntity") as ItemEntity[];
@@ -768,6 +810,7 @@ export class Player implements Entity, Collidable {
                 // Handles the death when hitting the ravine
                 if (contact === "death") {
                     if (!this.dead) {
+                        this.playDeathSFX();
                         this.dead = true;
                         GameEngine.g_INSTANCE.addUniqueEntity(
                             new DeathScreen(this.position.x, this.position.y, () => {
@@ -835,6 +878,10 @@ export class Player implements Entity, Collidable {
             //console.log(`Attack animation ended`);
         });
 
+        animator.onEvent(AnimationEvent.RELOAD_START, () => {
+            this.weapon.playReloadSFX();
+        });
+
         animator.onEvent(AnimationEvent.RELOAD_END, () => {
             this.weapon.isReloading = false;
             this.weapon.reload();
@@ -866,5 +913,26 @@ export class Player implements Entity, Collidable {
             this.isFlying = !this.isFlying;
         }
         this.pressFKey = keys["f"];
+    }
+
+    /**
+     * plays SFX for the players state
+     */
+    private onStateChange(): void {
+        if (this.prevState === PlayerState.AIRBORNE && this.currentState === PlayerState.SLIDING) {
+            AudioManager.playSFX(new AudioPath('res/aud/sfx/player/land.wav'), 0.5);
+        } 
+        
+        if (this.currentState === PlayerState.SLIDING) {
+            AudioManager.playLoopingSFX(new AudioPath('res/aud/sfx/player/snowboard.wav'), 1);
+            console.log("Started sliding - play snowboard sound");
+        } else {
+            AudioManager.stopLoopingSFX(new AudioPath('res/aud/sfx/player/snowboard.wav'));
+        }
+    }
+
+    private playDeathSFX(): void {
+        AudioManager.stopMusic(new AudioPath("res/aud/music/game_music.ogg"));
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/player/death.wav"), 0.5);
     }
 }

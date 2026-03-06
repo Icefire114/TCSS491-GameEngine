@@ -1,4 +1,5 @@
-import { ImagePath } from "../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../engine/assetmanager.js";
+import { AudioManager } from "../../engine/AudioManager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { unwrap } from "../../engine/util.js";
 import { Player } from "../worldEntities/player.js";
@@ -16,7 +17,7 @@ export class JumpBoostItem implements Buff, TempBuff {
 
     onApply(): void {
         const player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
-
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/items/jumpBoost.wav"));
         this.oldJumpMultiplier = player.jumpMultiplier;
         // Apply the multiplier
         player.jumpMultiplier = 1.5;

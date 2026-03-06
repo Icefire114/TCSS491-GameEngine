@@ -1,5 +1,5 @@
 import { Animator } from "../../../engine/Animator.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { DrawLayer } from "../../../engine/types.js";
@@ -16,6 +16,7 @@ import { Shop } from "./Shop.js";
 import { SafeZoneNotification } from "./SafeZoneNotification.js";
 import { DecoFactory } from "../../worldDeco/DecorationFactory.js";
 import { Background } from "../../worldBackground/Background.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -107,10 +108,16 @@ export class SafeZone implements Entity {
 
     onPlayerExitSafeZone(): void {
         console.log("Player exited the SafeZone!");
+        AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/enterExit3.wav'), 0.3);
+        AudioManager.stopMusic(new AudioPath("res/aud/music/safezone_music1.ogg"));
+        AudioManager.playMusic(new AudioPath('res/aud/music/game_music.ogg'), 0.5, 2);
         // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
     }
 
     onPlayerEnterSafeZone(): void {
+        AudioManager.stopMusic(new AudioPath('res/aud/music/game_music.ogg'));
+        AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/enterExit3.wav'), 0.3);
+        AudioManager.playSafezoneMusic(new AudioPath("res/aud/music/safezone_music1.ogg"));
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);

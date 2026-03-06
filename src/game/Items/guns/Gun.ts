@@ -1,11 +1,12 @@
 import { AnimationState } from "../../../engine/Animator.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { Vec2 } from "../../../engine/Vec2.js";
 import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { Player } from "../../worldEntities/player.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export abstract class Gun implements Entity {
 
@@ -81,6 +82,7 @@ export abstract class Gun implements Entity {
         }
 
         this.ammoInGun--;
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/" + this.tag + "/shoot.wav"), 0.3);
         return this.createBullet();
     }
 
@@ -89,7 +91,7 @@ export abstract class Gun implements Entity {
      */
     public reload(): void {
         if (!this.canReload()) return;
-        
+
             const ammoToReload = this.magSize - this.ammoInGun;
             if (this.ammoOnHand >= ammoToReload) {
                 this.ammoInGun = this.magSize;
@@ -98,8 +100,21 @@ export abstract class Gun implements Entity {
                 this.ammoInGun += this.ammoOnHand;
                 this.ammoOnHand = 0;
             }
-            this.isReloading = false;
-        
+        this.isReloading = false;
+    }
+
+    public playReloadSFX(): void {
+        switch (this.tag) {
+            case "AssultRifle":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/AssultRifle/reload.wav"), 0.3, 0.3);
+                break;
+            case "RPG":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/RPG/reload.wav"), 0.3, 1.8);
+                break;
+            case "RayGun":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/RayGun/reload.wav"), 0.3);
+                break;
+        }
     }
 
     /**

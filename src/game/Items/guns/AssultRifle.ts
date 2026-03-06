@@ -3,7 +3,6 @@ import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { RifleBullet } from "../../worldEntities/bullets/RifleBullet.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
-import { Player } from "../../worldEntities/player.js";
 
 export class AssultRifle extends Gun {
 
@@ -85,9 +84,6 @@ export class AssultRifle extends Gun {
         const originX = this.position.x + Math.cos(this.travelAngle) * localOffsetX - Math.sin(this.travelAngle) * localOffsetY;
         const originY = this.position.y + Math.sin(this.travelAngle) * localOffsetX + Math.cos(this.travelAngle) * localOffsetY;
 
-        const muzzleX = originX + Math.cos(this.travelAngle);
-        const muzzleY = originY + Math.sin(this.travelAngle);
         return new RifleBullet(originX, originY, this.travelAngle);
     }
-
 }

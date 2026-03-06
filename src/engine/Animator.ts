@@ -22,6 +22,7 @@ export enum AnimationState {
 export enum AnimationEvent {
     ATTACK_FIRE = "attack_fire",
     ATTACK_END = "attack_end",
+    RELOAD_START = "reload_start",
     RELOAD_END = "reload_end",
 }
 
@@ -171,6 +172,9 @@ export class Animator {
 
         // reload animation completion
         if (this.currentState === AnimationState.RELOAD) {
+            if (currentAnim.fireOnFrame !== undefined && displayedFrame === currentAnim.fireOnFrame) {
+                this.eventCallBacks.get(AnimationEvent.RELOAD_START)?.();
+            }
             // Fire reload complete event when animation wraps from last frame to frame 0
             if (previousDisplayedFrame === currentAnim.frameCount - 1 && displayedFrame === 0) {
                 this.eventCallBacks.get(AnimationEvent.RELOAD_END)?.();

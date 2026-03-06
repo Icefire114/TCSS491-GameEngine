@@ -1,5 +1,5 @@
 import { Animator } from "../../engine/Animator.js";
-import { ImagePath } from "../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
@@ -8,6 +8,7 @@ import { Player } from "../worldEntities/player.js";
 import { unwrap } from "../../engine/util.js";
 import { AnimationState } from "../../engine/Animator.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { AudioManager } from "../../engine/AudioManager.js";
 
 export abstract class Zombie implements Entity {
     tag: string;
@@ -62,6 +63,7 @@ export abstract class Zombie implements Entity {
     takeDamage(amount: number): void {
         this.health -= amount;
         if (this.health <= 0 && !this.rewardGiven) {
+            AudioManager.playSFX(new AudioPath('res/aud/sfx/zombies/death.wav'), 0.4);
             this.rewardGiven = true;
             const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
             player.killedEnemy(this);
@@ -154,6 +156,21 @@ export abstract class Zombie implements Entity {
     protected checkDespawn(player: Player): void {
         if (this.position.x < player.position.x - GameEngine.WORLD_UNITS_IN_VIEWPORT * 3) {
             this.removeFromWorld = true;
+        }
+    }
+
+    protected playAttackSFX(): void {
+        switch (this.tag) {
+            case "GiantZombie":
+                AudioManager.playInstanceSFX(new AudioPath(
+                    Math.random() < 0.5 ? 'res/aud/sfx/zombies/giantHit.wav' : 'res/aud/sfx/zombies/giantHit2.wav'), 0.4);
+                break;
+            case "ExplodingZombie":
+                AudioManager.playInstanceSFX(new AudioPath('res/aud/sfx/guns/RPG/explode.wav'), 0.5);
+                break;
+            default:
+                AudioManager.playInstanceSFX(new AudioPath(
+                    Math.random() < 0.5 ? 'res/aud/sfx/zombies/hit1.wav' : 'res/aud/sfx/zombies/hit2.wav'), 0.4);
         }
     }
 }

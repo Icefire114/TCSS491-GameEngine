@@ -1,4 +1,5 @@
-import { ImagePath } from "../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../engine/assetmanager.js";
+import { AudioManager } from "../../engine/AudioManager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { unwrap } from "../../engine/util.js";
 import { Player } from "../worldEntities/player.js";
@@ -10,6 +11,7 @@ export class ShockwaveBombItem implements Buff {
     sprite: ImagePath = new ImagePath("res/img/items/bomb.png"); 
 
     onApply(): void {
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/items/shockWaveExplosion2.wav"), 0.7);
         const player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         const blastRadius = 5000;
         const blastForce = 2500; 

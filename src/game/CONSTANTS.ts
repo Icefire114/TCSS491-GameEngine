@@ -9,7 +9,7 @@ export const G_CONFIG = {
     // If true, don't generate terrain just a flat plane
     TERRAIN_GENERATION_FORCE_FLAT: false,
     // If true, player does not take damage
-    GOD_MODE: true,
+    GOD_MODE: false,
     // If true, draw the safezone bounding boxes
     DRAW_SAFEZONE_BB: true,
     // If true, create the entities right in front of the player

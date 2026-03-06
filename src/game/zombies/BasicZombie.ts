@@ -111,6 +111,7 @@ export class BasicZombie extends Zombie {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                 this.lastAttackTime = currentTime;
                 player.damagePlayer(this.player_damage_amount, "Infection");
+                this.playAttackSFX();
             }
         }
     }

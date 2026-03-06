@@ -1,4 +1,5 @@
 import { ImagePath } from "../engine/assetmanager.js";
+import { AudioManager } from "../engine/AudioManager.js";
 import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
@@ -47,6 +48,10 @@ export class PauseScreen extends ForceDraw implements Entity {
         this.selectedIndex = 0;
         this.fadeAlpha = 0;
         game.pause();
+        const ctx = AudioManager.getAudioContext();
+        if (ctx.state === "running") {
+            ctx.suspend();
+        }
     }
 
 
@@ -56,6 +61,10 @@ export class PauseScreen extends ForceDraw implements Entity {
     private close(game: GameEngine): void {
         this.fadeAlpha = 0;
         game.resume();
+        const ctx = AudioManager.getAudioContext();
+        if (ctx.state === "suspended") {
+            ctx.resume();
+        }
     }
 
     update(keys: { [key: string]: boolean }, dt: number, _click: { x: number; y: number } | null, _mouse: { x: number; y: number } | null): void {
