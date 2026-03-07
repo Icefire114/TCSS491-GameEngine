@@ -1,11 +1,12 @@
 import { AnimationState } from "../../../engine/Animator.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { Vec2 } from "../../../engine/Vec2.js";
 import { unwrap } from "../../../engine/util.js";
 import { Bullet } from "../../worldEntities/bullets/Bullet.js";
 import { Player } from "../../worldEntities/player.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export abstract class Gun implements Entity {
 
@@ -38,7 +39,7 @@ export abstract class Gun implements Entity {
     public position: Vec2 = new Vec2();
     public physicsCollider = null;
     public removeFromWorld: boolean = false;
-    
+
     /**
      * Gun-specific properties
      */
@@ -81,6 +82,7 @@ export abstract class Gun implements Entity {
         }
 
         this.ammoInGun--;
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/" + this.tag + "/shoot.wav"), 0.3);
         return this.createBullet();
     }
 
@@ -89,17 +91,30 @@ export abstract class Gun implements Entity {
      */
     public reload(): void {
         if (!this.canReload()) return;
-        
-            const ammoToReload = this.magSize - this.ammoInGun;
-            if (this.ammoOnHand >= ammoToReload) {
-                this.ammoInGun = this.magSize;
-                this.ammoOnHand -= ammoToReload;
-            } else {
-                this.ammoInGun += this.ammoOnHand;
-                this.ammoOnHand = 0;
-            }
-            this.isReloading = false;
-        
+
+        const ammoToReload = this.magSize - this.ammoInGun;
+        if (this.ammoOnHand >= ammoToReload) {
+            this.ammoInGun = this.magSize;
+            this.ammoOnHand -= ammoToReload;
+        } else {
+            this.ammoInGun += this.ammoOnHand;
+            this.ammoOnHand = 0;
+        }
+        this.isReloading = false;
+    }
+
+    public playReloadSFX(): void {
+        switch (this.tag) {
+            case "AssultRifle":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/AssultRifle/reload.wav"), 0.3, 0.3);
+                break;
+            case "RPG":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/RPG/reload.wav"), 0.3, 1.8);
+                break;
+            case "RayGun":
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/RayGun/reload.wav"), 0.3);
+                break;
+        }
     }
 
     /**
@@ -113,7 +128,7 @@ export abstract class Gun implements Entity {
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
-        
+
         ctx.translate(screenX, screenY);
         ctx.rotate(this.travelAngle);
 
@@ -123,7 +138,6 @@ export abstract class Gun implements Entity {
     }
 
     public update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2, mouse: Vec2): void {
-        // console.log("mouse raw:", mouse.x, mouse.y);
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player"), "Failed to get the player!") as Player;
         const shoulderX = player.position.x + this.SHOULDER_OFFSET_X;
         const shoulderY = player.position.y + this.SHOULDER_OFFSET_Y;
@@ -131,7 +145,7 @@ export abstract class Gun implements Entity {
         const dx = mouse.x - shoulderX;
         const dy = mouse.y - shoulderY;
         this.travelAngle = Math.atan2(dy, dx);
-        
+
         this.position.x = shoulderX + Math.cos(this.travelAngle);
         this.position.y = shoulderY + Math.sin(this.travelAngle);
 
@@ -143,7 +157,7 @@ export abstract class Gun implements Entity {
             this.wantsToReload = false;
             this.isShooting = false;
         }
-        
+
         // ---------- Animation Logic ----------
         if (this.isShooting) {
             // continue playing attack animation

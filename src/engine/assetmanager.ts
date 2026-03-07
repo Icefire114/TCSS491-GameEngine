@@ -1,18 +1,23 @@
+import { AudioManager } from "./AudioManager.js";
 import { ResourcePath } from "./types.js";
 
 export class AssetManager {
     private m_successCount: number;
     private m_errorCount: number;
+
     private m_imageCache: Record<ResourcePath, HTMLImageElement>;
-    private m_audioCache: Record<ResourcePath, HTMLAudioElement>;
+    private m_audioBufferCache: Record<ResourcePath, AudioBuffer>;
+
     private m_downloadQueue: string[];
     private m_shaderSourceCache: Record<ResourcePath, string>;
 
     constructor() {
         this.m_successCount = 0;
         this.m_errorCount = 0;
+
         this.m_imageCache = {};
-        this.m_audioCache = {};
+         this.m_audioBufferCache = {};
+
         this.m_downloadQueue = [];
         this.m_shaderSourceCache = {};
     };
@@ -75,28 +80,20 @@ export class AssetManager {
                 case 'mp3':
                 case 'wav':
                 case 'ogg':
-                    const audio: HTMLAudioElement = new Audio();
-                    audio.addEventListener("loadeddata", () => {
-                        console.log("Loaded: " + audio.src);
-                        this.m_successCount++;
-                        if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
-                    });
-
-                    audio.addEventListener("error", () => {
-                        console.error("Error loading: " + audio.src);
-                        this.m_errorCount++;
-                        if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
-                    });
-
-                    audio.addEventListener("ended", () => {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    });
-
-                    audio.src = path;
-                    audio.load();
-
-                    this.m_audioCache[ResourcePath.of(path)] = audio;
+                    fetch(path)
+                        .then(response => response.arrayBuffer())
+                        .then(arrayBuffer => AudioManager.getAudioContext().decodeAudioData(arrayBuffer))
+                        .then(decodedBuffer => {
+                            this.m_audioBufferCache[ResourcePath.of(path)] = decodedBuffer;
+                            console.log("Loaded audio buffer: " + path);
+                            this.m_successCount++;
+                            if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
+                        })
+                        .catch(err => {
+                            console.error("Error loading audio: " + path, err);
+                            this.m_errorCount++;
+                            if (this.isDone()) callback(this.m_errorCount, this.m_successCount);
+                        });
                     break;
                 default:
                     throw new Error("Unkown asset type!");
@@ -112,27 +109,10 @@ export class AssetManager {
         return this.m_imageCache[path.asRaw()];
     };
 
-    getAudio(path: AudioPath): HTMLAudioElement | undefined {
-        return this.m_audioCache[path.asRaw()];
+    getAudio(path: AudioPath): AudioBuffer | undefined {
+        return this.m_audioBufferCache[path.asRaw()];
     };
 
-    /**
-     * Call to mute or unmute all audio and sfx
-     */
-    muteAudio(mute: boolean): void {
-        for (const [key, audio] of Object.entries(this.m_audioCache)) {
-            audio.muted = mute;
-        }
-    };
-
-    /**
-     * Call to adjust the volume of all audio and sfx
-     */
-    adjustAudioVolume(volume: number): void {
-        for (const [key, audio] of Object.entries(this.m_audioCache)) {
-            audio.volume = volume;
-        }
-    };
 };
 
 /**

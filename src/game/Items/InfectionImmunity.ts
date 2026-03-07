@@ -1,4 +1,5 @@
-import { ImagePath } from "../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../engine/assetmanager.js";
+import { AudioManager } from "../../engine/AudioManager.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { unwrap } from "../../engine/util.js";
 import { Player } from "../worldEntities/player.js";
@@ -17,6 +18,7 @@ export class InfectionImmunityItem implements Buff, TempBuff {
     onApply(): void {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         player.infectionImmune = true;
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/items/syringe.wav"), 0.7);
     }
 
     onEnd(): void {

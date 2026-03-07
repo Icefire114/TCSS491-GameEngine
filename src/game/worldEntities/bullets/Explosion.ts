@@ -2,10 +2,11 @@ import { Collidable } from "../../../engine/physics/Collider.js";
 import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Vec2 } from "../../../engine/Vec2.js";
 import { AnimationState, Animator, AnimationEvent } from "../../../engine/Animator.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { Zombie } from "../../zombies/Zombie.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 export class Explosion implements Entity, Collidable {
     private readonly YOFFSET = 7.5; // half of collider height
@@ -40,6 +41,9 @@ export class Explosion implements Entity, Collidable {
         this.position.x = x;
         this.position.y = y + this.YOFFSET; // adjust so explosion is centered on impact point
         this.damage = damage;
+        this.animator.onEvent(AnimationEvent.ATTACK_FIRE, () => {
+            AudioManager.playSFX(new AudioPath("res/aud/sfx/guns/RPG/explode.wav"), 0.5);
+        });
 
         this.animator.onEvent(AnimationEvent.ATTACK_END, () => {
             this.removeFromWorld = true;

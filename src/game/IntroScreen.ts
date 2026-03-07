@@ -2,8 +2,9 @@ import { Entity, EntityID } from "../engine/Entity.js";
 import { GameEngine } from "../engine/gameengine.js";
 import { Collider } from "../engine/physics/Collider.js";
 import { Vec2 } from "../engine/Vec2.js";
-import { ImagePath } from "../engine/assetmanager.js";
 import { G_CONFIG } from "./CONSTANTS.js";
+import { AudioPath, ImagePath } from "../engine/assetmanager.js";
+import { AudioManager } from "../engine/AudioManager.js";
 
 // Snowflake particle for the blizzard
 interface Flake {
@@ -45,7 +46,7 @@ const PROMPT = "[ PRESS ENTER OR CLICK TO BEGIN ]";
 
 // Points in the moutain to be drawn out  
 const MOUTAIN_POINTS = [
-    [0,1],[.03,.84],[.08,.70],[.14,.57],[.20,.46],[.26,.54],[.30,.40],[.35,.26],[.40,.40],[.44,.32],[.50,.18],[.56,.32],[.60,.24],[.65,.37],[.70,.30],[.75,.44],[.80,.57],[.86,.49],[.91,.63],[.96,.77],[1,1]
+    [0, 1], [.03, .84], [.08, .70], [.14, .57], [.20, .46], [.26, .54], [.30, .40], [.35, .26], [.40, .40], [.44, .32], [.50, .18], [.56, .32], [.60, .24], [.65, .37], [.70, .30], [.75, .44], [.80, .57], [.86, .49], [.91, .63], [.96, .77], [1, 1]
 ];
 
 // Bunch of math functions for the animation easing and interpolation
@@ -60,12 +61,12 @@ function easeOutBack(t: number): number {
     return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 }
 
-function easeOut(t: number, p = 2): number { 
-    return 1 - Math.pow(1 - Math.min(Math.max(t, 0), 1), p); 
+function easeOut(t: number, p = 2): number {
+    return 1 - Math.pow(1 - Math.min(Math.max(t, 0), 1), p);
 }
 
-function lerp(a: number, b: number, t: number): number { 
-    return a + (b - a) * Math.min(Math.max(t, 0), 1); 
+function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * Math.min(Math.max(t, 0), 1);
 }
 
 function pulse(spd: number, lo: number, hi: number, t: number): number {
@@ -96,7 +97,7 @@ export class IntroScreen implements Entity {
     private showFakePlayer = true;
 
     // Snow Effect logic in title 
-    private flakes: Flake[] =[];
+    private flakes: Flake[] = [];
     private readonly FLAKE_COUNT = 230;
 
     // The animation state 
@@ -162,12 +163,12 @@ export class IntroScreen implements Entity {
         if (G_CONFIG.SKIP_INTRO) {
             // Make sure player is visible when skipping intro
             const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as any;
-            if (player) player.visible = true; 
+            if (player) player.visible = true;
 
             // kills the overaly
             const overlay = document.getElementById('loading-overlay');
-            if (overlay) overlay.classList.add('hidden'); 
-            
+            if (overlay) overlay.classList.add('hidden');
+
             // removes the intro screen and calls the onDismiss callback to start the game
             this.removeFromWorld = true;
             this.onDismiss();
@@ -187,6 +188,11 @@ export class IntroScreen implements Entity {
 
         // The Title Screen Phase
         if (this.phase === Phase.TITLE) {
+            const ctx = AudioManager.getAudioContext();
+            if (ctx.state === "suspended") {
+                ctx.resume();
+            }
+            AudioManager.playMusic(new AudioPath("res/aud/music/menu.ogg"), 0.4);
             this.tickFlakes(dt);
 
             // Intro input — Allowed only after the animation has hit its prompt (2.65 seconds)
@@ -200,6 +206,8 @@ export class IntroScreen implements Entity {
         }
 
         if (this.phase === Phase.TITLE_EXIT) {
+            AudioManager.stopMusic(new AudioPath("res/aud/music/menu.ogg"));
+            AudioManager.playOnce(new AudioPath("res/aud/sfx/intro/start1.wav"), 0.3);
             this.tickFlakes(dt);
             for (const zombie of this.cinemaZombies) {
                 zombie.frameTimer += dt;
@@ -547,7 +555,7 @@ export class IntroScreen implements Entity {
         ctx.closePath();
         ctx.fillStyle = fill;
         ctx.fill();
-        
+
         // Logic to handle drawing the snow cap on the moutain layer
         if (capA > 0) {
             ctx.clip();
@@ -586,7 +594,7 @@ export class IntroScreen implements Entity {
             ag.addColorStop(0, `hsla(${hue},80%,45%,0)`);
             ag.addColorStop(0.45, `hsla(${hue},80%,52%,${0.030 + i * 0.013})`);
             ag.addColorStop(1, `hsla(${hue},80%,45%,0)`);
-            
+
             ctx.save();
             ctx.translate(Math.sin(t * 0.38 + i * 2.1) * H * 0.05, 0);
             ctx.fillStyle = ag;
@@ -614,7 +622,7 @@ export class IntroScreen implements Entity {
         }
         ctx.lineTo(W, H);
         ctx.closePath();
-        
+
         // The gradient fill for the moutain itself
         const ng = ctx.createLinearGradient(0, H * 0.18, 0, H);
         ng.addColorStop(0, '#c8dce8');
@@ -624,7 +632,7 @@ export class IntroScreen implements Entity {
         ng.addColorStop(1, '#182530');
         ctx.fillStyle = ng;
         ctx.fill();
-        
+
         // Snow cap clip
         ctx.save();
         ctx.beginPath();
@@ -633,9 +641,9 @@ export class IntroScreen implements Entity {
             ctx.lineTo(nx * W, lerp(H + 20, H * 0.18 + ny * H * 0.82, nrProg));
         }
         ctx.lineTo(W, H);
-        ctx.closePath(); 
+        ctx.closePath();
         ctx.clip();
-        
+
         // The snow cap gradient
         const cg = ctx.createLinearGradient(0, H * 0.18, 0, H * 0.44);
         cg.addColorStop(0, 'rgba(238,250,255,0.93)');
@@ -643,7 +651,7 @@ export class IntroScreen implements Entity {
         cg.addColorStop(1, 'rgba(200,225,240,0)');
         ctx.fillStyle = cg;
         ctx.fillRect(0, H * 0.18, W, H * 0.30);
-        ctx.restore(); 
+        ctx.restore();
         ctx.restore();
 
         // Sideways blizzard snow
@@ -711,7 +719,7 @@ export class IntroScreen implements Entity {
 
         // Drawing the sub and tagline
         ctx.save();
-        ctx.textAlign = 'center'; 
+        ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         // Sub title with the fade effect
@@ -739,7 +747,7 @@ export class IntroScreen implements Entity {
             ctx.globalAlpha = pulse(0.88, 0.18, 0.92, t) * baseAlpha;
             ctx.font = `${Math.round(H * 0.055)}px 'Share Tech Mono', monospace`;
             ctx.fillStyle = '#c0392b';
-            ctx.textAlign = 'center'; 
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(PROMPT, W / 2, H * 0.76);
             ctx.restore();

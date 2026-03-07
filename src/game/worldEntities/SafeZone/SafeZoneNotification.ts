@@ -1,3 +1,5 @@
+import { AudioPath } from "../../../engine/assetmanager.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Vec2 } from "../../../engine/Vec2.js";
 
@@ -23,6 +25,7 @@ export class SafeZoneNotification implements Entity {
 
     constructor(private levelNumber: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
+        AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/notification.wav'), 0.7);
     }
 
     update(keys: { [p: string]: boolean }, deltaTime: number): void {

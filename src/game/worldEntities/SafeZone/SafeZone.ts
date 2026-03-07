@@ -1,5 +1,5 @@
 import { Animator } from "../../../engine/Animator.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { DrawLayer } from "../../../engine/types.js";
@@ -16,6 +16,8 @@ import { Shop } from "./Shop.js";
 import { SafeZoneNotification } from "./SafeZoneNotification.js";
 import { DecoFactory } from "../../worldDeco/DecorationFactory.js";
 import { Background } from "../../worldBackground/Background.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
+import { safeZoneBackground } from "./safeZoneBackground.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -56,6 +58,17 @@ export class SafeZone implements Entity {
             ), DrawLayer.WORLD_DECORATION
         );
 
+        // start x = after enter wall (5 + 25 = 30 offset from position)
+        // width = total size - enter wall - exit wall - initial offset = size.x - 30 - 25
+        const bgWidth = this.size.x - 30 - 25;
+        const bgStartX = this.position.x + 30; // right edge of enter wall
+
+        GameEngine.g_INSTANCE.addEntity(
+            new safeZoneBackground(
+                new Vec2(bgStartX + bgWidth / 2, this.position.y), bgWidth
+            ), DrawLayer.FOREGROUND
+        );
+            
         GameEngine.g_INSTANCE.addEntity(
             new ChristmasTree(
                 Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1)))
@@ -90,6 +103,14 @@ export class SafeZone implements Entity {
                 2
             );
         }
+
+        GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
+            this.position,
+            new Vec2(this.size.x, this.size.y),
+            "rgba(36, 29, 29, )",
+            "#000000",
+            2
+        );
     }
 
 
@@ -107,10 +128,16 @@ export class SafeZone implements Entity {
 
     onPlayerExitSafeZone(): void {
         console.log("Player exited the SafeZone!");
+        AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/enterExit3.wav'), 0.3);
+        AudioManager.stopMusic(new AudioPath("res/aud/music/safezone_music1.ogg"));
+        AudioManager.playMusic(new AudioPath('res/aud/music/game_music.ogg'), 0.5, 2);
         // GameEngine.g_INSTANCE.positionScreenOnEnt(unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")), 0.15, 0.5);
     }
 
     onPlayerEnterSafeZone(): void {
+        AudioManager.stopMusic(new AudioPath('res/aud/music/game_music.ogg'));
+        AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/enterExit3.wav'), 0.3);
+        AudioManager.playSafezoneMusic(new AudioPath("res/aud/music/safezone_music1.ogg"));
         console.log("Player entered the SafeZone!");
         // TODO(maybe): When we enter a safe zone we should psoition the viewport so that it can see the whole safe zone
         // GameEngine.g_INSTANCE.positionScreenOnEnt(this, 0.5, 0.75);
@@ -143,6 +170,7 @@ export class SafeZone implements Entity {
         // Old safe zone things
         this.cleanupEntByTag("SafeZone");
         this.cleanupEntByTag("SafeZoneTurretWall");
+        this.cleanupEntByTag("safeZoneBackground");
         this.cleanupEntByTag("Shop");
         this.cleanupEntByTag("Armory");
     }

@@ -1,13 +1,14 @@
 import { GameEngine } from "../../../engine/gameengine.js";
 import { ForceDraw } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/Vec2.js";
-import { ImagePath } from "../../../engine/assetmanager.js";
+import { AudioPath, ImagePath } from "../../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Player } from "../player.js";
 import { AmmoRestore } from "../../Items/AmmoRestore.js";
 import { InstantHealthPickupBuff } from "../../Items/InstantHealthPickupBuff.js";
 import { ShieldRestorePickupItem } from "../../Items/ShieldBoost.js";
 import { Buff } from "../../Items/Buff.js";
+import { AudioManager } from "../../../engine/AudioManager.js";
 
 interface ShopItem {
     id: string;
@@ -107,6 +108,7 @@ export class ShopUI extends ForceDraw implements Entity {
         buff.onApply();
 
         this.showFlash(`Acquired: ${item.name}`, "#4DFFB4");
+        AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/shop/buy.wav"), 0.7);
         return true;
     }
 

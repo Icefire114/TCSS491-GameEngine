@@ -128,6 +128,7 @@ export class ExplodingZombie extends Zombie {
     }
 
     explode(player: Player): void {
+        this.playAttackSFX();
         const deltaX = player.position.x - this.position.x;
         const deltaY = player.position.y - this.position.y;
         const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);

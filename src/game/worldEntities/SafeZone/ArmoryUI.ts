@@ -140,7 +140,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 if (this.index < 0) {
                     this.index = this.items.length - 1;
                 }
-                AudioManager.playSFX(new AudioPath("res/aud/ui_click.ogg"), 0.3);
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiLeftBtn.wav"));
                 //console.log(`leftButton`);
             },
             color: ArmoryUI.BG2_MAIN
@@ -153,6 +153,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
                 if (this.index >= this.items.length) {
                     this.index = 0;
                 }
+                AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiRightBtn.wav"));
                 //console.log(`rightButton`);
             },
             color: ArmoryUI.BG2_MAIN
@@ -160,10 +161,11 @@ export class ArmoryUI extends ForceDraw implements Entity {
         {
             label: "equip",
             action: () => {
-                if (this.items[this.index].unlocked) {
+                if (this.items[this.index].unlocked && !this.items[this.index].equipped) {
                     const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
                     player.swapWeapon(this.items[this.index].id);
                     this.equipItem(this.items[this.index].id);
+                    AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/armory/armoryUiEquipBtn.wav"));
                 }
             },
             color: ArmoryUI.BG2_MAIN
@@ -366,7 +368,7 @@ export class ArmoryUI extends ForceDraw implements Entity {
         // draw all stats
         this.drawStatsBar(ctx, x + 10, y + 70, w - 25, 30, "Damage", itemStats.damage, 100);
         this.drawStatsBar(ctx, x + 10, y + 120, w - 25, 30, "Fire Rate", itemStats.fireRate, 20);
-        this.drawStatsBar(ctx, x + 10, y + 170, w - 25, 30, "Reload Time", itemStats.reloadTime, 3);
+        this.drawStatsBar(ctx, x + 10, y + 170, w - 25, 30, "Reload Time", itemStats.reloadTime, 6);
         this.drawStatsBar(ctx, x + 10, y + 220, w - 25, 30, "Magazine Size", itemStats.magSize, 100);
 
         //previous button

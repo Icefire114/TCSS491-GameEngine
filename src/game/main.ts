@@ -39,8 +39,6 @@ import { SkyLayer } from "./worldBackground/SkyLayer.js";
 import { DayNightCycle } from "./worldBackground/DayNightCycle.js";
 import { PauseScreen } from "./PauseScreen.js";
 
-
-
 /**
  * This is the main file for the game, and it should be considered the entry point for the game.
  */
@@ -134,9 +132,6 @@ ASSET_MANAGER.queueDownload("res/img/background/foreground/fore3.png");
 ASSET_MANAGER.queueDownload("res/img/background/foreground/fore4.png");
 ASSET_MANAGER.queueDownload("res/img/background/foreground/fore5.png");
 
-// === Music Assets ===
-ASSET_MANAGER.queueDownload("res/aud/game_music.ogg");
-
 // === World Object Assets ===
 ASSET_MANAGER.queueDownload("res/img/spike.png");
 ASSET_MANAGER.queueDownload("res/img/world_deco/tree_1.png");
@@ -153,6 +148,7 @@ ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/armory.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/safezoneBg.png");
 
 // === Shader Assets ===
 ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
@@ -169,29 +165,36 @@ ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_mid.png");
 ASSET_MANAGER.queueDownload("res/img/ui/infection_bar_start.png");
 
 // === Audio Assets ===
-// === UI SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/menu/mainUiMenuBtns.ogg");
 
-ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiEquipBtn.ogg");
-ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiLeftBtn.ogg");
-ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiRightBtn.ogg");
+// === Music Assets ===
+ASSET_MANAGER.queueDownload("res/aud/music/game_music.ogg");
+// ASSET_MANAGER.queueDownload("res/aud/music/boss_music.ogg");
+ASSET_MANAGER.queueDownload("res/aud/music/safezone_music1.ogg");
+ASSET_MANAGER.queueDownload("res/aud/music/menu.ogg");
+
+// === UI SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/menu/mainUiMenuBtns.wav");
+
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiEquipBtn.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiLeftBtn.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/armory/armoryUiRightBtn.wav");
 
 ASSET_MANAGER.queueDownload("res/aud/sfx/uiSfx/shop/buy.wav");
 
 // === GUNS SFX ===
 // === Assult Rifle SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/reload.mp3");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/shoot.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/Ar/shoot2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/AssultRifle/reload.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/AssultRifle/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/AssultRifle/shoot2.wav");
 
 // === RPG SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/reload.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/shoot.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/explode.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/reload.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/explode.wav");
 
 /// === Ray Gun SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/shoot.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/reload.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RayGun/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RayGun/reload.wav");
 
 // === Item SFX ===
 ASSET_MANAGER.queueDownload("res/aud/sfx/items/ammoRestore.wav");
@@ -202,25 +205,43 @@ ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost2.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/items/shieldBoost3.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/items/syringe.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/shockWaveExplosion.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/items/shockWaveExplosion2.wav");
 
 // === Player SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/player/damaged.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/damaged.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/damaged2.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/player/death.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/player/land.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/player/land2.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/player/land3.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/player/snowboard.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/player/snowboard.wav");
 
 // === Safezone SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit2.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/enterExit3.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/notification.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/openCloseUi.ogg");
-ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/shoot.mp3");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/openCloseUi.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/safezone/shoot.wav");
 
 // === Zombie SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/death.ogg");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/death.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/hit1.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/hit2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/giantHit.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/giantHit2.wav");
+
+// === Boss Zombie Audio ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/boss zombie/bossHit1.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/boss zombie/bossSomething1.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/boss zombie/bossSomething2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/boss zombie/bossSomething3.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/zombies/boss zombie/bossSomething4.wav");
+
+// === Intro SFX ===
+ASSET_MANAGER.queueDownload("res/aud/sfx/intro/loading.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/intro/start1.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/intro/start2.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/intro/static.wav");
 
 
 

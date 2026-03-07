@@ -46,13 +46,20 @@
           <div class="nav-item" onclick="setNav(this,'controls')">CONTROLS</div>
           <div class="nav-item" onclick="setNav(this,'about')">ABOUT</div>
         </nav>
-
+        
+        <!-- Audio elements -->
+      <div class="nav-audio">
+        <input id="audioSlider" type="range" min="0" max="100" step="1" value="50"></slider>
+        <button id="muteButton" class="audio-toggle">AUDIO ON</button>
+      </div>
         <!-- Clock on the top right -->
         <div class="nav-readouts">
           <span>TIME&nbsp;<span class="rval" id="clock">--:--:--</span></span>
         </div>
       </div>
     </header>
+
+
 
     <!-- Canvas + Panels -->
     <div id="canvas-container">
@@ -156,6 +163,7 @@
   <script>
     // Handles switching between the different content panels when clicking on the nav items
     function setNav(el, target) {
+      new Audio('res/aud/sfx/uiSfx/menu/mainUiMenuBtns.wav').play();
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       el.classList.add('active');
       document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
@@ -209,6 +217,7 @@
       function next() {
         if (i >= steps.length) {
           setTimeout(() => overlay.classList.add('hidden'), 500);
+          new Audio('res/aud/sfx/intro/loading.wav').play();
           return;
         }
         const step = steps[i++];

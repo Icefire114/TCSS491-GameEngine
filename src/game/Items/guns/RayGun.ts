@@ -4,7 +4,6 @@ import { LazerBullet } from "../../worldEntities/bullets/LazerBullet.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { AnimationState, Animator } from "../../../engine/Animator.js";
 import { GameEngine } from "../../../engine/gameengine.js";
-import { Player } from "../../worldEntities/player.js";
 
 export class RayGun extends Gun {
     readonly SHOULDER_OFFSET_X: number = -0.7;
@@ -16,7 +15,7 @@ export class RayGun extends Gun {
     static TAG: string = "RayGun";
     static DAMAGE: number = 15;
     static FIRE_RATE: number = 20;
-    static RELOAD_TIME: number = 3;
+    static RELOAD_TIME: number = 6;
     static MAG_SIZE: number = 100;
     static SPAWN_AMMO: number = 100;
 
@@ -99,9 +98,6 @@ export class RayGun extends Gun {
     protected createBullet(): Bullet {
         const originX = this.position.x + Math.cos(this.travelAngle) - Math.sin(this.travelAngle);
         const originY = this.position.y + Math.sin(this.travelAngle) + Math.cos(this.travelAngle);
-
-        const muzzleX = originX + Math.cos(this.travelAngle);
-        const muzzleY = originY + Math.sin(this.travelAngle);
 
         return new LazerBullet(originX, originY, this.travelAngle);
     }
