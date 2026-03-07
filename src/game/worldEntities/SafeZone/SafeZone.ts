@@ -68,7 +68,7 @@ export class SafeZone implements Entity {
                 new Vec2(bgStartX + bgWidth / 2, this.position.y), bgWidth
             ), DrawLayer.FOREGROUND
         );
-            
+
         GameEngine.g_INSTANCE.addEntity(
             new ChristmasTree(
                 Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1)))
@@ -103,14 +103,13 @@ export class SafeZone implements Entity {
                 2
             );
         }
-
-        GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
-            this.position,
-            new Vec2(this.size.x, this.size.y),
-            "rgba(36, 29, 29, )",
-            "#000000",
-            2
-        );
+        // GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
+        //     this.position,
+        //     new Vec2(this.size.x, this.size.y),
+        //     "rgba(36, 29, 29, 0)",
+        //     "#000000",
+        //     2
+        // );
     }
 
 
