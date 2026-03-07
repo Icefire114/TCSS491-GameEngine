@@ -17,6 +17,7 @@ import { SafeZoneNotification } from "./SafeZoneNotification.js";
 import { DecoFactory } from "../../worldDeco/DecorationFactory.js";
 import { Background } from "../../worldBackground/Background.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
+import { safeZoneBackground } from "./safeZoneBackground.js";
 
 export class SafeZone implements Entity {
     id: EntityID;
@@ -57,6 +58,17 @@ export class SafeZone implements Entity {
             ), DrawLayer.WORLD_DECORATION
         );
 
+        // start x = after enter wall (5 + 25 = 30 offset from position)
+        // width = total size - enter wall - exit wall - initial offset = size.x - 30 - 25
+        const bgWidth = this.size.x - 30 - 25;
+        const bgStartX = this.position.x + 30; // right edge of enter wall
+
+        GameEngine.g_INSTANCE.addEntity(
+            new safeZoneBackground(
+                new Vec2(bgStartX + bgWidth / 2, this.position.y), bgWidth
+            ), DrawLayer.FOREGROUND
+        );
+            
         GameEngine.g_INSTANCE.addEntity(
             new ChristmasTree(
                 Vec2.compAdd(this.position, Vec2.compDiv(new Vec2(this.size.x, this.size.y), new Vec2(2, 1)))
@@ -91,6 +103,14 @@ export class SafeZone implements Entity {
                 2
             );
         }
+
+        GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
+            this.position,
+            new Vec2(this.size.x, this.size.y),
+            "rgba(36, 29, 29, )",
+            "#000000",
+            2
+        );
     }
 
 
@@ -150,6 +170,7 @@ export class SafeZone implements Entity {
         // Old safe zone things
         this.cleanupEntByTag("SafeZone");
         this.cleanupEntByTag("SafeZoneTurretWall");
+        this.cleanupEntByTag("safeZoneBackground");
         this.cleanupEntByTag("Shop");
         this.cleanupEntByTag("Armory");
     }

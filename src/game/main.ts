@@ -148,6 +148,7 @@ ASSET_MANAGER.queueDownload("res/img/safe_zone/turret_wall.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/turret.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/shop.png");
 ASSET_MANAGER.queueDownload("res/img/safe_zone/armory.png");
+ASSET_MANAGER.queueDownload("res/img/safe_zone/safezoneBg.png");
 
 // === Shader Assets ===
 ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");

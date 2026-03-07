@@ -12,6 +12,9 @@ export class AudioManager {
     private static assetManager: AssetManager;
     private static activeSources: Map<string, AudioBufferSourceNode>;
 
+    /**
+     * Init method to start audio manager
+     */
     static init(assetManager: AssetManager): void {
         if (AudioManager.assetManager) {
             throw new Error("AudioManager has already been initialized!");
@@ -50,6 +53,12 @@ export class AudioManager {
         });
     }
 
+    /**
+     * Plays a sound effect, allowing for multiple overlapping instances of the same sound.
+     * @param path the audio path to play, must be preloaded in the asset manager
+     * @param volume The volume of this sfx between 0 and 1
+     * @param delay The delay in seconds before the sound starts playing. Default is 0 (play immediately).
+     */
     static playSFX(path: AudioPath, volume: number = 0.5, delay: number = 0): void {
         const buffer = this.assetManager.getAudio(path);
 
@@ -183,6 +192,16 @@ export class AudioManager {
         }
     }
 
+    /**
+     * Plays the safezone music in a loop with filters and effects.
+     * The music is added to active sources, if it is already playing and this method is 
+     * called, nothing happens.
+     * 
+     * Call stop music with the audio path to stop the music.
+     * 
+     * @param path the audiopath
+     * @param volume Volume between 0 and 1
+     */
     static playSafezoneMusic(path: AudioPath, volume: number = 0.5): void {
         const buffer = this.assetManager.getAudio(path);
         if (!buffer) return;
@@ -227,6 +246,15 @@ export class AudioManager {
         this.activeSources.set(path.asRaw(), source);
     }
 
+    /**
+     * Plays the music in a loop with no filters or effects.
+     * The music is added to active sources, if it is already playing and this method is 
+     * called, nothing happens.
+     * 
+     * @param path the audiopath
+     * @param volume the volume between 0 and 1
+     * @param fadeIn the time in seconds for the music to fade in
+     */
     static playMusic(path: AudioPath, volume: number = 0.5, fadeIn: number = 0): void {
         const buffer = this.assetManager.getAudio(path);
         if (!buffer) return;
@@ -256,14 +284,13 @@ export class AudioManager {
         source.start(0);
 
         this.activeSources.set(path.asRaw(), source);
-
-        // source.onended = () => {
-        //     if (this.activeSources.get(path.asRaw()) === source) 
-        //         this.activeSources.delete(path.asRaw());
-        // };
         console.log("sources:", this.activeSources.size);
     }
 
+    /**
+     * stops the music associated with the given audiopath if it is playing. If it is not playing, does nothing.
+     * @param path the audioPath
+     */
     public static stopMusic(path: AudioPath): void {
         const buffer = this.assetManager.getAudio(path);
         if (!buffer) return;
@@ -309,12 +336,4 @@ export class AudioManager {
     public static getAudioContext(): AudioContext {
         return AudioManager.m_audioContext;
     }
-
-    // /**
-    //  * unmutes audio and sets master gain to slider value
-    //  */
-    // public static unMute(): void {
-    //     AudioManager.isAudioMuted = false;
-    //     AudioManager.m_masterGain.gain.value = AudioManager.sliderValue;
-    // }
 }
