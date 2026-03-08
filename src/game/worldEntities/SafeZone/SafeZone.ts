@@ -103,6 +103,7 @@ export class SafeZone implements Entity {
                 2
             );
         }
+        // TODO: Wat the fuck is this doing here?
         // GameEngine.g_INSTANCE.renderer.drawRectAtWorldPos(
         //     this.position,
         //     new Vec2(this.size.x, this.size.y),

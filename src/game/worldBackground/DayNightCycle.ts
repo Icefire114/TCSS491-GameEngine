@@ -19,7 +19,7 @@ export class DayNightCycle implements Entity {
     // 0 to 1, full cycle
     cycleTime = 0;
     // seconds for a full day/night cycle
-    cycleDuration = 120; 
+    cycleDuration = 120;
 
     private lastTime = performance.now();
     private rawTime = 0;
@@ -29,10 +29,10 @@ export class DayNightCycle implements Entity {
         this.sunSprite = spritePaths[0];
         this.moonSprite = spritePaths[1];
     }
-    
+
     // 0.0 - 0.5 = day (sun), 0.5 - 1.0 = night (moon)
     get isDay() {
-        return this.cycleTime < 0.5; 
+        return this.cycleTime < 0.5;
     }
 
     // get timeOfDayAlpha() {
@@ -42,17 +42,17 @@ export class DayNightCycle implements Entity {
     // }
 
     get timeOfDayAlpha() {
-    // Start darkening at 0.4 (before sun exits) and peak darkness at 0.75 (moon middle)
-    // Then lighten back to 0 by 1.0 (before sun enters)
-    const darkStart = 0.4;
-    const darkEnd = 1.0;
-    const t = (this.cycleTime - darkStart) / (darkEnd - darkStart);
-    
-    if (this.cycleTime < darkStart) return 0; // full day
-    
-    // sin curve peaks in the middle of the night
-    return Math.max(0, Math.sin(t * Math.PI));
-}
+        // Start darkening at 0.4 (before sun exits) and peak darkness at 0.75 (moon middle)
+        // Then lighten back to 0 by 1.0 (before sun enters)
+        const darkStart = 0.4;
+        const darkEnd = 1.0;
+        const t = (this.cycleTime - darkStart) / (darkEnd - darkStart);
+
+        if (this.cycleTime < darkStart) return 0; // full day
+
+        // sin curve peaks in the middle of the night
+        return Math.max(0, Math.sin(t * Math.PI));
+    }
 
     update(keys: { [key: string]: boolean }, deltaTime: number) {
         // Keep position near player to avoid culling
@@ -74,14 +74,14 @@ export class DayNightCycle implements Entity {
         this.cycleTime = (this.rawTime / this.cycleDuration) % 1;
 
         const sprite = this.isDay ? game.getSprite(this.sunSprite) : game.getSprite(this.moonSprite);
-        
+
         const W = ctx.canvas.width;
         const H = ctx.canvas.height;
 
         // Arc across the screen: 0 = left horizon, 0.5 = top, 1 = right horizon
         const t = this.isDay ? this.cycleTime * 2 : (this.cycleTime - 0.5) * 2;
         const size = W * 0.5;
-        
+
         // Parametric arc using sin for Y (peaks at center) and lerp for X
         const x = W * 1.1 - t * W * 1.2;
         const y = H * 0.2 - Math.sin(t * Math.PI) * H * 0.1;

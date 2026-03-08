@@ -130,11 +130,9 @@ export class Mountain extends ForceDraw implements Entity {
         shader.render([
             // Snow shader uniforms
             {
-                u_snowHeight: 1.0,
-                u_snowThickness: 0.8,
                 u_viewportOffset: [
-                    game.viewportX * 0.00000002,
-                    game.viewportY * 0.00000002
+                    game.viewportX / GameEngine.WORLD_UNITS_IN_VIEWPORT,
+                    game.viewportY * -0.018
                 ]
             },
         ])

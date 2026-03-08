@@ -155,6 +155,7 @@ ASSET_MANAGER.queueDownload("res/shader/sun.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/area_light.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/terrain.frag.glsl");
 
 // === UI Assets ===
 ASSET_MANAGER.queueDownload("res/img/ui/health_bar_endcap.png");
