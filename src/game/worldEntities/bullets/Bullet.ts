@@ -92,9 +92,11 @@ export abstract class Bullet implements Entity, Collidable {
         }
 
         // ---------- Collision with boss ----------
-        const boss = GameEngine.g_INSTANCE.getUniqueEntityByTag("boss") as Boss;
-        if (boss && this.physicsCollider.collides(this, boss)) {
-            this.onEnemyHit(boss);
+        const bosses = GameEngine.g_INSTANCE.getEntitiesByTag("boss") as Boss[];
+        for (const boss of bosses) {
+            if (this.physicsCollider.collides(this, boss)) {
+                this.onEnemyHit(boss);
+            }
         }
 
         // remove if offscreen

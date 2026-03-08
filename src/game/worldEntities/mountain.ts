@@ -11,6 +11,7 @@ import { RavineDeathZone } from "./RavineZone.js";
 import { unwrap } from "../../engine/util.js";
 import { ShaderRegistry } from "../../engine/WebGL/ShaderRegistry.js";
 import { WebGL } from "../../engine/WebGL/WebGL.js";
+import { BossArena } from "./BossArena.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -65,6 +66,11 @@ export class Mountain extends ForceDraw implements Entity {
     private minDistanceBetweenZones = 2000;
     private maxDistanceBetweenZones = 3500;
 
+    // boss wave tracking
+    private bossWave: number = 0;
+    private bossGateActive: boolean = false;
+    private forceNextSafeZoneAfterBoss: boolean = false;
+
     // Used to handle the background of the ravine 
     private completedRavines: {
         startAnchorX: number;
@@ -96,6 +102,17 @@ export class Mountain extends ForceDraw implements Entity {
         this.m_mountainCanvas.width = 1280;
         this.m_mountainCanvas.height = 720;
         this.m_mtnCanvasCtx = unwrap(this.m_mountainCanvas.getContext("2d"), "Failed to get canvas for mountain rendering!");
+
+        // Resume special terrain generation after the boss is defeated.
+        window.addEventListener("boss:defeated", () => {
+            this.bossGateActive = false;
+            this.forceNextSafeZoneAfterBoss = true;
+
+            // Reset spawn cooldown anchors so generation resumes quickly after boss death.
+            const resumeX = this.lastAnchor.x;
+            this.flatEndX = resumeX - 300; // force next safezone soon
+            this.lastRavineEndX = resumeX - this.ravineCooldown - 1;    // allow ravines again
+        });
     }
 
 
@@ -265,13 +282,20 @@ export class Mountain extends ForceDraw implements Entity {
         }
 
         // Checking if were in a flat generation
-        if (this.flatSequenceOn || G_CONFIG.TERRAIN_GENERATION_FORCE_FLAT) {
+        if ((this.flatSequenceOn || G_CONFIG.TERRAIN_GENERATION_FORCE_FLAT) && !this.bossGateActive) {
             this.generateFlatAnchor();
             return;
         }
 
         // Storing the last anchor x position 
         const currentX = this.lastAnchor.x;
+
+        if (this.forceNextSafeZoneAfterBoss) {
+            this.forceNextSafeZoneAfterBoss = false;
+            this.startFlatSequence();
+            console.log(`Spawning SafeZone after boss defeat at x: ${currentX}`);
+            return;
+        }
 
         // Logic for safe zones
 
@@ -303,12 +327,16 @@ export class Mountain extends ForceDraw implements Entity {
 
         const notNearSafeZone = !this.isNearSafeZone(currentX, 300); // 300 unit buffer
 
-        if (shouldSpawnFlat) {
+        // no ravines spawn 100 units out of safe zones (needed for boss logic)
+        const SAFEZONE_RAVINE_BUFFER = 100;
+        const farEnoughFromSafeZoneExit = currentX > this.flatEndX + SAFEZONE_RAVINE_BUFFER;
+
+        if (shouldSpawnFlat && !this.bossGateActive) {
             this.startFlatSequence();
             console.log(`Spawning SafeZone at x: ${currentX}`);
         }
         // We can only spawn a ravine if we're not in a safe zone
-        else if (pastSpawnPoint && coolDownRavine && isTerrainFlat && notNearSafeZone && this.rng.next() < 0.1) {
+        else if (farEnoughFromSafeZoneExit && pastSpawnPoint && coolDownRavine && notNearSafeZone && this.rng.next() < 0.1) {
             this.startRavineSequence();
         }
         else {
@@ -450,6 +478,17 @@ export class Mountain extends ForceDraw implements Entity {
                 startX: this.tempSafeZoneStartX,
                 endX: this.flatEndX
             });
+
+            // boss spawns after 2 safezone
+            if (this.safeZones.length % 2 === 0) {
+                this.bossWave++;
+                this.bossGateActive = true;
+                this.flatSequenceOn = false;
+                this.isRavineSequence = false;
+                const arenaStart = this.flatEndX + 50;
+                const arenaEnd = arenaStart + 150;
+                GameEngine.g_INSTANCE.addEntity(new BossArena(arenaStart, arenaEnd, this.bossWave), DrawLayer.DEFAULT);
+            }
         }
     }
 

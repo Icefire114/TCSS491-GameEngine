@@ -81,6 +81,8 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
 
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
+
 
 // === Item Assets ===
 ASSET_MANAGER.queueDownload("res/img/items/instant_health_pickup.png");
@@ -312,8 +314,6 @@ function main() {
         gameEngine.addUniqueEntity(new WorldSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new DecorationSpawner("my-cool-seed"), DrawLayer.BACKGROUND);
 
-        //testing boss arena
-        //todo: fix background problems with boss arena
 
         if (G_CONFIG.CREATE_TESTING_ENTS) {
             gameEngine.addEntity(new BossArena(100, 250), DrawLayer.DEFAULT);
