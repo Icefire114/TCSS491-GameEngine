@@ -163,13 +163,24 @@
   <script>
     // Handles switching between the different content panels when clicking on the nav items
     function setNav(el, target) {
-      new Audio('res/aud/sfx/uiSfx/menu/mainUiMenuBtns.wav').play();
+      if (window.playUISFX) window.playUIClick();
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       el.classList.add('active');
       document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
       if (target !== 'play') document.getElementById('panel-' + target).classList.add('active');
     }
   </script>
+
+  <!-- Slider Fill Handler -->
+<script>
+  const slider = document.getElementById('audioSlider');
+  function updateSliderFill() {
+    const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+    slider.style.setProperty('--val', pct + '%');
+  }
+  slider.addEventListener('input', updateSliderFill);
+  updateSliderFill();
+</script>
 
   <!-- Clock Handler -->
   <script>
@@ -217,7 +228,7 @@
       function next() {
         if (i >= steps.length) {
           setTimeout(() => overlay.classList.add('hidden'), 500);
-          new Audio('res/aud/sfx/intro/loading.wav').play();
+          if (window.playUISFX) window.playUISFX();
           return;
         }
         const step = steps[i++];
