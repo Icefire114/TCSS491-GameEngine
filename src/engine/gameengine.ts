@@ -91,6 +91,13 @@ export class GameEngine {
         this.clockTick = 0;
         this.assetManager = assetManager;
         AudioManager.init(this.assetManager);
+        window.playUIClick = () => {
+            AudioManager.playSFX(new AudioPath('res/aud/sfx/uiSfx/menu/mainUiMenuBtns.wav'), 0.5);
+        };
+
+        window.playUISFX = () => {
+            AudioManager.playSFX(new AudioPath('res/aud/sfx/intro/loading.wav'), 0.5);
+        }
 
         const canvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
