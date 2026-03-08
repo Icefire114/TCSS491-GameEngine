@@ -5,37 +5,43 @@ import { BoxCollider } from "../../engine/physics/BoxCollider.js";
 import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
-import { AnimationState } from "../../engine/Animator.js";
 import { Zombie } from "../zombies/Zombie.js";
 
 export class Boss extends Zombie {
-    sprite: ImagePath = new ImagePath("res/img/player_new.png");
+    sprite: ImagePath = new ImagePath("res/img/zombies/Boss zombie/boss_zombie.png");
+
 
     // --- Power attack ---
-    powerDamage = 40;
-    powerCooldown = 10;    // seconds between power attacks
+    powerDamage: number;
+    powerCooldown: number;    // seconds between power attacks
     private powerTimer = 0;
     private powerWindUp = false;
     private powerWindUpTimer = 0;
     private readonly POWER_WIND_UP_DURATION = 1.2; // pause before power hit lands
 
-    constructor(pos?: Vec2) {
+    public maxHealth: number;
+
+    constructor(pos?: Vec2, wave: number = 1) {
         const tag: string = "boss";
-        const attack_range: number = 12;
+        const attack_range: number = 15;
         const attack_cooldown: number = 1.5; // seconds between attacks
         const run_range: number = 999;       // boss always runs
-        const health: number = 1500;
+        const scaleFactor = 1 + (wave -1) * 0.4; // scale factor +40% for each wave
+        const health: number = 1500 * scaleFactor;
         const reward: number = 0;            // no currency reward for boss
-        const walk_speed: number = 20;
-        const run_speed: number = 20;
-        const player_damage_amount: number = 15; // normal damage
+        const walk_speed: number = 22 * scaleFactor;
+        const run_speed: number = 22 * scaleFactor;
+        const player_damage_amount: number = 15 * scaleFactor; // normal damage
 
-        const physicsCollider = new BoxCollider(6, 8);
+        const physicsCollider = new BoxCollider(15, 20);
         const animator: Animator = new Animator([]); // TODO: add boss animations
 
         super(tag, physicsCollider, animator, attack_range, attack_cooldown, run_range, health, reward, walk_speed, run_speed, player_damage_amount, pos);
+        this.maxHealth = health;
 
         // Delay power attack just so it doesn't happen right away
+        this.powerDamage = 40 * scaleFactor;
+        this.powerCooldown = Math.max(4, 10 - (wave - 1));
         this.powerTimer = this.powerCooldown;
     }
 
@@ -73,7 +79,7 @@ export class Boss extends Zombie {
         if (distance <= this.attack_range) {
             if (currentTime - this.lastAttackTime >= this.attack_cooldown) {
                 this.lastAttackTime = currentTime;
-                player.damagePlayer(this.player_damage_amount, "Infection"); // Infection damage
+                player.damagePlayer(this.player_damage_amount, "Health"); // health damage
             }
         }
     }
@@ -95,9 +101,9 @@ export class Boss extends Zombie {
         const w = this.physicsCollider.width * scale / game.zoom;
         const h = this.physicsCollider.height * scale / game.zoom;
 
-        // red square
-        ctx.fillStyle = "#FF0000";
-        ctx.fillRect(screenX - w / 2, screenY - h, w, h);
+        //filller spirte
+        const sprite = game.getSprite(this.sprite);
+        ctx.drawImage(sprite, screenX - w / 2, screenY - h, w, h);
 
         // "POWER!" text during windup of power attack
         if (this.powerWindUp) {
@@ -116,6 +122,6 @@ export class Boss extends Zombie {
         ctx.fillStyle = "#333";
         ctx.fillRect(barX, barY, barW, barH);
         ctx.fillStyle = this.health > 500 ? "#44FF44" : this.health > 250 ? "#FFAA00" : "#FF3333";
-        ctx.fillRect(barX, barY, barW * (this.health / 1500), barH);
+        ctx.fillRect(barX, barY, barW * (this.health / this.maxHealth), barH);
     }
 }

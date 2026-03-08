@@ -9,6 +9,7 @@ import { SafeZone } from "./SafeZone/SafeZone.js";
 import Rand from 'rand-seed';
 import { RavineDeathZone } from "./RavineZone.js";
 import { unwrap } from "../../engine/util.js";
+import { BossArena } from "./BossArena.js";
 
 export interface SafeZoneInfo {
     index: number;
@@ -62,6 +63,11 @@ export class Mountain extends ForceDraw implements Entity {
     private tempSafeZoneStartX: number = 0;
     private minDistanceBetweenZones = 2000;
     private maxDistanceBetweenZones = 3500;
+    
+    // boss wave tracking
+    private bossWave: number = 0;
+    private bossGateActive: boolean = false;
+    private forceNextSafeZoneAfterBoss: boolean = false;
 
     // Used to handle the background of the ravine 
     private completedRavines: {
@@ -87,6 +93,17 @@ export class Mountain extends ForceDraw implements Entity {
 
         // Passing the anchor points array to the collider 
         this.physicsCollider = new MountainCollider(this.anchorPointsList);
+
+        // Resume special terrain generation after the boss is defeated.
+        window.addEventListener("boss:defeated", () => {
+            this.bossGateActive = false;
+            this.forceNextSafeZoneAfterBoss = true;
+
+            // Reset spawn cooldown anchors so generation resumes quickly after boss death.
+            const resumeX = this.lastAnchor.x;
+            this.flatEndX = resumeX - 300; // force next safezone soon
+            this.lastRavineEndX = resumeX - this.ravineCooldown - 1;    // allow ravines again
+        });
     }
 
 
@@ -245,13 +262,20 @@ export class Mountain extends ForceDraw implements Entity {
         }
 
         // Checking if were in a flat generation
-        if (this.flatSequenceOn || G_CONFIG.TERRAIN_GENERATION_FORCE_FLAT) {
+        if ((this.flatSequenceOn || G_CONFIG.TERRAIN_GENERATION_FORCE_FLAT) && !this.bossGateActive) {
             this.generateFlatAnchor();
             return;
         }
 
         // Storing the last anchor x position 
         const currentX = this.lastAnchor.x;
+
+        if (this.forceNextSafeZoneAfterBoss) {
+            this.forceNextSafeZoneAfterBoss = false;
+            this.startFlatSequence();
+            console.log(`Spawning SafeZone after boss defeat at x: ${currentX}`);
+            return;
+        }
 
         // Logic for safe zones
 
@@ -279,12 +303,16 @@ export class Mountain extends ForceDraw implements Entity {
         const pastSpawnPoint = currentX > this.ravineStartShowing;
         const coolDownRavine = currentX > (this.lastRavineEndX + this.ravineCooldown);
 
-        if (shouldSpawnFlat) {
+        // no ravines spawn 100 units out of safe zones (needed for boss logic)
+        const SAFEZONE_RAVINE_BUFFER = 100;
+        const farEnoughFromSafeZoneExit = currentX > this.flatEndX + SAFEZONE_RAVINE_BUFFER;
+
+        if (shouldSpawnFlat && !this.bossGateActive) {
             this.startFlatSequence();
             console.log(`Spawning SafeZone at x: ${currentX}`);
         }
         // We can only spawn a ravine if we're not in a safe zone
-        else if (pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
+        else if (farEnoughFromSafeZoneExit && pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
             this.startRavineSequence();
         }
         else {
@@ -426,6 +454,17 @@ export class Mountain extends ForceDraw implements Entity {
                 startX: this.tempSafeZoneStartX,
                 endX: this.flatEndX
             });
+            
+            // boss spawns after 2 safezone
+            if (this.safeZones.length % 2 === 0) {
+                this.bossWave++;
+                this.bossGateActive = true;
+                this.flatSequenceOn = false;
+                this.isRavineSequence = false;
+                const arenaStart = this.flatEndX + 50;
+                const arenaEnd = arenaStart + 150;
+                GameEngine.g_INSTANCE.addEntity(new BossArena(arenaStart, arenaEnd, this.bossWave), DrawLayer.DEFAULT);
+            }
         }
     }
 

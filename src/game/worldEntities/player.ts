@@ -674,7 +674,7 @@ export class Player implements Entity, Collidable {
         const inBossArena = GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena").length > 0 &&
             (GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena")[0] as any).isActive;
 
-        if (!inSafeZone && !inBossArena) {
+        if (!inSafeZone) {
             if (onGround) {
                 this.velocity.x = Math.max(Player.MIN_SPEED, this.velocity.x);
                 this.prevGroundSpeed = this.velocity.x;
