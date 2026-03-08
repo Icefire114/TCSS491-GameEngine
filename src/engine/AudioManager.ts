@@ -118,7 +118,6 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-                console.log(`Stopped existing SFX instance for ${key}`);
             } catch {}
             this.activeSources.delete(key.asRaw());
         }
@@ -140,7 +139,6 @@ export class AudioManager {
             if (this.activeSources.get(key.asRaw()) === source) 
                 this.activeSources.delete(key.asRaw());
         };
-        console.log("sources:", this.activeSources.size);
     }
 
     /**
@@ -171,7 +169,6 @@ export class AudioManager {
             if (this.activeSources.get(key.asRaw()) === source) 
                 this.activeSources.delete(key.asRaw());
         };
-        console.log("sources:", this.activeSources.size);
     }
 
     /**
@@ -186,7 +183,6 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-                console.log(`Stopped existing SFX instance for ${key}`);
             } catch {}
             this.activeSources.delete(key.asRaw());
         }
@@ -284,7 +280,6 @@ export class AudioManager {
         source.start(0);
 
         this.activeSources.set(path.asRaw(), source);
-        console.log("sources:", this.activeSources.size);
     }
 
     /**
@@ -300,7 +295,6 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-                console.log(`Stopped existing SFX instance for ${path}`);
             } catch {}
             this.activeSources.delete(path.asRaw());
         }
