@@ -16,11 +16,11 @@ export const G_CONFIG = {
     // If true, create the entities right in front of the player
     CREATE_TESTING_ENTS: false,
     // If true, enable cheats by pressing 'f' for free fly and 'k' to force death
-    ENABLE_DEBUG_KEYS: true,
+    ENABLE_DEBUG_KEYS: false,
     // If true, player can access armory at anytime by pressing 'p', and can access all guns
     UNLOCK_ALL_GUNS: true,
     // If true, skip the intro cinematic and start the player in the game
-    SKIP_INTRO: true,
+    SKIP_INTRO: false,
     // If true, enable the boss fight and arena
-    ENABLE_BOSS_ARENA: true
+    ENABLE_BOSS_ARENA: false
 }
