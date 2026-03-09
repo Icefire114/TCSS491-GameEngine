@@ -644,6 +644,7 @@ export class Player implements Entity, Collidable {
 
             this.position.x += this.velocity.x * deltaTime;
             this.position.y += this.velocity.y * deltaTime;
+            console.log(this.velocity);
             return;
         }
 
