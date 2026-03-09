@@ -26,7 +26,7 @@ export class ExplodingZombie extends Zombie {
         const reward: number = 20;
         const walk_speed: number = 25;
         const run_speed: number = walk_speed * 1.5;
-        const player_damage_amount: number = 0; // Damage is handled by explode
+        const player_damage_amount: number = 50; // Damage is handled by explode
 
         const physicsCollider = new BoxCollider(2, 4);
         const animator: Animator = new Animator([
@@ -145,7 +145,7 @@ export class ExplodingZombie extends Zombie {
             new Explosion(
                 this.position.x,
                 this.position.y,
-                this.explosion_radius
+                this.player_damage_amount
             ),
             DrawLayer.ZOMBIE
         );

@@ -44,9 +44,6 @@ export class RifleBullet extends Bullet {
         if (target instanceof Zombie) {
             target.takeDamage(this.damage);
         }
-        if (target instanceof Boss) {
-            target.damage(this.damage);
-        }
         if (this.shouldRemoveOnHit()) {
             this.removeFromWorld = true;
         }

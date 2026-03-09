@@ -7,6 +7,8 @@ import { Entity, EntityID } from "../../../engine/Entity.js";
 import { GameEngine } from "../../../engine/gameengine.js";
 import { Zombie } from "../../zombies/Zombie.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
+import { Player } from "../player.js";
+import { unwrap } from "../../../engine/util.js";
 
 export class Explosion implements Entity, Collidable {
     private readonly YOFFSET = 7.5; // half of collider height
@@ -67,6 +69,11 @@ export class Explosion implements Entity, Collidable {
             if (this.physicsCollider.collides(this, zombie) && zombie instanceof Zombie) {
                 zombie.takeDamage(this.damage);
             }
+        }
+
+        const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
+        if (this.physicsCollider.collides(this, player)) {
+            player.damagePlayer(this.damage, "Health");
         }
     }
 }

@@ -84,10 +84,8 @@ export class Boss extends Zombie {
         }
     }
 
-    // Called by damage sources
-    damage(amount: number): void {
-        this.takeDamage(amount);
-
+    takeDamage(amount: number): void {
+        super.takeDamage(amount);
         if (this.health <= 0) {
             this.removeFromWorld = true;
             window.dispatchEvent(new CustomEvent("boss:defeated"));
