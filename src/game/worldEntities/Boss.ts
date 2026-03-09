@@ -26,7 +26,7 @@ export class Boss extends Zombie {
         const attack_range: number = 15;
         const attack_cooldown: number = 1.5; // seconds between attacks
         const run_range: number = 999;       // boss always runs
-        const scaleFactor = 1 + (wave -1) * 0.4; // scale factor +40% for each wave
+        const scaleFactor = 1 + (wave - 1) * 0.4; // scale factor +40% for each wave
         const health: number = 1500 * scaleFactor;
         const reward: number = 0;            // no currency reward for boss
         const walk_speed: number = 22 * scaleFactor;
@@ -72,7 +72,7 @@ export class Boss extends Zombie {
             this.velocity.x = 0;
         }
     }
-    
+
     protected _doAttack(player: Player, distance: number, currentTime: number): void {
         if (this.powerWindUp) return; // don't normal attack during power attack windup
 

@@ -5,6 +5,7 @@ import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "./mountain.js";
 import { Player } from "./player.js";
 import { Boss } from "./Boss.js";
+import { G_CONFIG } from "../CONSTANTS.js";
 
 export class BossArena implements Entity {
     readonly tag = "boss_arena";
@@ -39,7 +40,7 @@ export class BossArena implements Entity {
     private bossDefeated = false;
 
     constructor(minX: number, maxX: number, private wave: number = 1) {
-        this.id   = `boss_arena#${crypto.randomUUID()}` as EntityID;
+        this.id = `boss_arena#${crypto.randomUUID()}` as EntityID;
         this.minX = minX;
         this.maxX = maxX;
         this.arenaWidth = maxX - minX;
@@ -58,7 +59,7 @@ export class BossArena implements Entity {
                 this.isOutroFading = false;
             }
         }
-    
+
         this.position.x = player.position.x;
         this.position.y = player.position.y;
 
@@ -142,7 +143,7 @@ export class BossArena implements Entity {
     private deactivate(): void {
         // boss died, so unlock arena
         this.isActive = false;
-        this.boss     = null;
+        this.boss = null;
         this.bossDefeated = true;
         this.isOutroFading = true;
         this.outroFadeTime = 0;
@@ -158,27 +159,28 @@ export class BossArena implements Entity {
 
         if (this.isActive) {
             // --- Arena boundary lines ---
-            // mainly for test but we can keep it if needed
-            const scale  = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            const leftX  = (this.minX - game.viewportX) * scale / game.zoom;
+            if (G_CONFIG.DRAW_BOSS_ARENA_BB) {
+                const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
+                const leftX = (this.minX - game.viewportX) * scale / game.zoom;
 
-            ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
-            ctx.lineWidth   = 12;
-            ctx.setLineDash([16, 8]);
-            ctx.beginPath();
-            ctx.moveTo(leftX,  0);
-            ctx.lineTo(leftX,  ctx.canvas.height);
-            // ctx.moveTo(rightX, 0);
-            // ctx.lineTo(rightX, ctx.canvas.height);
-            ctx.stroke();
-            ctx.setLineDash([]);
+                ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
+                ctx.lineWidth = 12;
+                ctx.setLineDash([16, 8]);
+                ctx.beginPath();
+                ctx.moveTo(leftX, 0);
+                ctx.lineTo(leftX, ctx.canvas.height);
+                // ctx.moveTo(rightX, 0);
+                // ctx.lineTo(rightX, ctx.canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
 
             // --- Boss health bar HUD ---
             if (this.boss) {
-                const pct     = this.boss.health / this.boss.maxHealth;
-                const barW    = ctx.canvas.width * 0.5; 
-                const barH    = 22;
-                const barX    = (ctx.canvas.width - barW) / 2;
+                const pct = this.boss.health / this.boss.maxHealth;
+                const barW = ctx.canvas.width * 0.5;
+                const barH = 22;
+                const barX = (ctx.canvas.width - barW) / 2;
                 const barY = ctx.canvas.height - 54;
 
                 // Background
@@ -194,9 +196,9 @@ export class BossArena implements Entity {
                 ctx.fillRect(barX, barY, barW * pct, barH);
 
                 // "BOSS" label
-                ctx.fillStyle  = "white";
-                ctx.font       = "bold 13px Arial";
-                ctx.textAlign  = "center";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 13px Arial";
+                ctx.textAlign = "center";
                 ctx.fillText(`BOSS  ${Math.ceil(this.boss.health)} / ${Math.ceil(this.boss.maxHealth)}`, ctx.canvas.width / 2, barY - 8);
             }
 

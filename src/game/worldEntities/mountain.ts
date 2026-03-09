@@ -480,7 +480,7 @@ export class Mountain extends ForceDraw implements Entity {
             });
 
             // boss spawns after 2 safezone
-            if (this.safeZones.length % 2 === 0) {
+            if (this.safeZones.length % 2 === 0 && G_CONFIG.ENABLE_BOSS_ARENA) {
                 this.bossWave++;
                 this.bossGateActive = true;
                 this.flatSequenceOn = false;

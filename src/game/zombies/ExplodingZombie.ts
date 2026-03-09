@@ -8,6 +8,8 @@ import { unwrap } from "../../engine/util.js";
 import { Vec2 } from "../../engine/Vec2.js";
 import { Mountain } from "../worldEntities/mountain.js";
 import { Zombie } from "./Zombie.js";
+import { Explosion } from "../worldEntities/bullets/Explosion.js";
+import { DrawLayer } from "../../engine/types.js";
 
 export class ExplodingZombie extends Zombie {
     sprite: ImagePath = new ImagePath("res/img/player_new.png");
@@ -139,7 +141,14 @@ export class ExplodingZombie extends Zombie {
             player.damagePlayer(this.explosion_damage, "Infection");
         }
 
-        // TODO: Add explosion visual effect here later
+        GameEngine.g_INSTANCE.addEntity(
+            new Explosion(
+                this.position.x,
+                this.position.y,
+                this.explosion_radius
+            ),
+            DrawLayer.ZOMBIE
+        );
 
         // remove this zombie after explosion
         this.removeFromWorld = true;

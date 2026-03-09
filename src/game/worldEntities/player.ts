@@ -21,6 +21,7 @@ import { RavineDeathZone } from "./RavineZone.js";
 import { RayGun } from "../Items/guns/RayGun.js";
 import { UILayer } from "../UI.js";
 import { AudioManager } from "../../engine/AudioManager.js";
+import { clamp } from "../../engine/util.js";
 
 
 export type DamageType = "Infection" | "Health";
@@ -50,14 +51,15 @@ export class Player implements Entity, Collidable {
     static ACCELERATION = 90;
     static BRAKE_FORCE = 200;
     static FRICTION = 0.01;
-    static GROUND_STICK_FORCE = 500;
-    static JUMP_FORCE = -35;
+    static JUMP_FORCE = -25;
     static SLOPE_GRAVITY_MULT = 1.2;
+    static LIFTOFF_THRESHOLD = 30;
 
     private prevState: PlayerState = PlayerState.IDLE;
     private currentState: PlayerState = PlayerState.IDLE;
 
     private prevGroundSpeed: number = 0;
+    private jumpCooldown: number = 0;
 
     /**
      * Snowboard rotation state
@@ -299,7 +301,7 @@ export class Player implements Entity, Collidable {
     /**
      * The amount of currency the player has collected.
      */
-    public currency: number = 1000000000000;
+    public currency: number = 0;
 
     constructor(spawnPos: Vec2) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
@@ -409,9 +411,6 @@ export class Player implements Entity, Collidable {
         }
         this.weapon.equipped = true;
     }
-
-    // TODO(pg): When we are going down a slope, we should rotate the snowboard to be perpendicular to the slope
-    //            and maybe shear the player's sprite to match it aswell?
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         if (!this.visible) {
@@ -604,9 +603,14 @@ export class Player implements Entity, Collidable {
      */
     private updateMovement(keys: { [key: string]: boolean }, deltaTime: number): void {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
-        const onGround: boolean = Math.abs(this.position.y - mountain.getHeightAt(this.position.x)) <= 0.2;
+
+        const groundY = mountain.getHeightAt(this.position.x);
+        const distToGround = groundY - this.position.y;          // positive = above ground
+        const onGround = distToGround <= 0.2;
         const inSafeZone = this.isInSafeZone();
-        // Handles when we are flying cheats 
+        this.jumpCooldown = Math.max(0, this.jumpCooldown - deltaTime);
+
+        // ── Flying cheat ────────────────────────────────────────
         if (this.isFlying) {
             const FLY_SPEED = 150;
             this.velocity.x = 0;
@@ -615,80 +619,107 @@ export class Player implements Entity, Collidable {
             if (keys["a"]) this.position.x -= FLY_SPEED * deltaTime;
             if (keys["w"] || keys[" "]) this.position.y -= FLY_SPEED * deltaTime;
             if (keys["s"]) this.position.y += FLY_SPEED * deltaTime;
-        } else if (inSafeZone) {
+            return; // skip all physics below
+        }
+
+        // ── Safe-zone walking ────────────────────────────────────
+        if (inSafeZone) {
             this.currentState = PlayerState.IDLE;
-            // Reset velocity when entering safe zone to avoid carrying momentum
             const SAFE_ZONE_SPEED = Player.MAX_SPEED * 0.85;
             const SAFE_ZONE_ACCEL = 120;
-
-            // Horizontal movement
-            if (keys["d"]) {
-                this.velocity.x += SAFE_ZONE_ACCEL * deltaTime;
-            }
-            if (keys["a"]) {
-                this.velocity.x -= SAFE_ZONE_ACCEL * deltaTime;
-            }
-
-            // Apply friction to slow down when no keys pressed
+            if (keys["d"]) this.velocity.x += SAFE_ZONE_ACCEL * deltaTime;
+            if (keys["a"]) this.velocity.x -= SAFE_ZONE_ACCEL * deltaTime;
             this.velocity.x *= 0.9;
             this.velocity.y *= 0.9;
-
-            // Clamp speed
             const speed = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2);
             if (speed > SAFE_ZONE_SPEED) {
                 this.velocity.x = (this.velocity.x / speed) * SAFE_ZONE_SPEED;
                 this.velocity.y = (this.velocity.y / speed) * SAFE_ZONE_SPEED;
             }
-        } else {
-            // ---------- Ground-only momentum ----------
-            if (onGround) {
-                // --- Slope-based gravity ---
-                const normal = mountain.getNormalAt(this.position.x);
+            // Gravity still applies so the player settles onto the terrain
+            this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
+            this.position.x += this.velocity.x * deltaTime;
+            this.position.y += this.velocity.y * deltaTime;
+            return;
+        }
 
-                // Tangent parallel to slope
-                const tangent = new Vec2(normal.y, -normal.x);
+        // ── Slope helpers ────────────────────────────────────────
+        const normal = mountain.getNormalAt(this.position.x);   // unit normal pointing away from slope
+        const tangent = new Vec2(normal.y, -normal.x);           // unit tangent along slope
+        if (tangent.x < 0) { tangent.x *= -1; tangent.y *= -1; } // ensure rightward / downhill
 
-                // Ensure downhill (rightward)
-                if (tangent.x < 0) {
-                    tangent.x *= -1;
-                    tangent.y *= -1;
-                }
+        if (onGround) {
+            // ── Project current velocity onto the slope tangent ──
+            // This removes any component that would push the player into or away from
+            // the slope, preventing the "pogo" / bounce effect entirely.
+            const vDotT = this.velocity.x * tangent.x + this.velocity.y * tangent.y;
+            this.velocity.x = vDotT * tangent.x;
+            this.velocity.y = vDotT * tangent.y;
 
-                // Project gravity along slope
-                const slopeAccel = GameEngine.g_INSTANCE.G * Player.SLOPE_GRAVITY_MULT;
-                this.velocity.x += tangent.x * slopeAccel * deltaTime;
-                this.velocity.y += tangent.y * slopeAccel * deltaTime;
+            // ── Slope gravity (accelerate downhill) ──────────────
+            const slopeAccel = GameEngine.g_INSTANCE.G * Player.SLOPE_GRAVITY_MULT;
+            this.velocity.x += tangent.x * slopeAccel * deltaTime;
+            this.velocity.y += tangent.y * slopeAccel * deltaTime;
 
-                // --- Player input (ground only) ---
-                if (keys["d"]) {
-                    this.velocity.x += Player.ACCELERATION * deltaTime;
-                    this.prevState = this.currentState;
-                    this.currentState = PlayerState.SLIDING;
-                }
+            // ── Player input ─────────────────────────────────────
+            if (keys["d"]) {
+                this.velocity.x += Player.ACCELERATION * deltaTime;
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.SLIDING;
+            }
+            if (keys["a"]) {
+                this.velocity.x -= Player.BRAKE_FORCE * deltaTime;
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.SLIDING;
+            }
+            if (!keys["a"] && !keys["d"]) {
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.IDLE;
+            }
 
-                if (keys["a"]) {
-                    this.velocity.x -= Player.BRAKE_FORCE * deltaTime;
-                    this.prevState = this.currentState;
-                    this.currentState = PlayerState.SLIDING;
-                }
-
-                // used to set player idle state
-                if (!keys["a"] && !keys["d"]) {
-                    this.prevState = this.currentState;
-                    this.currentState = PlayerState.IDLE;
-                }
-
-                // ---------- Jump ----------
-                if ((keys["w"] || keys[" "]) && onGround) {
-                    this.velocity.y = Player.JUMP_FORCE * this.jumpMultiplier;
-                    this.prevState = this.currentState;
-                    this.currentState = PlayerState.JUMPING;
-                }
-
-                // Stick player to terrain
-                this.velocity.y += Player.GROUND_STICK_FORCE * deltaTime;
+            // ── Jump ─────────────────────────────────────────────
+            if (keys["w"] || keys[" "]) {
+                // Launch perpendicular to the slope so the jump feels natural on hills
+                // horizontal velocity penalty for jumping
+                this.velocity.x = this.velocity.x * 0.9
+                this.velocity.y += normal.y * Player.JUMP_FORCE * this.jumpMultiplier;
+                this.jumpCooldown = 0.2;
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.JUMPING;
             } else {
-                // ---------- In air: no momentum gains ----------
+                // ── Slope-stick: snap position back to terrain ───
+                // Only do this when NOT jumping.  This is the core fix: instead of
+                // relying on a large stick-force we just move the player to the ground.
+                if (this.jumpCooldown <= 0) {
+                    this.position.y = groundY;
+                    this.prevGroundSpeed = this.velocity.x;
+                }
+            }
+
+            // ── Ground friction ───────────────────────────────────
+            this.velocity.x *= (1 - Player.FRICTION);
+
+        } else {
+            // ── Airborne ─────────────────────────────────────────
+            // Check whether the player should still be on the ground.
+            // If the slope dips away beneath them but they're moving slowly,
+            // snap them back down (handles gentle concave transitions).
+            // Only allow genuine liftoff when fast enough or already rising.
+            const speedAlongNormal = this.velocity.x * normal.x + this.velocity.y * normal.y;
+
+            const slopeDroppedAway = distToGround > 0 &&           // ground fell below player
+                distToGround < 1.5;           // but only just
+
+            if (slopeDroppedAway && speedAlongNormal < Player.LIFTOFF_THRESHOLD && this.jumpCooldown <= 0) {
+                // Stick to the slope: project velocity onto tangent and snap down
+                const vDotT = Vec2.dot(this.velocity, tangent);
+                this.velocity.x = vDotT * tangent.x;
+                this.velocity.y = vDotT * tangent.y;
+                this.position.y = groundY;
+                this.prevState = this.currentState;
+                this.currentState = PlayerState.SLIDING;
+            } else {
+                // Genuinely airborne
                 const AIR_DRAG = 0.9995;
                 this.velocity.x *= AIR_DRAG;
                 this.prevState = this.currentState;
@@ -696,24 +727,10 @@ export class Player implements Entity, Collidable {
             }
         }
 
+        // ── Global gravity (always, except flying) ───────────────
+        this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
 
-        // ---------- Gravity ----------
-        if (!this.isFlying) {
-            this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
-        }
-
-        // ---------- Ground friction ----------
-        if (onGround) {
-            this.velocity.x *= (1 - Player.FRICTION);
-        }
-
-
-        // ---------- Speed limits ----------
-        // check if "boss_arena" exists and check if player is inside the boundary
-        // if player is inside arena, player can move left and right
-        const inBossArena = GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena").length > 0 &&
-            (GameEngine.g_INSTANCE.getEntitiesByTag("boss_arena")[0] as any).isActive;
-
+        // ── Speed limits ─────────────────────────────────────────
         if (!inSafeZone) {
             if (onGround) {
                 this.velocity.x = Math.max(Player.MIN_SPEED, this.velocity.x);
@@ -722,12 +739,9 @@ export class Player implements Entity, Collidable {
                 this.velocity.x = Math.min(this.velocity.x, this.prevGroundSpeed);
             }
         }
-
-
-
         this.velocity.x = Math.min(Player.MAX_SPEED, this.velocity.x);
 
-        // ---------- Integrate ----------
+        // ── Integrate ────────────────────────────────────────────
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
     }
@@ -780,9 +794,23 @@ export class Player implements Entity, Collidable {
 
         // ---------- Collision with terrain ----------
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
-        if (mountain && mountain.physicsCollider) {
-            if (this.physicsCollider.collides(this, mountain)) {
-                this.velocity.y = 0;
+        if (mountain) {
+            const groundY = mountain.getHeightAt(this.position.x);
+            if (this.position.y > groundY) {
+                // Player has clipped into the terrain — push them back out.
+                this.position.y = groundY;
+
+                // Project velocity onto the slope so it doesn't abruptly stop
+                // and doesn't bounce the player back upward.
+                const normal = mountain.getNormalAt(this.position.x);
+                const tangent = new Vec2(normal.y, -normal.x);
+                if (tangent.x < 0) { tangent.x *= -1; tangent.y *= -1; }
+
+                const vDotT = Vec2.dot(this.velocity, tangent);
+                // Only keep the downhill component (clamp to 0 if somehow moving uphill)
+                const projected = Math.max(0, vDotT);
+                this.velocity.x = projected * tangent.x;
+                this.velocity.y = projected * tangent.y;
             }
         }
 
@@ -890,6 +918,8 @@ export class Player implements Entity, Collidable {
                 this.buffs.splice(this.buffs.indexOf(buff), 1);
             }
         }
+        // infection drops off over time
+        this.infection = clamp(this.infection - 0.01, 0, this.infection);
     }
 
     /**
