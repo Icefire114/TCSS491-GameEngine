@@ -21,7 +21,7 @@ export class GiantZombie extends Zombie {
         const reward: number = 30;
         const walk_speed: number = 30;
         const run_speed: number = walk_speed * 1.5;
-        const player_damage_amount: number = 50;
+        const player_damage_amount: number = 25;
 
         const physicsCollider = new BoxCollider(9, 12);
         const animator: Animator = new Animator([
