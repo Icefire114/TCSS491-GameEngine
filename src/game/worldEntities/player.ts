@@ -605,12 +605,12 @@ export class Player implements Entity, Collidable {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain;
 
         const groundY = mountain.getHeightAt(this.position.x);
-        const distToGround = groundY - this.position.y;          // positive = above ground
+        const distToGround = groundY - this.position.y;
         const onGround = distToGround <= 0.2;
         const inSafeZone = this.isInSafeZone();
         this.jumpCooldown = Math.max(0, this.jumpCooldown - deltaTime);
 
-        // ── Flying cheat ────────────────────────────────────────
+        // == Flying cheat ========================================
         if (this.isFlying) {
             const FLY_SPEED = 150;
             this.velocity.x = 0;
@@ -622,46 +622,51 @@ export class Player implements Entity, Collidable {
             return; // skip all physics below
         }
 
-        // ── Safe-zone walking ────────────────────────────────────
+        // == Safe-zone walking ====================================
         if (inSafeZone) {
             this.currentState = PlayerState.IDLE;
             const SAFE_ZONE_SPEED = Player.MAX_SPEED * 0.85;
             const SAFE_ZONE_ACCEL = 120;
             if (keys["d"]) this.velocity.x += SAFE_ZONE_ACCEL * deltaTime;
             if (keys["a"]) this.velocity.x -= SAFE_ZONE_ACCEL * deltaTime;
+
             this.velocity.x *= 0.9;
             this.velocity.y *= 0.9;
+
             const speed = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2);
             if (speed > SAFE_ZONE_SPEED) {
                 this.velocity.x = (this.velocity.x / speed) * SAFE_ZONE_SPEED;
                 this.velocity.y = (this.velocity.y / speed) * SAFE_ZONE_SPEED;
             }
+
             // Gravity still applies so the player settles onto the terrain
             this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
+
             this.position.x += this.velocity.x * deltaTime;
             this.position.y += this.velocity.y * deltaTime;
+            console.log(this.velocity);
             return;
         }
 
-        // ── Slope helpers ────────────────────────────────────────
+        // == Slope helpers ========================================
         const normal = mountain.getNormalAt(this.position.x);   // unit normal pointing away from slope
         const tangent = new Vec2(normal.y, -normal.x);           // unit tangent along slope
         if (tangent.x < 0) { tangent.x *= -1; tangent.y *= -1; } // ensure rightward / downhill
 
         if (onGround) {
-            // ── Project current velocity onto the slope tangent ──
+            // == Project current velocity onto the slope tangent ==
             // This removes any component that would push the player into or away from
             // the slope, preventing the "pogo" / bounce effect entirely.
             const vDotT = this.velocity.x * tangent.x + this.velocity.y * tangent.y;
             this.velocity.x = vDotT * tangent.x;
             this.velocity.y = vDotT * tangent.y;
 
-            // ── Slope gravity (accelerate downhill) ──────────────
+            // == Slope gravity (accelerate downhill) ==============
             const slopeAccel = GameEngine.g_INSTANCE.G * Player.SLOPE_GRAVITY_MULT;
             this.velocity.x += tangent.x * slopeAccel * deltaTime;
             this.velocity.y += tangent.y * slopeAccel * deltaTime;
 
-            // ── Player input ─────────────────────────────────────
+            // == Player input =====================================
             if (keys["d"]) {
                 this.velocity.x += Player.ACCELERATION * deltaTime;
                 this.prevState = this.currentState;
@@ -677,7 +682,7 @@ export class Player implements Entity, Collidable {
                 this.currentState = PlayerState.IDLE;
             }
 
-            // ── Jump ─────────────────────────────────────────────
+            // == Jump =============================================
             if (keys["w"] || keys[" "]) {
                 // Launch perpendicular to the slope so the jump feels natural on hills
                 // horizontal velocity penalty for jumping
@@ -687,7 +692,7 @@ export class Player implements Entity, Collidable {
                 this.prevState = this.currentState;
                 this.currentState = PlayerState.JUMPING;
             } else {
-                // ── Slope-stick: snap position back to terrain ───
+                // == Slope-stick: snap position back to terrain ===
                 // Only do this when NOT jumping.  This is the core fix: instead of
                 // relying on a large stick-force we just move the player to the ground.
                 if (this.jumpCooldown <= 0) {
@@ -696,11 +701,11 @@ export class Player implements Entity, Collidable {
                 }
             }
 
-            // ── Ground friction ───────────────────────────────────
+            // == Ground friction ===================================
             this.velocity.x *= (1 - Player.FRICTION);
 
         } else {
-            // ── Airborne ─────────────────────────────────────────
+            // == Airborne =========================================
             // Check whether the player should still be on the ground.
             // If the slope dips away beneath them but they're moving slowly,
             // snap them back down (handles gentle concave transitions).
@@ -727,10 +732,10 @@ export class Player implements Entity, Collidable {
             }
         }
 
-        // ── Global gravity (always, except flying) ───────────────
+        // == Global gravity (always, except flying) ===============
         this.velocity.y += GameEngine.g_INSTANCE.G * deltaTime * 3;
 
-        // ── Speed limits ─────────────────────────────────────────
+        // == Speed limits =========================================
         if (!inSafeZone) {
             if (onGround) {
                 this.velocity.x = Math.max(Player.MIN_SPEED, this.velocity.x);
@@ -741,7 +746,7 @@ export class Player implements Entity, Collidable {
         }
         this.velocity.x = Math.min(Player.MAX_SPEED, this.velocity.x);
 
-        // ── Integrate ────────────────────────────────────────────
+        // == Integrate ============================================
         this.position.x += this.velocity.x * deltaTime;
         this.position.y += this.velocity.y * deltaTime;
     }
@@ -806,11 +811,13 @@ export class Player implements Entity, Collidable {
                 const tangent = new Vec2(normal.y, -normal.x);
                 if (tangent.x < 0) { tangent.x *= -1; tangent.y *= -1; }
 
-                const vDotT = Vec2.dot(this.velocity, tangent);
-                // Only keep the downhill component (clamp to 0 if somehow moving uphill)
-                const projected = Math.max(0, vDotT);
-                this.velocity.x = projected * tangent.x;
-                this.velocity.y = projected * tangent.y;
+                if (!this.isInSafeZone()) {
+                    const vDotT = Vec2.dot(this.velocity, tangent);
+                    // Only keep the downhill component (clamp to 0 if somehow moving uphill)
+                    const projected = Math.max(0, vDotT);
+                    this.velocity.x = projected * tangent.x;
+                    this.velocity.y = projected * tangent.y;
+                }
             }
         }
 
