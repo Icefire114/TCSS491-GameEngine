@@ -191,13 +191,13 @@ ASSET_MANAGER.queueDownload("res/aud/sfx/guns/AssultRifle/shoot.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/guns/AssultRifle/shoot2.wav");
 
 // === RPG SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/reload.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/shoot.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RPG/explode.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/reload.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/rpg/explode.wav");
 
 /// === Ray Gun SFX ===
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RayGun/shoot.wav");
-ASSET_MANAGER.queueDownload("res/aud/sfx/guns/RayGun/reload.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/shoot.wav");
+ASSET_MANAGER.queueDownload("res/aud/sfx/guns/raygun/reload.wav");
 
 // === Item SFX ===
 ASSET_MANAGER.queueDownload("res/aud/sfx/items/ammoRestore.wav");

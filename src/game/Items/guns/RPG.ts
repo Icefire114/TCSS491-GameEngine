@@ -9,7 +9,7 @@ export class RPG extends Gun {
     /**
      * RPG components
      */
-    static TAG: string = "RPG";
+    static TAG: string = "rpg";
     static DAMAGE: number = 100;
     static FIRE_RATE: number = 2;
     static RELOAD_TIME: number = 3;

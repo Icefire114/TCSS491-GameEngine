@@ -12,7 +12,7 @@ export class RayGun extends Gun {
     /**
      * Ray Gun components
      */
-    static TAG: string = "RayGun";
+    static TAG: string = "raygun";
     static DAMAGE: number = 15;
     static FIRE_RATE: number = 20;
     static RELOAD_TIME: number = 6;
