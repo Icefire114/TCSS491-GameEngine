@@ -23,10 +23,14 @@ export class Shop implements Entity, Collidable {
     size: Vec2 = new Vec2(24, 14);
 
     private isShopOpen: boolean = false;
+    private zoneLevel: number;
 
-    constructor(pos: Vec2) {
+
+    constructor(pos: Vec2, zoneLevel: number) {
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         this.position = pos;
+        this.zoneLevel = zoneLevel;
+
         this.physicsCollider = new BoxCollider(this.size.x, this.size.y);
     }
 
@@ -59,7 +63,11 @@ export class Shop implements Entity, Collidable {
         const player: Player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         UI.drawOpenShopPrompt = this.isPlayerTouching();
         if (UI.drawOpenShopPrompt && keys['e']) {
-            shop_ui.isOpen = !shop_ui.isOpen;
+            if (!shop_ui.isOpen) {
+                shop_ui.openForZone(this.zoneLevel);
+            } else {
+                shop_ui.isOpen = false;
+            }
             player.uiOpen = shop_ui.isOpen;
             keys['e'] = false;
             AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/openCloseUi.wav'), 0.4);

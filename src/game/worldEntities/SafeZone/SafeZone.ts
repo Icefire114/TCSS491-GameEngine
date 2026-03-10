@@ -77,7 +77,8 @@ export class SafeZone implements Entity {
 
         GameEngine.g_INSTANCE.addEntity(
             new Shop(
-                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 + 30, 0))
+                Vec2.compAdd(this.position, new Vec2(this.size.x / 2 + 30, 0)),
+                this.zoneLevel,
             ), DrawLayer.WORLD_DECORATION
         );
 

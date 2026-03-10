@@ -12,6 +12,8 @@ import { AudioManager } from "../../../engine/AudioManager.js";
 import { AssultRifle } from "../../Items/guns/AssultRifle.js";
 import { RPG } from "../../Items/guns/RPG.js";
 import { RayGun } from "../../Items/guns/RayGun.js";
+import { JumpBoostItem } from "../../Items/JumpBoostItem.js";
+import { InfectionImmunityItem } from "../../Items/InfectionImmunity.js";
 
 interface ShopItem {
     id: string;
@@ -46,6 +48,8 @@ export class ShopUI extends ForceDraw implements Entity {
     private flashTimer: number = 0;
     private readonly FLASH_DURATION = 1.5;
 
+    // Tracking safezone ID
+    private currentZoneId: string | number | null = null;
 
     // The Ammo Representation image 
     private static AMMO_SPRITES = {
@@ -54,7 +58,8 @@ export class ShopUI extends ForceDraw implements Entity {
         [RayGun.TAG]:    { path: "res/img/items/ray_gun.png", w: 38, h: 15 },
     };
 
-    private items: ShopItem[] = [
+    // Represent all potential items to appear in shop
+    private static readonly ITEM_POOL: ShopItem[] = [
         {
             id: "ammo",
             name: "AMMO REFILL",
@@ -76,13 +81,33 @@ export class ShopUI extends ForceDraw implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "Boots max health\nby 25 points.",
+            description: "Boosts max health\nby 25 points.",
             cost: 150,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
             frameHeight: 64,
         },
+        {
+            id: "jump",
+            name: "JUMP BOOST",
+            description: "Increases your\njump height.",
+            cost: 120,
+            spritePath: "res/img/items/boots.png",
+            frameWidth: 17,
+            frameHeight: 17,
+        },
+        {
+            id: "immunity",
+            name: "IMMUNITY",
+            description: "Grants temporary\ninfection immunity.",
+            cost: 175,
+            spritePath: "res/img/items/infection_immunity.png",
+            frameWidth: 39,
+            frameHeight: 51,
+        },
     ];
+
+    private items: ShopItem[] = [];
 
     constructor() {
         super();
@@ -94,10 +119,12 @@ export class ShopUI extends ForceDraw implements Entity {
      */
     private createBuff(itemId: string): Buff | null {
         switch (itemId) {
-            case "ammo": return new AmmoRestore();
-            case "health": return new InstantHealthPickupBuff();
-            case "shield": return new ShieldRestorePickupItem();
-            default: return null;
+            case "ammo":      return new AmmoRestore();
+            case "health":    return new InstantHealthPickupBuff();
+            case "shield":    return new ShieldRestorePickupItem();
+            case "jump":      return new JumpBoostItem();
+            case "immunity":  return new InfectionImmunityItem();
+            default:          return null;
         }
     }
 
@@ -398,6 +425,33 @@ export class ShopUI extends ForceDraw implements Entity {
 
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
+    }
+
+    /** 
+     * Call this when entering a safezone. Re-rolls only if the zone changed.
+    */
+    openForZone(zoneId: string | number): void {
+        if (zoneId !== this.currentZoneId) {
+            this.currentZoneId = zoneId;
+            this.randomizeItems();
+        }
+        this.isOpen = true;
+    }
+
+    /** 
+     * Picks 3 unique random items from the pool for this zone's shop.
+     */
+    private randomizeItems(): void {
+        const pool = [...ShopUI.ITEM_POOL];
+        const picked: ShopItem[] = [];
+
+        while (picked.length < 3 && pool.length > 0) {
+            const idx = Math.floor(Math.random() * pool.length);
+            picked.push({ ...pool[idx] }); 
+            pool.splice(idx, 1);
+        }
+
+        this.items = picked;
     }
 
 
