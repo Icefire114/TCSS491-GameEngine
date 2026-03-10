@@ -9,6 +9,9 @@ import { InstantHealthPickupBuff } from "../../Items/InstantHealthPickupBuff.js"
 import { ShieldRestorePickupItem } from "../../Items/ShieldBoost.js";
 import { Buff } from "../../Items/Buff.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
+import { AssultRifle } from "../../Items/guns/AssultRifle.js";
+import { RPG } from "../../Items/guns/RPG.js";
+import { RayGun } from "../../Items/guns/RayGun.js";
 
 interface ShopItem {
     id: string;
@@ -21,6 +24,8 @@ interface ShopItem {
     rect?: { x: number, y: number, w: number, h: number };
     buttonRect?: { x: number, y: number, w: number, h: number };
 }
+
+
 
 /**
  * Class that represents the Shop UI
@@ -40,6 +45,14 @@ export class ShopUI extends ForceDraw implements Entity {
     private flashColor: string = "#FF5555";
     private flashTimer: number = 0;
     private readonly FLASH_DURATION = 1.5;
+
+
+    // The Ammo Representation image 
+    private static AMMO_SPRITES = {
+        [AssultRifle.TAG]: { path: "res/img/items/rifle.png", w: 43, h: 24 },
+        [RPG.TAG]:       { path: "res/img/items/rpg.png",    w: 47, h: 11 },
+        [RayGun.TAG]:    { path: "res/img/items/ray_gun.png", w: 38, h: 15 },
+    };
 
     private items: ShopItem[] = [
         {
@@ -221,6 +234,21 @@ export class ShopUI extends ForceDraw implements Entity {
         ctx.font = "12px monospace";
         ctx.fillText("CURRENCY", panelX + panelW - 20, panelY + 49);
 
+
+        // Ammo Card: dyanmic where ammo image is base on the player gun
+        const ammoItem = this.items.find(i => i.id === "ammo");
+    
+        if (player && ammoItem && player.weapon) {
+            const weaponTag = player.weapon.tag; 
+            const spriteData = ShopUI.AMMO_SPRITES[weaponTag];
+            
+            if (spriteData) {
+                ammoItem.spritePath = spriteData.path;
+                ammoItem.frameWidth = spriteData.w;
+                ammoItem.frameHeight = spriteData.h;
+            }
+        }
+
         // The Items cards
         const GAP = 10;
         const MARGIN = 16;
@@ -371,4 +399,6 @@ export class ShopUI extends ForceDraw implements Entity {
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
     }
+
+
 }
