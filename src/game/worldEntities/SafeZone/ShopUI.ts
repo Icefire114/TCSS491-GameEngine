@@ -290,7 +290,8 @@ export class ShopUI extends ForceDraw implements Entity {
         // The Shop Info 
         ctx.fillStyle = ACCENT;
         ctx.font = "13px monospace";
-        ctx.fillText("SAFE ZONE  ·  ZONE 1", panelX + 20, panelY + 47);
+        const zoneLabel = this.currentZoneId != null ? `ZONE ${this.currentZoneId}` : "ZONE ?";
+        ctx.fillText(`SAFE ZONE  ·  ${zoneLabel}`, panelX + 20, panelY + 47);
 
         // Player currency (top-right of header)
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
