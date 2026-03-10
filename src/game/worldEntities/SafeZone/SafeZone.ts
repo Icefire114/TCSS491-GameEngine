@@ -148,7 +148,7 @@ export class SafeZone implements Entity {
             // Spawn the UI Notification
             GameEngine.g_INSTANCE.addEntity(
                 new SafeZoneNotification(this.zoneLevel),
-                999 as DrawLayer // Ensurign it draws above everything
+                DrawLayer.UI_LAYER // Ensurign it draws above everything
             );
             this.hasNotified = true;
         }
