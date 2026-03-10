@@ -14,12 +14,15 @@ import { RPG } from "../../Items/guns/RPG.js";
 import { RayGun } from "../../Items/guns/RayGun.js";
 import { JumpBoostItem } from "../../Items/JumpBoostItem.js";
 import { InfectionImmunityItem } from "../../Items/InfectionImmunity.js";
+import { ArmoryUI } from "./ArmoryUI.js";
+
 
 interface ShopItem {
     id: string;
     name: string;
     description: string;
     cost: number;
+    rare?: boolean; 
     spritePath?: string;
     frameWidth?: number;
     frameHeight?: number;
@@ -105,6 +108,26 @@ export class ShopUI extends ForceDraw implements Entity {
             frameWidth: 39,
             frameHeight: 51,
         },
+        {
+            id: "unlock_rpg",
+            name: "RPG",
+            description: "Unlocks the RPG\nin your armory.",
+            cost: 300,
+            rare: true,
+            spritePath: "res/img/items/rpg.png",
+            frameWidth: 47,
+            frameHeight: 11,
+        },
+        {
+            id: "unlock_raygun",
+            name: "RAY GUN",
+            description: "Unlocks the Ray Gun\nin your armory.",
+            cost: 250,
+            rare: true,
+            spritePath: "res/img/items/ray_gun.png",
+            frameWidth: 38,
+            frameHeight: 15,
+        },
     ];
 
     private items: ShopItem[] = [];
@@ -138,6 +161,25 @@ export class ShopUI extends ForceDraw implements Entity {
         if (player.currency < item.cost) {
             this.showFlash(`Not enough currency — need ${item.cost}`, "#FF5555");
             return false;
+        }
+
+        // Gun unlock items logic
+        if (item.id === "unlock_rpg" || item.id === "unlock_raygun") {
+            const armoryUI = GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui") as ArmoryUI | undefined;
+            if (!armoryUI) {
+                return false;
+            }
+            
+            // Handles the aftermath of the purchase 
+            const gunId = item.id === "unlock_rpg" ? RPG.TAG : RayGun.TAG;
+            armoryUI.unlockItem(gunId);
+            player.currency -= item.cost;
+            this.showFlash(`Unlocked: ${item.name}`, "#4DFFB4");
+            AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/shop/buy.wav"), 0.7);
+            
+            // Remove it from the shop so it can't be bought twice
+            this.items = this.items.filter(i => i.id !== item.id);
+            return true;
         }
 
         const buff = this.createBuff(item.id);
@@ -442,17 +484,33 @@ export class ShopUI extends ForceDraw implements Entity {
      * Picks 3 unique random items from the pool for this zone's shop.
      */
     private randomizeItems(): void {
+        const RARE_CHANCE = 0.10;
         const pool = [...ShopUI.ITEM_POOL];
         const picked: ShopItem[] = [];
 
+        // Debuggging to force see the gun
+        // const debugRare = pool.find(i => i.id === "unlock_raygun");
+        //     if (debugRare) {
+        //         picked.push({ ...debugRare });
+        //         pool.splice(pool.indexOf(debugRare), 1);
+        //     }
+
+        // Choosing our random items 
         while (picked.length < 3 && pool.length > 0) {
-            const idx = Math.floor(Math.random() * pool.length);
-            picked.push({ ...pool[idx] }); 
-            pool.splice(idx, 1);
+            // Filtering items, only skip rare items that don't pass the roll
+            const candidates = pool.filter(item =>
+                !item.rare || Math.random() < RARE_CHANCE
+            );
+
+            // If no items passed (all remaining are rare and failed), just pick any
+            const source = candidates.length > 0 ? candidates : pool;
+            const idx = Math.floor(Math.random() * source.length);
+            const chosen = source[idx];
+
+            picked.push({ ...chosen });
+            pool.splice(pool.indexOf(chosen), 1);
         }
 
         this.items = picked;
-    }
-
-
+    }   
 }
