@@ -67,7 +67,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "ammo",
             name: "AMMO REFILL",
             description: "Restores ammunition\nto full capacity.",
-            cost: 50,
+            cost: 10,
             spritePath: "res/img/items/rifle.png",
             frameWidth: 43,
             frameHeight: 24,
@@ -76,7 +76,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "health",
             name: "HEALTH PACK",
             description: "Instantly heals you\nback to full health.",
-            cost: 100,
+            cost: 20,
             spritePath: "res/img/items/instant_health_pickup.png",
             frameWidth: 42,
             frameHeight: 40,
@@ -85,7 +85,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "shield",
             name: "SHIELD BOOST",
             description: "Boosts max health\nby 25 points.",
-            cost: 150,
+            cost: 20,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
             frameHeight: 64,
@@ -94,7 +94,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "jump",
             name: "JUMP BOOST",
             description: "Increases your\njump height.",
-            cost: 120,
+            cost: 10,
             spritePath: "res/img/items/boots.png",
             frameWidth: 17,
             frameHeight: 17,
@@ -103,7 +103,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "immunity",
             name: "IMMUNITY",
             description: "Grants temporary\ninfection immunity.",
-            cost: 175,
+            cost: 25,
             spritePath: "res/img/items/infection_immunity.png",
             frameWidth: 39,
             frameHeight: 51,
@@ -112,7 +112,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "unlock_rpg",
             name: "RPG",
             description: "Unlocks the RPG\nin your armory.",
-            cost: 300,
+            cost: 50,
             rare: true,
             spritePath: "res/img/items/rpg.png",
             frameWidth: 47,
@@ -122,11 +122,29 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "unlock_raygun",
             name: "RAY GUN",
             description: "Unlocks the Ray Gun\nin your armory.",
-            cost: 250,
+            cost: 100,
             rare: true,
             spritePath: "res/img/items/ray_gun.png",
             frameWidth: 38,
             frameHeight: 15,
+        },
+        {
+            id: "speed",
+            name: "SPEED BOOST",
+            description: "Grants temporary\nspeed boost.",
+            cost: 15,
+            spritePath: "res/img/items/energy_drink.png",
+            frameHeight: 25, 
+            frameWidth: 35,
+        },
+        {
+            id: "crown",
+            name: "KING CROWN",
+            description: "Earn more\nmoney from zombies.",
+            cost: 20,
+            spritePath: "res/img/items/king.png",
+            frameHeight: 25, 
+            frameWidth: 28,
         },
     ];
 
@@ -490,11 +508,13 @@ export class ShopUI extends ForceDraw implements Entity {
         const picked: ShopItem[] = [];
 
         // Debuggging to force see the gun
-        // const debugRare = pool.find(i => i.id === "unlock_raygun");
-        //     if (debugRare) {
-        //         picked.push({ ...debugRare });
-        //         pool.splice(pool.indexOf(debugRare), 1);
-        //     }
+        const debugRare = pool.find(i => i.id === "speed");
+            if (debugRare) {
+                picked.push({ ...debugRare });
+                pool.splice(pool.indexOf(debugRare), 1);
+            }
+
+      
 
         // Choosing our random items 
         while (picked.length < 3 && pool.length > 0) {
