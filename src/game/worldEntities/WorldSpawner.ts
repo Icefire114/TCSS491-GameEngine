@@ -127,8 +127,9 @@ export class WorldSpawner implements Entity {
                     ItemFactory.createGun(pos),
                     ItemFactory.createImmunity(pos),
                     ItemFactory.createJumpBoost(pos),
-                    ItemFactory.creatShockWaveBomb(pos)
-
+                    ItemFactory.creatShockWaveBomb(pos),
+                    ItemFactory.createSpeedBoost(pos),
+                    ItemFactory.createCrown(pos),
                 ]),
                 DrawLayer.ITEM);
         }

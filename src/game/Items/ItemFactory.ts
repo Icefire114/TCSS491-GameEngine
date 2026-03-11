@@ -8,6 +8,8 @@ import { Vec2 } from "../../engine/Vec2.js";
 import { BuffEntity } from "./BuffEntity.js";
 import { ShockwaveBombItem } from "./ShockwaveBombItem.js";
 import { JumpBoostItem } from "./JumpBoostItem.js";
+import { SpeedBoostItem } from "./SpeedBoostItem.js";
+import { CrownItem } from "./CrownItem.js";
 
 export class ItemFactory {
     // PS: I just copy the setup from creating entity in main.ts
@@ -121,4 +123,40 @@ export class ItemFactory {
             position
         );
     }   
+
+    // Creating Speed Boost
+    static createSpeedBoost(position: Vec2): BuffEntity {
+        return new BuffEntity(
+            new SpeedBoostItem(),
+            new Animator([
+                [{
+                    frameCount: 1, 
+                    frameHeight: 25, 
+                    frameWidth: 35,
+                    sprite: new ImagePath("res/img/items/energy_drink.png")
+                },
+                AnimationState.IDLE]
+            ], { x: 3, y: 3 }),
+            new Vec2(3, 3),
+            position
+        );
+    }
+
+    // Creating Crown (Double Money)
+    static createCrown(position: Vec2): BuffEntity {
+        return new BuffEntity(
+            new CrownItem(),
+            new Animator([
+                [{
+                    frameCount: 1,
+                    frameHeight: 20, 
+                    frameWidth: 28,
+                    sprite: new ImagePath("res/img/items/king.png")
+                },
+                AnimationState.IDLE]
+            ], { x: 3, y: 3 }),
+            new Vec2(3, 3),
+            position
+        );
+    }
 }

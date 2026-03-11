@@ -96,6 +96,10 @@ ASSET_MANAGER.queueDownload("res/img/items/AmmoBox.png");
 ASSET_MANAGER.queueDownload("res/img/items/assult_rifle.png");
 ASSET_MANAGER.queueDownload("res/img/items/rpg.png");
 ASSET_MANAGER.queueDownload("res/img/items/ray_gun.png");
+ASSET_MANAGER.queueDownload("res/img/items/energy_drink.png");
+ASSET_MANAGER.queueDownload("res/img/items/king.png");
+
+
 
 // === Guns Assets ===
 ASSET_MANAGER.queueDownload("res/img/guns/assult_rifle/Shot.png");
