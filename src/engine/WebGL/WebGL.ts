@@ -32,6 +32,7 @@ export class WebGL {
         ]);
         ShaderRegistry.registerPassesByName(WebGL.TERRAIN, [
             unwrap(assMan.getShaderSource(new ShaderPath("res/shader/terrain.frag.glsl"))),
+            unwrap(assMan.getShaderSource(new ShaderPath("res/shader/sun.frag.glsl"))),
         ]);
     }
 }

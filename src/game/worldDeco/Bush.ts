@@ -3,10 +3,11 @@ import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/Vec2.js";
-import { randomOf, unwrap } from "../../engine/util.js";
+import { clamp, randomOf, unwrap } from "../../engine/util.js";
 import { ShaderRegistry } from "../../engine/WebGL/ShaderRegistry.js";
 import { WebGL } from "../../engine/WebGL/WebGL.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { DayNightCycle } from "../worldBackground/DayNightCycle.js";
 
 export class Bush implements Entity {
     tag: string = "bush";
@@ -54,9 +55,18 @@ export class Bush implements Entity {
             offsetX: 0
         };
         const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_SUN, currentAnim.sprite), "Did not find shader for given template");
+        const dnc: DayNightCycle = unwrap(game.getUniqueEntityByTag("DayNightCycle")) as DayNightCycle;
+        /**
+         * Maps cycle time to a number like so:
+         * \left(\frac{1+\cos\left(2\pi\left(x-0.25\right)\right)}{2}\right)^{1.3} (its TeX so use something nice to render it)
+         * https://www.desmos.com/calculator/svjimn17wv
+         */
+        const ambient = Math.pow((1 + Math.cos(2 * Math.PI * (dnc.cycleTime - 0.25))) / 2, 1.3)
+        const MIN_BRIGHTNESS = 0.2;
+        const brightness = ambient + MIN_BRIGHTNESS * (1 - clamp(2 * ambient, 0, 1));
 
-        const sunAngle = -130; // or calculate based on game time
-        const rad = (sunAngle * Math.PI) / 180;
+        const sunAngleDeg = dnc.cycleTime * 360;
+        const rad = (sunAngleDeg * Math.PI) / 180;
         const sunDir = [Math.cos(rad), Math.sin(rad)];
         shader.render([
             // Snow shader uniforms
@@ -67,9 +77,9 @@ export class Bush implements Entity {
             // Sun shader uniforms
             {
                 u_sunDirection: sunDir,
-                u_intensity: 0.3,
-                u_baseLight: 0.6,
-                u_warmth: 0.15
+                u_intensity: 0.5 * ambient,
+                u_baseLight: brightness,
+                u_warmth: 0.15 * ambient
             },
         ]);
 

@@ -20,7 +20,7 @@ export const G_CONFIG = {
     // If true, player can access armory at anytime by pressing 'p', and can access all guns
     UNLOCK_ALL_GUNS: true,
     // If true, skip the intro cinematic and start the player in the game
-    SKIP_INTRO: false,
+    SKIP_INTRO: true,
     // If true, enable the boss fight and arena
     ENABLE_BOSS_ARENA: true
 }

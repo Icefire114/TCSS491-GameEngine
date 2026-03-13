@@ -5,7 +5,7 @@ import { BoxCollider } from "../../../engine/physics/BoxCollider.js";
 import { Collidable, Collider } from "../../../engine/physics/Collider.js";
 import { DrawLayer } from "../../../engine/types.js";
 import { Vec2 } from "../../../engine/Vec2.js";
-import { unwrap } from "../../../engine/util.js";
+import { clamp, unwrap } from "../../../engine/util.js";
 import { ShaderRegistry } from "../../../engine/WebGL/ShaderRegistry.js";
 import { WebGL } from "../../../engine/WebGL/WebGL.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
@@ -15,6 +15,7 @@ import { Zombie } from "../../zombies/Zombie.js";
 import { RifleBullet } from "../bullets/RifleBullet.js";
 import { SafeZone } from "./SafeZone.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
+import { DayNightCycle } from "../../worldBackground/DayNightCycle.js";
 
 export type SafeZoneWallType = "enter" | "exit";
 
@@ -63,7 +64,15 @@ export class SafeZoneTurretWall implements Entity, Collidable {
             offsetX: 0
         };
         const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_AREA_LIGHT, currentAnim.sprite), "Did not find shader for given template");
-
+        const dnc: DayNightCycle = unwrap(game.getUniqueEntityByTag("DayNightCycle")) as DayNightCycle;
+        /**
+         * Maps cycle time to a number like so:
+         * \left(\frac{1+\cos\left(2\pi\left(x-0.25\right)\right)}{2}\right)^{1.3} (its TeX so use something nice to render it)
+         * https://www.desmos.com/calculator/svjimn17wv
+         */
+        const ambient = Math.pow((1 + Math.cos(2 * Math.PI * (dnc.cycleTime - 0.25))) / 2, 1.3)
+        const MIN_BRIGHTNESS = 0.2;
+        const brightness = ambient + MIN_BRIGHTNESS * (1 - clamp(2 * ambient, 0, 1));
         shader.render([
             // Snow shader uniforms
             {
@@ -75,7 +84,7 @@ export class SafeZoneTurretWall implements Entity, Collidable {
                 u_lightSize: [[60], [60]],
                 u_lightPos: [[185, 187], [231, 187]],
                 u_lightColor: [[0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0]], // rgba
-                u_ambient: 0.95 //TODO: Change depending on time of day
+                u_ambient: brightness //TODO: Change depending on time of day
             }
         ]);
 
