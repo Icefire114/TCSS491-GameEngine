@@ -5,13 +5,14 @@ import { GameEngine } from "../../../engine/gameengine.js";
 import { G_CONFIG } from "../../CONSTANTS.js";
 import { WebGL } from "../../../engine/WebGL/WebGL.js";
 import { ShaderRegistry } from "../../../engine/WebGL/ShaderRegistry.js";
-import { unwrap } from "../../../engine/util.js";
+import { clamp, unwrap } from "../../../engine/util.js";
+import { DayNightCycle } from "../../worldBackground/DayNightCycle.js";
 
 export class safeZoneBackground extends Background {
 
     public size: Vec2 = new Vec2();
 
-    constructor (pos: Vec2, width: number) {
+    constructor(pos: Vec2, width: number) {
         super("safeZoneBackground", [new ImagePath("res/img/safe_zone/safezoneBg.png")], 0);
         this.position = pos;
         this.size = new Vec2(width, 50);
@@ -29,7 +30,15 @@ export class safeZoneBackground extends Background {
             offsetX: 0
         };
         const shader = unwrap(ShaderRegistry.getShader(WebGL.SNOW_AND_AREA_LIGHT, currentAnim.sprite), "Did not find shader for given template");
-
+        const dnc: DayNightCycle = unwrap(game.getUniqueEntityByTag("DayNightCycle")) as DayNightCycle;
+        /**
+         * Maps cycle time to a number like so:
+         * \left(\frac{1+\cos\left(2\pi\left(x-0.25\right)\right)}{2}\right)^{1.3} (its TeX so use something nice to render it)
+         * https://www.desmos.com/calculator/svjimn17wv
+         */
+        const ambient = Math.pow((1 + Math.cos(2 * Math.PI * (dnc.cycleTime - 0.25))) / 2, 1.3)
+        const MIN_BRIGHTNESS = 0.2;
+        const brightness = ambient + MIN_BRIGHTNESS * (1 - clamp(2 * ambient, 0, 1));
         shader.render([
             // Snow shader uniforms
             {
@@ -38,10 +47,10 @@ export class safeZoneBackground extends Background {
             },
             {
                 u_lightCount: 0n,
-                u_lightSize: [[60], [60]],
-                u_lightPos: [[185, 187], [231, 187]],
-                u_lightColor: [[0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0], [0.83137254901961, 0.0156862745098, 0.0156862745098, 1.0]], // rgba
-                u_ambient: 0.95 //TODO: Change depending on time of day
+                u_lightSize: [],
+                u_lightPos: [],
+                u_lightColor: [], // rgba
+                u_ambient: brightness
             }
         ]);
 
