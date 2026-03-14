@@ -8,6 +8,7 @@ export class WebGL {
     public static readonly SNOW = "Snow";
     public static readonly SNOW_AND_AREA_LIGHT = "SnowAndAreaLight";
     public static readonly TERRAIN = "Terrain";
+    public static readonly SUN = "Sun";
 
     static isWebGL2Supported(): boolean {
         return document.createElement("canvas").getContext("webgl2") !== null;
@@ -21,6 +22,9 @@ export class WebGL {
         ]);
         ShaderRegistry.registerPassesByName(WebGL.SNOW_AND_SUN, [
             unwrap(assMan.getShaderSource(new ShaderPath("res/shader/snow.frag.glsl"))),
+            unwrap(assMan.getShaderSource(new ShaderPath("res/shader/sun.frag.glsl"))),
+        ]);
+        ShaderRegistry.registerPassesByName(WebGL.SUN, [
             unwrap(assMan.getShaderSource(new ShaderPath("res/shader/sun.frag.glsl"))),
         ]);
         ShaderRegistry.registerPassesByName(WebGL.SNOW, [
