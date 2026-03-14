@@ -72,12 +72,6 @@ export class UILayer extends ForceDraw implements Entity {
         this.drawHUDPanel(ctx, player);
         this.drawInteractionPrompt(ctx);
 
-        if (this.shop.isOpen) {
-            ctx.save();
-            this.shop.draw(ctx, game);
-            ctx.restore();
-        }
-
         ctx.restore();
     }
 

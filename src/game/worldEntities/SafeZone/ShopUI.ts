@@ -9,18 +9,28 @@ import { InstantHealthPickupBuff } from "../../Items/InstantHealthPickupBuff.js"
 import { ShieldRestorePickupItem } from "../../Items/ShieldBoost.js";
 import { Buff } from "../../Items/Buff.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
+import { AssultRifle } from "../../Items/guns/AssultRifle.js";
+import { RPG } from "../../Items/guns/RPG.js";
+import { RayGun } from "../../Items/guns/RayGun.js";
+import { JumpBoostItem } from "../../Items/JumpBoostItem.js";
+import { InfectionImmunityItem } from "../../Items/InfectionImmunity.js";
+import { ArmoryUI } from "./ArmoryUI.js";
+
 
 interface ShopItem {
     id: string;
     name: string;
     description: string;
     cost: number;
+    rare?: boolean; 
     spritePath?: string;
     frameWidth?: number;
     frameHeight?: number;
     rect?: { x: number, y: number, w: number, h: number };
     buttonRect?: { x: number, y: number, w: number, h: number };
 }
+
+
 
 /**
  * Class that represents the Shop UI
@@ -41,12 +51,23 @@ export class ShopUI extends ForceDraw implements Entity {
     private flashTimer: number = 0;
     private readonly FLASH_DURATION = 1.5;
 
-    private items: ShopItem[] = [
+    // Tracking safezone ID
+    private currentZoneId: string | number | null = null;
+
+    // The Ammo Representation image 
+    private static AMMO_SPRITES = {
+        [AssultRifle.TAG]: { path: "res/img/items/rifle.png", w: 43, h: 24 },
+        [RPG.TAG]:       { path: "res/img/items/rpg.png",    w: 47, h: 11 },
+        [RayGun.TAG]:    { path: "res/img/items/ray_gun.png", w: 38, h: 15 },
+    };
+
+    // Represent all potential items to appear in shop
+    private static readonly ITEM_POOL: ShopItem[] = [
         {
             id: "ammo",
             name: "AMMO REFILL",
             description: "Restores ammunition\nto full capacity.",
-            cost: 50,
+            cost: 10,
             spritePath: "res/img/items/rifle.png",
             frameWidth: 43,
             frameHeight: 24,
@@ -55,7 +76,7 @@ export class ShopUI extends ForceDraw implements Entity {
             id: "health",
             name: "HEALTH PACK",
             description: "Instantly heals you\nback to full health.",
-            cost: 100,
+            cost: 20,
             spritePath: "res/img/items/instant_health_pickup.png",
             frameWidth: 42,
             frameHeight: 40,
@@ -63,13 +84,71 @@ export class ShopUI extends ForceDraw implements Entity {
         {
             id: "shield",
             name: "SHIELD BOOST",
-            description: "Boots max health\nby 25 points.",
-            cost: 150,
+            description: "Boosts max health\nby 25 points.",
+            cost: 20,
             spritePath: "res/img/items/shield_pickup.png",
             frameWidth: 54,
             frameHeight: 64,
         },
+        {
+            id: "jump",
+            name: "JUMP BOOST",
+            description: "Increases your\njump height.",
+            cost: 10,
+            spritePath: "res/img/items/boots.png",
+            frameWidth: 17,
+            frameHeight: 17,
+        },
+        {
+            id: "immunity",
+            name: "IMMUNITY",
+            description: "Grants temporary\ninfection immunity.",
+            cost: 25,
+            spritePath: "res/img/items/infection_immunity.png",
+            frameWidth: 39,
+            frameHeight: 51,
+        },
+        {
+            id: "unlock_rpg",
+            name: "RPG",
+            description: "Unlocks the RPG\nin your armory.",
+            cost: 50,
+            rare: true,
+            spritePath: "res/img/items/rpg.png",
+            frameWidth: 47,
+            frameHeight: 11,
+        },
+        {
+            id: "unlock_raygun",
+            name: "RAY GUN",
+            description: "Unlocks the Ray Gun\nin your armory.",
+            cost: 100,
+            rare: true,
+            spritePath: "res/img/items/ray_gun.png",
+            frameWidth: 38,
+            frameHeight: 15,
+        },
+        {
+            id: "speed",
+            name: "SPEED BOOST",
+            description: "Grants temporary\nspeed boost.",
+            cost: 15,
+            spritePath: "res/img/items/energy_drink.png",
+            frameHeight: 25, 
+            frameWidth: 35,
+        },
+        {
+            id: "crown",
+            name: "KING CROWN",
+            description: "Earn more\nmoney from zombies.",
+            cost: 20,
+            spritePath: "res/img/items/king.png",
+            frameHeight: 25, 
+            frameWidth: 28,
+        },
     ];
+
+    private items: ShopItem[] = [];
 
     constructor() {
         super();
@@ -81,10 +160,12 @@ export class ShopUI extends ForceDraw implements Entity {
      */
     private createBuff(itemId: string): Buff | null {
         switch (itemId) {
-            case "ammo": return new AmmoRestore();
-            case "health": return new InstantHealthPickupBuff();
-            case "shield": return new ShieldRestorePickupItem();
-            default: return null;
+            case "ammo":      return new AmmoRestore();
+            case "health":    return new InstantHealthPickupBuff();
+            case "shield":    return new ShieldRestorePickupItem();
+            case "jump":      return new JumpBoostItem();
+            case "immunity":  return new InfectionImmunityItem();
+            default:          return null;
         }
     }
 
@@ -98,6 +179,25 @@ export class ShopUI extends ForceDraw implements Entity {
         if (player.currency < item.cost) {
             this.showFlash(`Not enough currency — need ${item.cost}`, "#FF5555");
             return false;
+        }
+
+        // Gun unlock items logic
+        if (item.id === "unlock_rpg" || item.id === "unlock_raygun") {
+            const armoryUI = GameEngine.g_INSTANCE.getUniqueEntityByTag("armory_ui") as ArmoryUI | undefined;
+            if (!armoryUI) {
+                return false;
+            }
+            
+            // Handles the aftermath of the purchase 
+            const gunId = item.id === "unlock_rpg" ? RPG.TAG : RayGun.TAG;
+            armoryUI.unlockItem(gunId);
+            player.currency -= item.cost;
+            this.showFlash(`Unlocked: ${item.name}`, "#4DFFB4");
+            AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/shop/buy.wav"), 0.7);
+            
+            // Remove it from the shop so it can't be bought twice
+            this.items = this.items.filter(i => i.id !== item.id);
+            return true;
         }
 
         const buff = this.createBuff(item.id);
@@ -208,7 +308,8 @@ export class ShopUI extends ForceDraw implements Entity {
         // The Shop Info 
         ctx.fillStyle = ACCENT;
         ctx.font = "13px monospace";
-        ctx.fillText("SAFE ZONE  ·  ZONE 1", panelX + 20, panelY + 47);
+        const zoneLabel = this.currentZoneId != null ? `ZONE ${this.currentZoneId}` : "ZONE ?";
+        ctx.fillText(`SAFE ZONE  ·  ${zoneLabel}`, panelX + 20, panelY + 47);
 
         // Player currency (top-right of header)
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
@@ -220,6 +321,21 @@ export class ShopUI extends ForceDraw implements Entity {
         ctx.fillStyle = TEXT_DIM;
         ctx.font = "12px monospace";
         ctx.fillText("CURRENCY", panelX + panelW - 20, panelY + 49);
+
+
+        // Ammo Card: dyanmic where ammo image is base on the player gun
+        const ammoItem = this.items.find(i => i.id === "ammo");
+    
+        if (player && ammoItem && player.weapon) {
+            const weaponTag = player.weapon.tag; 
+            const spriteData = ShopUI.AMMO_SPRITES[weaponTag];
+            
+            if (spriteData) {
+                ammoItem.spritePath = spriteData.path;
+                ammoItem.frameWidth = spriteData.w;
+                ammoItem.frameHeight = spriteData.h;
+            }
+        }
 
         // The Items cards
         const GAP = 10;
@@ -371,4 +487,51 @@ export class ShopUI extends ForceDraw implements Entity {
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
     }
+
+    /** 
+     * Call this when entering a safezone. Re-rolls only if the zone changed.
+    */
+    openForZone(zoneId: string | number): void {
+        if (zoneId !== this.currentZoneId) {
+            this.currentZoneId = zoneId;
+            this.randomizeItems();
+        }
+        this.isOpen = true;
+    }
+
+    /** 
+     * Picks 3 unique random items from the pool for this zone's shop.
+     */
+    private randomizeItems(): void {
+        const RARE_CHANCE = 0.10;
+        const pool = [...ShopUI.ITEM_POOL];
+        const picked: ShopItem[] = [];
+
+        // Debuggging to force see the gun
+        const debugRare = pool.find(i => i.id === "speed");
+            if (debugRare) {
+                picked.push({ ...debugRare });
+                pool.splice(pool.indexOf(debugRare), 1);
+            }
+
+      
+
+        // Choosing our random items 
+        while (picked.length < 3 && pool.length > 0) {
+            // Filtering items, only skip rare items that don't pass the roll
+            const candidates = pool.filter(item =>
+                !item.rare || Math.random() < RARE_CHANCE
+            );
+
+            // If no items passed (all remaining are rare and failed), just pick any
+            const source = candidates.length > 0 ? candidates : pool;
+            const idx = Math.floor(Math.random() * source.length);
+            const chosen = source[idx];
+
+            picked.push({ ...chosen });
+            pool.splice(pool.indexOf(chosen), 1);
+        }
+
+        this.items = picked;
+    }   
 }

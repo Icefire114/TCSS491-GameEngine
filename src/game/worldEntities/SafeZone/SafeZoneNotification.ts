@@ -2,8 +2,9 @@ import { AudioPath } from "../../../engine/assetmanager.js";
 import { AudioManager } from "../../../engine/AudioManager.js";
 import { Entity, EntityID } from "../../../engine/Entity.js";
 import { Vec2 } from "../../../engine/Vec2.js";
+import { ForceDraw } from "../../../engine/types.js";
 
-export class SafeZoneNotification implements Entity {
+export class SafeZoneNotification extends ForceDraw implements Entity {
     // Required info
     id: EntityID;
     tag: string = "SafeZoneNotification";
@@ -24,6 +25,7 @@ export class SafeZoneNotification implements Entity {
     private targetY: number = 15;
 
     constructor(private levelNumber: number) {
+        super();
         this.id = `${this.tag}#${crypto.randomUUID()}`;
         AudioManager.playSFX(new AudioPath('res/aud/sfx/safezone/notification.wav'), 0.7);
     }
