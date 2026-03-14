@@ -7,12 +7,12 @@ import { unwrap } from "../../engine/util.js";
 import { Player } from "../worldEntities/player.js";
 
 
-export abstract class Background implements Entity, ForceDraw{
+export abstract class Background implements Entity, ForceDraw {
 
     parallaxSpeed: number;
     spritePaths: ImagePath[];
     static currentSpriteIndex = 0;
-    
+
 
     public id: EntityID;
     public player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
@@ -29,7 +29,7 @@ export abstract class Background implements Entity, ForceDraw{
     constructor(tag: string, spritePaths: ImagePath[], parallaxSpeed: number) {
         this.tag = tag;
         this.id = `${this.tag}#${crypto.randomUUID()}`;
-        
+
         this.parallaxSpeed = parallaxSpeed;
         this.spritePaths = spritePaths;
         // this.startY = 30;
@@ -43,7 +43,7 @@ export abstract class Background implements Entity, ForceDraw{
         const intro = game.getUniqueEntityByTag("intro_screen") as any;
         const blendAlpha = intro ? intro.getAlpha() : 0;
 
-        const sprite  = game.getSprite(this.spritePaths[Background.currentSpriteIndex]);
+        const sprite = game.getSprite(this.spritePaths[Background.currentSpriteIndex]);
 
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const w = this.worldWidth * scale;
@@ -56,13 +56,13 @@ export abstract class Background implements Entity, ForceDraw{
         const wrappedDrift = ((drift % w) + w) % w;
 
         // Tile 1 starts at left edge minus the wrapped drift
-        const screenX  = -wrappedDrift;
+        const screenX = -wrappedDrift;
         // Tile 2 is always exactly one tile width to the right
         const screenX2 = screenX + w - 1;
 
         const screenY = ctx.canvas.height;
 
-        ctx.drawImage(sprite,  screenX, screenY - h, w, h);
+        ctx.drawImage(sprite, screenX, screenY - h, w, h);
         ctx.drawImage(sprite, screenX2, screenY - h, w, h);
 
         this.blueSmokeDrawing(ctx, blendAlpha);
