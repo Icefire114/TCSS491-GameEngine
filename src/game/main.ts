@@ -81,6 +81,9 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
 
+ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Run.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Idle.png");
+
 ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
 
 

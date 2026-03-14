@@ -32,7 +32,7 @@ export class ExplodingZombie extends Zombie {
         const animator: Animator = new Animator([
             [
                 {
-                    sprite: new ImagePath("res/img/zombies/Wild Zombie/Idle.png"),
+                    sprite: new ImagePath("res/img/zombies/exploder zombie/Idle.png"),
                     frameHeight: 96,
                     frameWidth: 96,
                     frameCount: 9,
@@ -95,10 +95,10 @@ export class ExplodingZombie extends Zombie {
             ],
             [
                 {
-                    sprite: new ImagePath("res/img/zombies/Wild Zombie/Run.png"),
+                    sprite: new ImagePath("res/img/zombies/exploder zombie/Run.png"),
                     frameHeight: 96,
                     frameWidth: 96,
-                    frameCount: 4
+                    frameCount: 8
                 },
                 AnimationState.RUN
             ]
