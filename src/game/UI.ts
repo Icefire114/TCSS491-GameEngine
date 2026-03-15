@@ -127,7 +127,7 @@ export class UILayer extends ForceDraw implements Entity {
         // Drawing all the parts and pieces for the panle
         this.drawPanelBackground(ctx, panelX, panelY);
 
-        this.drawHealthStat(ctx, player, panelX, panelY);   
+        this.drawHealthStat(ctx, player, panelX, panelY);
         this.drawInfectionStat(ctx, player, panelX, panelY);
         this.drawAmmoStat(ctx, player, panelX, panelY);
         this.drawMagStat(ctx, player, panelX, panelY);
@@ -160,9 +160,9 @@ export class UILayer extends ForceDraw implements Entity {
 
         // Subtle inner edge
         const grad = ctx.createLinearGradient(panelX, panelY, panelX + PANEL_W, panelY + PANEL_H);
-        grad.addColorStop(0,   "rgba(77, 164, 250, 0.06)");
+        grad.addColorStop(0, "rgba(77, 164, 250, 0.06)");
         grad.addColorStop(0.5, "rgba(0,   0,   0,   0.00)");
-        grad.addColorStop(1,   "rgba(0, 210, 255, 0.04)");
+        grad.addColorStop(1, "rgba(0, 210, 255, 0.04)");
         ctx.fillStyle = grad;
         ctx.fill();
 
@@ -173,9 +173,9 @@ export class UILayer extends ForceDraw implements Entity {
 
         // A bar on the top 
         const topGrad = ctx.createLinearGradient(panelX + panelRadius, panelY, panelX + PANEL_W - panelRadius, panelY);
-        topGrad.addColorStop(0,   "#00c6ff");
+        topGrad.addColorStop(0, "#00c6ff");
         topGrad.addColorStop(0.5, "#4da4fa");
-        topGrad.addColorStop(1,   "#0072ff");
+        topGrad.addColorStop(1, "#0072ff");
         ctx.fillStyle = topGrad;
         ctx.fillRect(panelX + panelRadius, panelY, PANEL_W - panelRadius * 2, 3);
 
