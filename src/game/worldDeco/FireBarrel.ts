@@ -4,8 +4,11 @@ import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { Collider } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/Vec2.js";
-import { randomOf, unwrap } from "../../engine/util.js";
+import { clamp, randomOf, unwrap } from "../../engine/util.js";
 import { Mountain } from "../worldEntities/mountain.js";
+import { ShaderRegistry } from "../../engine/WebGL/ShaderRegistry.js";
+import { WebGL } from "../../engine/WebGL/WebGL.js";
+import { DayNightCycle } from "../worldBackground/DayNightCycle.js";
 
 export class FireBarrel implements Entity {
     tag: string = "FireBarrel";
@@ -19,6 +22,7 @@ export class FireBarrel implements Entity {
     sprite: ImagePath;
     removeFromWorld: boolean = false;
     animator: Animator;
+    scale: Vec2;
 
     static readonly SPRITE_PATHS = [
         new ImagePath("res/img/world_deco/fire_barrel.png"),
@@ -40,6 +44,7 @@ export class FireBarrel implements Entity {
             }
             this.sprite = FireBarrel.SPRITE_PATHS[variant];
         }
+        this.scale = new Vec2(36 * scale, 80 * scale);
         this.animator = new Animator(
             [
                 [
@@ -52,12 +57,50 @@ export class FireBarrel implements Entity {
                     AnimationState.IDLE
                 ]
             ],
-            new Vec2(36 * scale, 80 * scale)
+            this.scale
         );
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
-        this.animator.drawCurrentAnimFrameAtPos(this.position);
+    draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
+        const currentAnim = this.animator.getCurrentFrame();
+        const shader = unwrap(ShaderRegistry.getShader(WebGL.AREA_LIGHT, currentAnim.spriteData.sprite), "Did not find shader for given template");
+        const dnc: DayNightCycle = unwrap(game.getUniqueEntityByTag("DayNightCycle")) as DayNightCycle;
+        /**
+         * Maps cycle time to a number like so:
+         * \left(\frac{1+\cos\left(2\pi\left(x-0.25\right)\right)}{2}\right)^{1.3} (its TeX so use something nice to render it)
+         * https://www.desmos.com/calculator/svjimn17wv
+         */
+        const ambient = Math.pow((1 + Math.cos(2 * Math.PI * (dnc.cycleTime - 0.25))) / 2, 1.3)
+        const MIN_BRIGHTNESS = 0.2;
+        const brightness = ambient + MIN_BRIGHTNESS * (1 - clamp(2 * ambient, 0, 1));
+
+        const sunAngleDeg = dnc.cycleTime * 360;
+        const rad = (sunAngleDeg * Math.PI) / 180;
+        const sunDir = [Math.cos(rad), Math.sin(rad)];
+        shader.render([
+            // Area light shader uniforms
+            {
+                u_lightCount: 1n,
+                u_lightSize: [[30]],
+                u_lightPos: [[18 + currentAnim.spriteSheetData.spriteSheetOffsetX, 24]],
+                u_lightColor: [[1.0, 1.0, 1.0, 1.0]], // rgba
+                u_ambient: brightness
+            }
+        ]);
+
+        const { screenPos, screenSize } = game.renderer.computeScreenRect(this.position, currentAnim.spriteData, currentAnim.forceScaleToSize);
+        
+        ctx.drawImage(
+            shader.canvas,
+            currentAnim.spriteSheetData.spriteSheetOffsetX,        // srcX
+            currentAnim.spriteSheetData.spriteSheetOffsetY,        // srcY
+            currentAnim.spriteData.frameWidth,                          // srcWidth
+            currentAnim.spriteData.frameHeight,                         // srcHeight
+            screenPos.x,                                    // dstX
+            screenPos.y,                                    // dstY
+            screenSize.x,                                   // dstWidth
+            screenSize.y                                    // dstHeight
+        );
     }
 
     update(keys: { [key: string]: boolean; }, deltaTime: number, clickCoords: Vec2): void {

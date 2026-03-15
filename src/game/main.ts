@@ -162,6 +162,7 @@ ASSET_MANAGER.queueDownload("res/shader/snow.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/christmas_light.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/area_light.frag.glsl");
 ASSET_MANAGER.queueDownload("res/shader/terrain.frag.glsl");
+ASSET_MANAGER.queueDownload("res/shader/flip.frag.glsl");
 
 // === UI Assets ===
 ASSET_MANAGER.queueDownload("res/img/ui/health_bar_endcap.png");
@@ -279,36 +280,36 @@ function main() {
         gameEngine.snapViewportToFollowedEnt();
         gameEngine.addUniqueEntity(new DayNightCycle(
             [
-            new ImagePath("res/img/background/sky/sun.png"),
-            new ImagePath("res/img/background/sky/moon.png")
+                new ImagePath("res/img/background/sky/sun.png"),
+                new ImagePath("res/img/background/sky/moon.png")
             ]
         ), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new SkyLayer(
             0,
             [
-            new ImagePath("res/img/background/background/day.png"),
-            new ImagePath("res/img/background/background/night.png"),
-            new ImagePath("res/img/background/background/nightWLights.png")
+                new ImagePath("res/img/background/background/day.png"),
+                new ImagePath("res/img/background/background/night.png"),
+                new ImagePath("res/img/background/background/nightWLights.png")
             ]
         ), DrawLayer.SKY);
         gameEngine.addUniqueEntity(new BackgroundLayer(
             0.3,
             [
-            new ImagePath("res/img/background/middleground/middle1.png"),
-            new ImagePath("res/img/background/middleground/middle2.png"),
-            new ImagePath("res/img/background/middleground/middle3.png"),
-            new ImagePath("res/img/background/middleground/middle4.png"),
-            new ImagePath("res/img/background/middleground/middle5.png")
+                new ImagePath("res/img/background/middleground/middle1.png"),
+                new ImagePath("res/img/background/middleground/middle2.png"),
+                new ImagePath("res/img/background/middleground/middle3.png"),
+                new ImagePath("res/img/background/middleground/middle4.png"),
+                new ImagePath("res/img/background/middleground/middle5.png")
             ]
         ), DrawLayer.BACKGROUND);
         gameEngine.addUniqueEntity(new ForegroundLayer(
             0.8,
             [
-            new ImagePath("res/img/background/foreground/fore1.png"),
-            new ImagePath("res/img/background/foreground/fore2.png"),
-            new ImagePath("res/img/background/foreground/fore3.png"),
-            new ImagePath("res/img/background/foreground/fore4.png"),
-            new ImagePath("res/img/background/foreground/fore5.png")
+                new ImagePath("res/img/background/foreground/fore1.png"),
+                new ImagePath("res/img/background/foreground/fore2.png"),
+                new ImagePath("res/img/background/foreground/fore3.png"),
+                new ImagePath("res/img/background/foreground/fore4.png"),
+                new ImagePath("res/img/background/foreground/fore5.png")
             ]
         ), DrawLayer.FOREGROUND);
         gameEngine.addUniqueEntity(new Mountain("Moutain_Level_01"), DrawLayer.MOUNTAIN_TERRAIN);
