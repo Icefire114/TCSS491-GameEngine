@@ -80,12 +80,12 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
 
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss running.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss attack.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup start transition.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup end transition.png");
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss running.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss attack.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup start transition.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup end transition.png");
+// ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Run.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Idle.png");
 
@@ -258,8 +258,6 @@ ASSET_MANAGER.queueDownload("res/aud/sfx/intro/loading.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/intro/start1.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/intro/start2.wav");
 ASSET_MANAGER.queueDownload("res/aud/sfx/intro/static.wav");
-
-
 
 
 ASSET_MANAGER.downloadAll((errorCount, successCount) => {
