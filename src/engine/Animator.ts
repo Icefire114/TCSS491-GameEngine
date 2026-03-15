@@ -34,6 +34,9 @@ export type SpriteSheetInfo = {
     // Offset to help the sprite sheet be centered due to transparency on the spritesheet
     offestX?: number;
 
+    // Optional per-state scale override (world units)
+    forceScaleToSize?: Vec2;
+
     // what frame to fire the weapon on (only used for attack animations)
     fireOnFrame?: number;
 
@@ -47,6 +50,7 @@ export type AnimationData = {
     frameHeight: number,
     frameCount: number,
     offsetX: number,
+    forceScaleToSize?: Vec2,
 };
 
 export class Animator {
@@ -67,6 +71,7 @@ export class Animator {
             frameHeight: number,
             frameCount: number,
             offsetX: number,
+            forceScaleToSize?: Vec2,
             fireOnFrame?: number,
             animationSpeed: number
         } | null
@@ -98,6 +103,7 @@ export class Animator {
                 frameCount: spriteSheet[0].frameCount,
                 frameWidth: spriteSheet[0].frameWidth,
                 offsetX: spriteSheet[0].offestX ?? 0,
+                forceScaleToSize: spriteSheet[0].forceScaleToSize,
                 fireOnFrame: spriteSheet[0].fireOnFrame,
                 animationSpeed: spriteSheet[0].animationSpeed ?? 1.0
             }
@@ -197,6 +203,7 @@ export class Animator {
             );
         }
         let frameIdx = this.computeFrameIdx(currentAnim);
+        const scaleToUse = currentAnim.forceScaleToSize ?? this.forceScaleToSize;
         GameEngine.g_INSTANCE.renderer.drawSpriteAtWorldPos(
             pos,
             currentAnim,
@@ -204,7 +211,7 @@ export class Animator {
                 spriteSheetOffsetX: frameIdx * currentAnim.frameWidth,
                 spriteSheetOffsetY: 0
             },
-            this.forceScaleToSize
+            scaleToUse
         );
     }
 

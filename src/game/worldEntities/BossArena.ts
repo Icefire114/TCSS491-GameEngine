@@ -32,7 +32,6 @@ export class BossArena implements Entity {
     private outroFadeTime = 0;
 
     private stagedPlayerX = 0;
-    private stagedPlayerStartX = 0;
 
     isActive = false;
     private boss: Boss | null = null;
@@ -48,7 +47,7 @@ export class BossArena implements Entity {
         window.addEventListener("boss:defeated", () => this.deactivate());
     }
 
-    update(keys: { [key: string]: boolean }, deltaTime: number, _click: Vec2): void {
+    update(_keys: { [key: string]: boolean }, deltaTime: number, _click: Vec2): void {
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
         if (!player) return;
 
@@ -113,10 +112,8 @@ export class BossArena implements Entity {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain | undefined;
         if (!mountain) return;
 
-        // Snapshot old player position (boss starts here)
         const oldPlayerX = player.position.x;
 
-        // Stage positions: player right, boss left
         this.stagedPlayerX = oldPlayerX + 50;
         const stagedBossX = this.minX + 3;
 
@@ -140,7 +137,6 @@ export class BossArena implements Entity {
     }
 
     private deactivate(): void {
-        // boss died, so unlock arena
         this.isActive = false;
         this.boss     = null;
         this.bossDefeated = true;
@@ -157,22 +153,6 @@ export class BossArena implements Entity {
         if (!this.isActive && !this.isOutroFading) return;
 
         if (this.isActive) {
-            // --- Arena boundary lines ---
-            // mainly for test but we can keep it if needed
-            const scale  = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
-            const leftX  = (this.minX - game.viewportX) * scale / game.zoom;
-
-            ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
-            ctx.lineWidth   = 12;
-            ctx.setLineDash([16, 8]);
-            ctx.beginPath();
-            ctx.moveTo(leftX,  0);
-            ctx.lineTo(leftX,  ctx.canvas.height);
-            // ctx.moveTo(rightX, 0);
-            // ctx.lineTo(rightX, ctx.canvas.height);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
             // --- Boss health bar HUD ---
             if (this.boss) {
                 const pct     = this.boss.health / this.boss.maxHealth;

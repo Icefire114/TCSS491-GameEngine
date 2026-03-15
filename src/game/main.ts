@@ -83,7 +83,11 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Dead.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Thrower Zombie/Run.png");
 
-ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss running.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss attack.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup start transition.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup end transition.png");
 
 
 // === Item Assets ===
@@ -112,6 +116,7 @@ ASSET_MANAGER.queueDownload("res/img/ammo/RPGRocket.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/RPGExplode.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/Lazer.png");
 ASSET_MANAGER.queueDownload("res/img/ammo/SingleLazer.png");
+ASSET_MANAGER.queueDownload("res/img/ammo/SingleIce.png");
 
 
 

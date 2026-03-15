@@ -312,7 +312,7 @@ export class Mountain extends ForceDraw implements Entity {
             console.log(`Spawning SafeZone at x: ${currentX}`);
         }
         // We can only spawn a ravine if we're not in a safe zone
-        else if (farEnoughFromSafeZoneExit && pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
+        else if (!this.bossGateActive && farEnoughFromSafeZoneExit && pastSpawnPoint && coolDownRavine && this.rng.next() < 0.1) {
             this.startRavineSequence();
         }
         else {
