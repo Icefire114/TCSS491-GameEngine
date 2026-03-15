@@ -286,7 +286,7 @@ export class Mountain extends ForceDraw implements Entity {
                 GameEngine.g_INSTANCE.viewportX = newX - 300;
                 console.log(`Teleported to X: ${newX.toFixed(0)}, Y: ${newY.toFixed(0)}`);
 
-                keys["T"] = false;
+                keys["t"] = false;
             }
         }
     }
