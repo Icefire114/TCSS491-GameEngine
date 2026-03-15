@@ -2,7 +2,6 @@ import { Background } from "../../worldBackground/Background.js";
 import { Vec2 } from "../../../engine/Vec2.js";
 import { ImagePath } from "../../../engine/assetmanager.js";
 import { GameEngine } from "../../../engine/gameengine.js";
-import { G_CONFIG } from "../../CONSTANTS.js";
 import { WebGL } from "../../../engine/WebGL/WebGL.js";
 import { ShaderRegistry } from "../../../engine/WebGL/ShaderRegistry.js";
 import { clamp, unwrap } from "../../../engine/util.js";

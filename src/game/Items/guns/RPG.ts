@@ -22,38 +22,38 @@ export class RPG extends Gun {
     public unlocked = false;
 
     animator = new Animator(
+        [
             [
-                [ 
-                    {
-                        sprite: new ImagePath("res/img/guns/RPG/Shot.png"),
-                        frameCount: 4,
-                        frameHeight: 21,
-                        frameWidth: 50,
-                        fireOnFrame: 2
-                    },
-                    AnimationState.ATTACK
-                ],
-                [ 
-                    {
-                        sprite: new ImagePath("res/img/guns/IdleGun.png"),
-                        frameCount: 1,
-                        frameHeight: 1,
-                        frameWidth: 1,
-                    },
-                    AnimationState.IDLE
-                ],
-                [
-                    {
-                        sprite: new ImagePath("res/img/guns/IdleGun.png"),
-                        frameCount: 1,
-                        frameHeight: 1,
-                        frameWidth: 1,
-                    },
-                    AnimationState.RELOAD
-                ]
+                {
+                    sprite: new ImagePath("res/img/guns/RPG/Shot.png"),
+                    frameCount: 4,
+                    frameHeight: 21,
+                    frameWidth: 50,
+                    fireOnFrame: 2
+                },
+                AnimationState.ATTACK
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/guns/IdleGun.png"),
+                    frameCount: 1,
+                    frameHeight: 1,
+                    frameWidth: 1,
+                },
+                AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/guns/IdleGun.png"),
+                    frameCount: 1,
+                    frameHeight: 1,
+                    frameWidth: 1,
+                },
+                AnimationState.RELOAD
             ]
-        );
-    
+        ]
+    );
+
     constructor() {
         super(RPG.TAG,
             RPG.SPAWN_AMMO,
@@ -72,10 +72,10 @@ export class RPG extends Gun {
         this.animator.synchroizeFrames(RPG.FIRE_RATE, AnimationState.ATTACK);
     }
 
-     /**
-     * 
-     * @returns A bullet spawned at the muzzle of the gun
-     */
+    /**
+    * 
+    * @returns A bullet spawned at the muzzle of the gun
+    */
     protected createBullet(): Bullet {
         const localOffsetX = 1.0;  // along the gun barrel direction
         const localOffsetY = -0.2;   // perpendicular to the gun

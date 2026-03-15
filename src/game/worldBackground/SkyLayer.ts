@@ -26,7 +26,7 @@ export class SkyLayer extends Background {
         const intro = game.getUniqueEntityByTag("intro_screen") as any;
         const blendAlpha = intro ? intro.getAlpha() : 0;
 
-        const daySprite  = game.getSprite(this.daySprite);
+        const daySprite = game.getSprite(this.daySprite);
         const nightSprite = game.getSprite(this.rareNightSprite)
 
 

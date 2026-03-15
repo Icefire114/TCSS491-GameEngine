@@ -1,6 +1,6 @@
 import { DrawLayer, ForceDraw } from "./types.js";
 import { Vec2 } from "./Vec2.js";
-import { Entity, EntityID } from "./Entity.js";
+import { Entity } from "./Entity.js";
 import { Timer } from "./timer.js";
 import { AssetManager, AudioPath, ImagePath } from "./assetmanager.js";
 import { unwrap } from "./util.js";

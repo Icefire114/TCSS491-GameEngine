@@ -456,7 +456,7 @@ export class Player implements Entity, Collidable {
         // Check if the player has the crown buff or not 
         const hasCrown = this.buffs.some(b => b.tag === "crown_boost");
         // Double the value if player such buff
-        const multiplier = hasCrown ? 2 : 1; 
+        const multiplier = hasCrown ? 2 : 1;
 
         this.currency += (enemy.reward * multiplier);
     }

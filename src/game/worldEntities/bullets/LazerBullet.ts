@@ -52,7 +52,7 @@ export class LazerBullet extends Bullet {
         }
     }
 
-    onTerrainHit(): void { 
+    onTerrainHit(): void {
         this.removeFromWorld = true;
     }
 
@@ -62,7 +62,7 @@ export class LazerBullet extends Bullet {
 
     draw(ctx: CanvasRenderingContext2D, game: GameEngine): void {
         ctx.save();
-        
+
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
@@ -74,7 +74,7 @@ export class LazerBullet extends Bullet {
     }
 
     update(keys: { [key: string]: boolean }, deltaTime: number): void {
-        this.animator.updateAnimState(AnimationState.IDLE, deltaTime); 
+        this.animator.updateAnimState(AnimationState.IDLE, deltaTime);
         super.update(keys, deltaTime);
     }
 }

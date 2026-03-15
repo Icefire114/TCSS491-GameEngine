@@ -1,5 +1,3 @@
-import { Vec2 } from "./Vec2";
-
 export type DrawLayer = number & { __brand: "DrawLayer" };
 export namespace DrawLayer {
     export const HIGHEST: DrawLayer = 1000000 as DrawLayer;

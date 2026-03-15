@@ -1,5 +1,4 @@
 import { AudioPath } from "./assetmanager.js";
-import { GameEngine } from "./gameengine.js";
 import { AssetManager } from "./assetmanager.js";
 
 export class AudioManager {
@@ -75,7 +74,7 @@ export class AudioManager {
 
         if (delay === 0)
             source.start(0);
-        else    
+        else
             source.start(AudioManager.m_audioContext.currentTime + delay);
     }
 
@@ -107,7 +106,7 @@ export class AudioManager {
      * will play the audiopath with no stacking.
      * If the same audiopath is already playing then it is restarted
      */
-   public static playInstanceSFX(key: AudioPath, volume: number = 0.5): void {
+    public static playInstanceSFX(key: AudioPath, volume: number = 0.5): void {
 
         const buffer = this.assetManager.getAudio(key);
         if (!buffer) return;
@@ -118,7 +117,7 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-            } catch {}
+            } catch { }
             this.activeSources.delete(key.asRaw());
         }
 
@@ -136,7 +135,7 @@ export class AudioManager {
         this.activeSources.set(key.asRaw(), source);
 
         source.onended = () => {
-            if (this.activeSources.get(key.asRaw()) === source) 
+            if (this.activeSources.get(key.asRaw()) === source)
                 this.activeSources.delete(key.asRaw());
         };
     }
@@ -166,7 +165,7 @@ export class AudioManager {
         this.activeSources.set(key.asRaw(), source);
 
         source.onended = () => {
-            if (this.activeSources.get(key.asRaw()) === source) 
+            if (this.activeSources.get(key.asRaw()) === source)
                 this.activeSources.delete(key.asRaw());
         };
     }
@@ -183,7 +182,7 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-            } catch {}
+            } catch { }
             this.activeSources.delete(key.asRaw());
         }
     }
@@ -295,7 +294,7 @@ export class AudioManager {
             try {
                 existing.onended = null; // prevent onended from firing after we stop it
                 existing.stop(0);
-            } catch {}
+            } catch { }
             this.activeSources.delete(path.asRaw());
         }
     }

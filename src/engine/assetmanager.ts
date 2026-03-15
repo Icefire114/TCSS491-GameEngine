@@ -16,7 +16,7 @@ export class AssetManager {
         this.m_errorCount = 0;
 
         this.m_imageCache = {};
-         this.m_audioBufferCache = {};
+        this.m_audioBufferCache = {};
 
         this.m_downloadQueue = [];
         this.m_shaderSourceCache = {};

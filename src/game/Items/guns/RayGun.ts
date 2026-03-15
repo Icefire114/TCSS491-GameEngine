@@ -25,38 +25,38 @@ export class RayGun extends Gun {
     public unlocked = false;
 
     animator = new Animator(
+        [
             [
-                [ 
-                    {
-                        sprite: new ImagePath("res/img/guns/ray_gun/Shot.png"),
-                        frameCount: 1,
-                        frameHeight: 26,
-                        frameWidth: 41,
-                        fireOnFrame: 1
-                    },
-                    AnimationState.ATTACK
-                ],
-                [ 
-                    {
-                        sprite: new ImagePath("res/img/guns/IdleGun.png"),
-                        frameCount: 1,
-                        frameHeight: 1,
-                        frameWidth: 1,
-                    },
-                    AnimationState.IDLE
-                ],
-                [
-                    {
-                        sprite: new ImagePath("res/img/guns/IdleGun.png"),
-                        frameCount: 1,
-                        frameHeight: 1,
-                        frameWidth: 1,
-                    },
-                    AnimationState.RELOAD
-                ]
+                {
+                    sprite: new ImagePath("res/img/guns/ray_gun/Shot.png"),
+                    frameCount: 1,
+                    frameHeight: 26,
+                    frameWidth: 41,
+                    fireOnFrame: 1
+                },
+                AnimationState.ATTACK
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/guns/IdleGun.png"),
+                    frameCount: 1,
+                    frameHeight: 1,
+                    frameWidth: 1,
+                },
+                AnimationState.IDLE
+            ],
+            [
+                {
+                    sprite: new ImagePath("res/img/guns/IdleGun.png"),
+                    frameCount: 1,
+                    frameHeight: 1,
+                    frameWidth: 1,
+                },
+                AnimationState.RELOAD
             ]
-        );
-    
+        ]
+    );
+
     constructor() {
         super(RayGun.TAG,
             RayGun.SPAWN_AMMO,
@@ -82,7 +82,7 @@ export class RayGun extends Gun {
         const scale = ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
         const screenX = (this.position.x - game.viewportX) * scale / game.zoom;
         const screenY = (this.position.y - game.viewportY) * scale / game.zoom;
-        
+
         ctx.translate(screenX, screenY);
         ctx.rotate(this.travelAngle);
 
@@ -91,10 +91,10 @@ export class RayGun extends Gun {
         ctx.restore();
     }
 
-     /**
-     * 
-     * @returns A bullet spawned at the muzzle of the gun
-     */
+    /**
+    * 
+    * @returns A bullet spawned at the muzzle of the gun
+    */
     protected createBullet(): Bullet {
         const originX = this.position.x + Math.cos(this.travelAngle) - Math.sin(this.travelAngle);
         const originY = this.position.y + Math.sin(this.travelAngle) + Math.cos(this.travelAngle);

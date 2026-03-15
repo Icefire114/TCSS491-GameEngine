@@ -144,10 +144,10 @@ export class RavineDeathZone implements Entity {
 
         // List of all zombie types 
         const zombieTags = [
-            "BasicZombie", 
-            "FastZombie", 
-            "GiantZombie", 
-            "ExplodingZombie", 
+            "BasicZombie",
+            "FastZombie",
+            "GiantZombie",
+            "ExplodingZombie",
             "ThrowerZombie"
         ];
 
@@ -155,22 +155,22 @@ export class RavineDeathZone implements Entity {
         // Loop through all zombies and check if they are in contact with the ravine zones
         for (const tag of zombieTags) {
             const zombies = engine.getEntitiesByTag(tag);
-            
+
             // Loop through all zombies of the current type
             for (const entity of zombies) {
-                const z = entity as any; 
-                
+                const z = entity as any;
+
                 // If the zombie is already marked for removal or doesn't have a position, skip it
                 if (!z.position || z.removeFromWorld) {
                     continue;
                 }
 
                 const contact = this.checkContact(z.position.x, z.position.y, 2.5, 5.25);
-                
+
                 // If ozombie hit the death zone, delete it
                 if (contact === "death") {
-                    z.removeFromWorld = true; 
-                } 
+                    z.removeFromWorld = true;
+                }
                 // If zombie hit the bounce zone, push it in the opposite direction
                 else if (contact === "bounce") {
                     const nearestWall = this.getNearestWall(z.position.x);
@@ -178,7 +178,7 @@ export class RavineDeathZone implements Entity {
                     if (z.velocity) {
                         const bounceForceX = 15;
                         const bounceForceY = -10;
-                        
+
                         // Handles the bounce direction and force based on which wall the zombie is closer to
                         if (nearestWall === "left") {
                             z.velocity.x = bounceForceX;
@@ -191,8 +191,8 @@ export class RavineDeathZone implements Entity {
                         }
 
                         // handles the zombie bounce state
-                        z.bounceTimer = 0.3;  
-                        z.isBouncing = true;  
+                        z.bounceTimer = 0.3;
+                        z.isBouncing = true;
                     }
                 }
             }

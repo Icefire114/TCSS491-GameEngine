@@ -41,7 +41,7 @@ export class IceBeamBullet extends Bullet {
     }
 
     protected onEnemyHit(target: Entity): void {
-  
+
     }
 
     onTerrainHit(): void {

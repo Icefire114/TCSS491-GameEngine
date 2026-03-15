@@ -2,7 +2,7 @@ import { ImagePath } from "../../engine/assetmanager.js";
 import { Entity, EntityID } from "../../engine/Entity.js";
 import { GameEngine } from "../../engine/gameengine.js";
 import { BoxCollider } from "../../engine/physics/BoxCollider.js";
-import { Collidable, Collider } from "../../engine/physics/Collider.js";
+import { Collidable } from "../../engine/physics/Collider.js";
 import { Vec2 } from "../../engine/Vec2.js";
 
 export class BoxTrigger implements Entity, Collidable {

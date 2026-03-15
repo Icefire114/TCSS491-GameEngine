@@ -16,21 +16,18 @@ import { JumpBoostItem } from "../../Items/JumpBoostItem.js";
 import { InfectionImmunityItem } from "../../Items/InfectionImmunity.js";
 import { ArmoryUI } from "./ArmoryUI.js";
 
-
 interface ShopItem {
     id: string;
     name: string;
     description: string;
     cost: number;
-    rare?: boolean; 
+    rare?: boolean;
     spritePath?: string;
     frameWidth?: number;
     frameHeight?: number;
     rect?: { x: number, y: number, w: number, h: number };
     buttonRect?: { x: number, y: number, w: number, h: number };
 }
-
-
 
 /**
  * Class that represents the Shop UI
@@ -57,8 +54,8 @@ export class ShopUI extends ForceDraw implements Entity {
     // The Ammo Representation image 
     private static AMMO_SPRITES = {
         [AssultRifle.TAG]: { path: "res/img/items/rifle.png", w: 43, h: 24 },
-        [RPG.TAG]:       { path: "res/img/items/rpg.png",    w: 47, h: 11 },
-        [RayGun.TAG]:    { path: "res/img/items/ray_gun.png", w: 38, h: 15 },
+        [RPG.TAG]: { path: "res/img/items/rpg.png", w: 47, h: 11 },
+        [RayGun.TAG]: { path: "res/img/items/ray_gun.png", w: 38, h: 15 },
     };
 
     // Represent all potential items to appear in shop
@@ -134,7 +131,7 @@ export class ShopUI extends ForceDraw implements Entity {
             description: "Grants temporary\nspeed boost.",
             cost: 15,
             spritePath: "res/img/items/energy_drink.png",
-            frameHeight: 25, 
+            frameHeight: 25,
             frameWidth: 35,
         },
         {
@@ -143,7 +140,7 @@ export class ShopUI extends ForceDraw implements Entity {
             description: "Earn more\nmoney from zombies.",
             cost: 20,
             spritePath: "res/img/items/king.png",
-            frameHeight: 25, 
+            frameHeight: 25,
             frameWidth: 28,
         },
     ];
@@ -160,12 +157,12 @@ export class ShopUI extends ForceDraw implements Entity {
      */
     private createBuff(itemId: string): Buff | null {
         switch (itemId) {
-            case "ammo":      return new AmmoRestore();
-            case "health":    return new InstantHealthPickupBuff();
-            case "shield":    return new ShieldRestorePickupItem();
-            case "jump":      return new JumpBoostItem();
-            case "immunity":  return new InfectionImmunityItem();
-            default:          return null;
+            case "ammo": return new AmmoRestore();
+            case "health": return new InstantHealthPickupBuff();
+            case "shield": return new ShieldRestorePickupItem();
+            case "jump": return new JumpBoostItem();
+            case "immunity": return new InfectionImmunityItem();
+            default: return null;
         }
     }
 
@@ -187,14 +184,14 @@ export class ShopUI extends ForceDraw implements Entity {
             if (!armoryUI) {
                 return false;
             }
-            
+
             // Handles the aftermath of the purchase 
             const gunId = item.id === "unlock_rpg" ? RPG.TAG : RayGun.TAG;
             armoryUI.unlockItem(gunId);
             player.currency -= item.cost;
             this.showFlash(`Unlocked: ${item.name}`, "#4DFFB4");
             AudioManager.playSFX(new AudioPath("res/aud/sfx/uiSfx/shop/buy.wav"), 0.7);
-            
+
             // Remove it from the shop so it can't be bought twice
             this.items = this.items.filter(i => i.id !== item.id);
             return true;
@@ -325,11 +322,11 @@ export class ShopUI extends ForceDraw implements Entity {
 
         // Ammo Card: dyanmic where ammo image is base on the player gun
         const ammoItem = this.items.find(i => i.id === "ammo");
-    
+
         if (player && ammoItem && player.weapon) {
-            const weaponTag = player.weapon.tag; 
+            const weaponTag = player.weapon.tag;
             const spriteData = ShopUI.AMMO_SPRITES[weaponTag];
-            
+
             if (spriteData) {
                 ammoItem.spritePath = spriteData.path;
                 ammoItem.frameWidth = spriteData.w;
@@ -509,12 +506,12 @@ export class ShopUI extends ForceDraw implements Entity {
 
         // Debuggging to force see the gun
         const debugRare = pool.find(i => i.id === "speed");
-            if (debugRare) {
-                picked.push({ ...debugRare });
-                pool.splice(pool.indexOf(debugRare), 1);
-            }
+        if (debugRare) {
+            picked.push({ ...debugRare });
+            pool.splice(pool.indexOf(debugRare), 1);
+        }
 
-      
+
 
         // Choosing our random items 
         while (picked.length < 3 && pool.length > 0) {
@@ -533,5 +530,5 @@ export class ShopUI extends ForceDraw implements Entity {
         }
 
         this.items = picked;
-    }   
+    }
 }

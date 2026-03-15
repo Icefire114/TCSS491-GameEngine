@@ -23,7 +23,7 @@ export class AssultRifle extends Gun {
 
     animator = new Animator(
         [
-            [ 
+            [
                 {
                     sprite: this.sprite,
                     frameCount: 4,
@@ -34,7 +34,7 @@ export class AssultRifle extends Gun {
                 },
                 AnimationState.ATTACK
             ],
-            [ 
+            [
                 {
                     sprite: new ImagePath("res/img/guns/IdleGun.png"),
                     frameCount: 1,
@@ -56,11 +56,11 @@ export class AssultRifle extends Gun {
     );
 
     constructor() {
-        super(AssultRifle.TAG, 
-            AssultRifle.SPAWN_AMMO, 
-            AssultRifle.MAG_SIZE, 
-            AssultRifle.FIRE_RATE, 
-            AssultRifle.RELOAD_TIME, 
+        super(AssultRifle.TAG,
+            AssultRifle.SPAWN_AMMO,
+            AssultRifle.MAG_SIZE,
+            AssultRifle.FIRE_RATE,
+            AssultRifle.RELOAD_TIME,
         );
 
         this.syncFrames();
