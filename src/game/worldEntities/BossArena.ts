@@ -33,7 +33,6 @@ export class BossArena implements Entity {
     private outroFadeTime = 0;
 
     private stagedPlayerX = 0;
-    private stagedPlayerStartX = 0;
 
     isActive = false;
     private boss: Boss | null = null;
@@ -49,7 +48,7 @@ export class BossArena implements Entity {
         window.addEventListener("boss:defeated", () => this.deactivate());
     }
 
-    update(keys: { [key: string]: boolean }, deltaTime: number, _click: Vec2): void {
+    update(_keys: { [key: string]: boolean }, deltaTime: number, _click: Vec2): void {
         const player = GameEngine.g_INSTANCE.getUniqueEntityByTag("player") as Player | undefined;
         if (!player) return;
 
@@ -114,10 +113,8 @@ export class BossArena implements Entity {
         const mountain = GameEngine.g_INSTANCE.getUniqueEntityByTag("mountain") as Mountain | undefined;
         if (!mountain) return;
 
-        // Snapshot old player position (boss starts here)
         const oldPlayerX = player.position.x;
 
-        // Stage positions: player right, boss left
         this.stagedPlayerX = oldPlayerX + 50;
         const stagedBossX = this.minX + 3;
 
@@ -141,7 +138,6 @@ export class BossArena implements Entity {
     }
 
     private deactivate(): void {
-        // boss died, so unlock arena
         this.isActive = false;
         this.boss = null;
         this.bossDefeated = true;
