@@ -109,19 +109,19 @@ export class Animator {
         this.eventCallBacks.set(event, callback);
     }
 
-    
+
 
     synchroizeFrames(duration: number, state: AnimationState): void {
         // Get the attack animation info
         const animInfo = this.spriteSheet[state];
         if (!animInfo) return;
-        
+
         // Calculate how long the animation naturally takes at base speed
         const baseAnimDuration = animInfo.frameCount / this.ANIMATION_FPS;
-        
+
         // Calculate speed multiplier needed
         const animationSpeed = baseAnimDuration * duration;
-        
+
         // Update the animation speed
         animInfo.animationSpeed = animationSpeed;
     }
@@ -191,6 +191,24 @@ export class Animator {
         }
 
         return frameIdx;
+    }
+
+    public getCurrentFrame(): { spriteData: AnimationData, spriteSheetData: { spriteSheetOffsetX: number, spriteSheetOffsetY: number }, forceScaleToSize: Vec2 | undefined, } {
+        const currentAnim = this.spriteSheet[this.currentState];
+        if (!currentAnim) {
+            throw new Error(
+                `SpriteSheet for animation state ${this.currentState} is null`
+            );
+        }
+        let frameIdx = this.computeFrameIdx(currentAnim);
+        return {
+            spriteData: currentAnim,
+            spriteSheetData: {
+                spriteSheetOffsetX: frameIdx * currentAnim.frameWidth,
+                spriteSheetOffsetY: 0
+            },
+            forceScaleToSize: this.forceScaleToSize
+        }
     }
 
     drawCurrentAnimFrameAtPos(pos: Vec2): void {

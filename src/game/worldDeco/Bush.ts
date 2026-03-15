@@ -77,7 +77,7 @@ export class Bush implements Entity {
             // Sun shader uniforms
             {
                 u_sunDirection: sunDir,
-                u_intensity: 0.5 * ambient,
+                u_intensity: 0.05 * ambient,
                 u_baseLight: brightness,
                 u_warmth: 0.15 * ambient
             },

@@ -164,7 +164,7 @@ export class Mountain extends ForceDraw implements Entity {
             {
                 u_viewportOffset: [
                     game.viewportX / GameEngine.WORLD_UNITS_IN_VIEWPORT,
-                    game.viewportY * -0.018
+                    game.viewportY * -0.018 // behold the magic number
                 ]
             },
             // Sun shader uniforms

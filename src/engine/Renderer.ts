@@ -151,7 +151,7 @@ export class Renderer {
         }
     }
 
-    private computeScreenRect(pos: Vec2, anim: AnimationData, forceScaleToSize?: Vec2): { screenPos: Vec2, screenSize: Vec2 } {
+    public computeScreenRect(pos: Vec2, anim: AnimationData, forceScaleToSize?: Vec2): { screenPos: Vec2, screenSize: Vec2 } {
         const mInPx = this.ctx.canvas.width / GameEngine.WORLD_UNITS_IN_VIEWPORT;
 
         const worldSize = new Vec2(
