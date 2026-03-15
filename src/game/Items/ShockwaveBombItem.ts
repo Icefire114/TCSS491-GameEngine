@@ -8,20 +8,20 @@ import { Buff, BuffType } from "./Buff.js";
 export class ShockwaveBombItem implements Buff {
     type: BuffType = BuffType.INSTANT_APPLY;
     tag: string = "ShockwaveBombItem";
-    sprite: ImagePath = new ImagePath("res/img/items/bomb.png"); 
+    sprite: ImagePath = new ImagePath("res/img/items/bomb.png");
 
     onApply(): void {
         AudioManager.playSFX(new AudioPath("res/aud/sfx/items/shockWaveExplosion2.wav"), 0.7);
         const player = unwrap(GameEngine.g_INSTANCE.getUniqueEntityByTag("player")) as Player;
         const blastRadius = 5000;
-        const blastForce = 2500; 
+        const blastForce = 2500;
 
         // ALl zombies types tags
         const zombieTags = ["zombie", "BasicZombie", "ThrowerZombie", "FastZombie", "ExplodingZombie", "GiantZombie"];
-        
+
         zombieTags.forEach(tag => {
             const enemies = GameEngine.g_INSTANCE.getEntitiesByTag(tag);
-            
+
             enemies.forEach(enemy => {
                 const dx = enemy.position.x - player.position.x;
                 const dy = enemy.position.y - player.position.y;
@@ -29,10 +29,10 @@ export class ShockwaveBombItem implements Buff {
 
                 if (distance < blastRadius && distance > 0) {
                     const dirX = dx / distance;
-                    
+
                     // Applying the force both x andy 
                     enemy.velocity.x += dirX * blastForce;
-                    enemy.velocity.y = -1200; 
+                    enemy.velocity.y = -1200;
                 }
             });
         });

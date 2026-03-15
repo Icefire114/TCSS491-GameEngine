@@ -6,8 +6,8 @@ export class SpeedBoostItem implements Buff, TempBuff {
     type: BuffType = BuffType.TEMP_BUFF;
     tag: string = "speed_boost";
     sprite: ImagePath = new ImagePath("res/img/items/energy_drink.png");
-    
-    startingDuration: number = 8; 
+
+    startingDuration: number = 8;
     currentDuration: number = 8;
 
     onApply(): void {
