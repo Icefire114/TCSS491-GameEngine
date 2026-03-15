@@ -85,6 +85,10 @@ ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss attack.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup start transition.png");
 ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss powerup end transition.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/Boss zombie/boss_zombie.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Run.png");
+ASSET_MANAGER.queueDownload("res/img/zombies/exploder zombie/Idle.png");
+
 
 
 // === Item Assets ===
