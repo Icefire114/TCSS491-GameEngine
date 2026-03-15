@@ -4,7 +4,6 @@ import { GameEngine } from "../engine/gameengine.js";
 import { DrawLayer } from "../engine/types.js";
 import { Vec2 } from "../engine/Vec2.js";
 import { WebGL } from "../engine/WebGL/WebGL.js";
-import { Background } from "./background.js";
 import { BasicZombie } from "./zombies/BasicZombie.js";
 import { G_CONFIG } from "./CONSTANTS.js";
 import { AmmoRestore } from "./Items/AmmoRestore.js";
